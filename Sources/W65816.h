@@ -23,6 +23,11 @@ public:
 
     bool VDA();
     bool VPA();
+
+    uint16_t getPC();
+    uint16_t getAcc();
+    uint8_t getIR();
+
 private:
     Bus * bus;
 
@@ -35,7 +40,7 @@ private:
 
     struct Register16
     {
-        uint8_t low,high;
+        uint8_t low = 0,high = 0;
         uint16_t val() { return (uint16_t(high) << 8) | low; }
 
         void set(uint16_t v)
@@ -63,6 +68,7 @@ private:
     uint8_t ir;
     Register16 adr;
     Register16 idb;
+    Register16 acc;
 
     bool vda = true;
     bool vpa = true;
@@ -81,7 +87,7 @@ private:
     void dummyFetch(Register16 *src);
     void moveReg(uint8_t * src, uint8_t * dst);
 
-    void instStage();
+    void instStage(); //Dummy
 
     void incPC();
     void opPrefetchInIDB();

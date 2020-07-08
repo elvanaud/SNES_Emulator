@@ -14,9 +14,9 @@ public:
     AddressingMode();
 
     vector<vector<Stage>> gen(std::function<void(W65816*)>);
-    void setStages(vector<vector<Stage>> &&stages);
+    void setStages(vector<vector<Stage>> stages);
     vector<std::function<void()>> Signals();
-    void setSignals(vector<std::function<void()>> &&s);
+    void setSignals(vector<std::function<void()>> s);
 private:
     vector<vector<Stage>> stages;
     vector<std::function<void()>> signals;

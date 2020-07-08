@@ -33,12 +33,27 @@ void W65816::initializeOpcodes()
 
 void W65816::instStage()
 {
+    ; //Dummy
+}
 
+uint16_t W65816::getPC()
+{
+    return pc.val();
+}
+
+uint16_t W65816::getAcc()
+{
+    return acc.val();
+}
+
+uint8_t W65816::getIR()
+{
+    return ir;
 }
 
 void W65816::ADC()
 {
-
+    ++acc;
 }
 
 void W65816::incPC()
@@ -117,12 +132,15 @@ bool W65816::VPA()
 void W65816::dummyFetch(Register16 *src)
 {
     //setInvalidAddress();
+    vda = vpa = 0;
     bus->read(src->val());
 }
 
 void W65816::fetch(Register16 *src, uint8_t * dst)
 {
     //setValidAddress();
+    if(src == &pc){ vpa = true; vda = tcycle == 0; }
+    else{ vda = true; vpa = false; }
     //generateAddressWithBank();
     bus->read(src->val());
     *dst =  bus->DMR();
@@ -147,10 +165,8 @@ void W65816::tick()
         stage(this);
     }
     processSignals();
-    cout << pc.val() << endl,
-
     //checkInterupts();
-
+    cout << tcycle << endl;
     ++tcycle;
 
     if(tcycle >= pipeline.size())
