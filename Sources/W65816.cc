@@ -13,8 +13,42 @@ using namespace std::placeholders;
 
 W65816::W65816()
 {
+    initializeAddressingModes();
+    initializeOpcodes();
     reloadPipeline();
     pc.set(0x100);
+}
+
+void W65816::initializeAddressingModes()
+{
+    Immediate.setStages({{Stage(Stage::SIG_MEM16_ONLY,fetchInc,&pc,&idb.high)},{Stage(Stage::SIG_INST,instStage)}});
+    Immediate.setSignals({bind(incPC,this),bind(opPrefetchInIDB,this)});
+
+}
+
+void W65816::initializeOpcodes()
+{
+    decodingTable[0x69] = Instruction("ADC", Immediate, ADC);
+}
+
+void W65816::instStage()
+{
+
+}
+
+void W65816::ADC()
+{
+
+}
+
+void W65816::incPC()
+{
+    if(tcycle == 1) ++pc;
+}
+
+void W65816::opPrefetchInIDB()
+{
+    if(tcycle == 1) idb.low = adr.low;
 }
 
 void W65816::attachBus(Bus * b)
@@ -27,7 +61,8 @@ void W65816::reloadPipeline()
     pipeline.clear();
     tcycle = 0;
 
-    vector<StageType> T1 = {bind(fetchInc,_1,&pc,&ir)};
+    vector<StageType> T1 = {Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&ir).get()};
+    //T1.push_back(lastStage);
     pipeline.push_back(T1);
 
     vector<StageType> T2 = {Stage(Stage::SIG_ALWAYS,fetch,&pc,&adr.low).get(), Stage(Stage::SIG_ALWAYS,decode).get()};
@@ -36,7 +71,21 @@ void W65816::reloadPipeline()
 
 bool W65816::isStageEnabled(Stage &st)
 {
-    return true;
+    switch(st.getSignal())
+    {
+        case Stage::SIG_ALWAYS: return true;
+        case Stage::SIG_MEM16_ONLY: return !mem8;
+        default: return true;
+    }
+    //return true;
+}
+
+void W65816::processSignals()
+{
+    for(auto & sig : decodingTable[ir].Signals())
+    {
+        sig();
+    }
 }
 
 void W65816::decode()
@@ -97,8 +146,9 @@ void W65816::tick()
     {
         stage(this);
     }
+    processSignals();
     cout << pc.val() << endl,
-    //processSignals();
+
     //checkInterupts();
 
     ++tcycle;

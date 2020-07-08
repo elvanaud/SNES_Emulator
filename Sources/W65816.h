@@ -11,6 +11,7 @@ using std::vector;
 class Bus;
 #include "Instruction.h"
 #include "Types.h"
+#include "AddressingMode.h"
 
 
 class W65816
@@ -27,6 +28,8 @@ private:
 
     vector<vector<StageType>> pipeline;
     unsigned int tcycle = 0;
+    bool mem8 = true;
+    bool index8 = true;
 
     Instruction decodingTable[0x100];
 
@@ -59,12 +62,17 @@ private:
     Register16 pc;
     uint8_t ir;
     Register16 adr;
+    Register16 idb;
 
     bool vda = true;
     bool vpa = true;
 
     void reloadPipeline();
+    void processSignals();
     bool isStageEnabled(Stage &st);
+    void initializeOpcodes();
+    void initializeAddressingModes();
+
     void decode();
 
     void fetchInc(Register16 *src, uint8_t * dst);
@@ -72,6 +80,15 @@ private:
     void fetch(Register16 *src, uint8_t * dst);
     void dummyFetch(Register16 *src);
     void moveReg(uint8_t * src, uint8_t * dst);
+
+    void instStage();
+
+    void incPC();
+    void opPrefetchInIDB();
+
+    AddressingMode Immediate;
+
+    void ADC();
 };
 
 #endif // W65816_H

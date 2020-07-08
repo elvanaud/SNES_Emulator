@@ -11,18 +11,21 @@ using namespace std::placeholders;
 class Stage
 {
 public:
-    enum Signal{SIG_ALWAYS};
+    enum Signal{SIG_ALWAYS,SIG_INST,SIG_MEM16_ONLY};
 
     StageType get();
+    Signal getSignal();
 
     template<class F, class ... Args>
     Stage(Signal s, F f, Args ... args)
     {
+        signal = s;
         func = bind(f,_1,args...);
     }
 
 private:
     StageType func;
+    Signal signal;
 };
 
 #endif // STAGE_H
