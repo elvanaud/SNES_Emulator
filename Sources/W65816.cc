@@ -1,7 +1,7 @@
 #include "W65816.h"
 #include "Bus.h"
 #include "Stage.h"
-
+#include "Types.h"
 
 using std::bind;
 
@@ -27,16 +27,32 @@ void W65816::reloadPipeline()
     pipeline.clear();
     tcycle = 0;
 
-    StageType T1 = {bind(fetchInc,_1,&pc,&ir)};
+    vector<StageType> T1 = {bind(fetchInc,_1,&pc,&ir)};
     pipeline.push_back(T1);
 
-    StageType T2 = {Stage(Stage::SIG_ALWAYS,fetch,&pc,&adr.low).get(), Stage(Stage::SIG_ALWAYS,decode).get()};
+    vector<StageType> T2 = {Stage(Stage::SIG_ALWAYS,fetch,&pc,&adr.low).get(), Stage(Stage::SIG_ALWAYS,decode).get()};
     pipeline.push_back(T2);
+}
+
+bool W65816::isStageEnabled(Stage &st)
+{
+    return true;
 }
 
 void W65816::decode()
 {
-
+    for(auto &st : decodingTable[ir].Stages())
+    {
+        vector<StageType> pipelineCycleN;
+        for(Stage & stage : st)
+        {
+            if(isStageEnabled(stage))
+            {
+                pipelineCycleN.push_back(stage.get());
+            }
+        }
+        pipeline.push_back(pipelineCycleN);
+    }
 }
 
 bool W65816::VDA()

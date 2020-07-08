@@ -9,13 +9,13 @@ using std::vector;
 
 #include "Stage.h"
 class Bus;
+#include "Instruction.h"
+#include "Types.h"
 
 
 class W65816
 {
 public:
-    using StageType = vector<std::function<void(W65816*)>>;
-
     W65816();
     void attachBus(Bus * b);
     void tick();
@@ -25,8 +25,10 @@ public:
 private:
     Bus * bus;
 
-    vector<StageType> pipeline;
+    vector<vector<StageType>> pipeline;
     unsigned int tcycle = 0;
+
+    Instruction decodingTable[0x100];
 
     struct Register16
     {
@@ -62,7 +64,7 @@ private:
     bool vpa = true;
 
     void reloadPipeline();
-
+    bool isStageEnabled(Stage &st);
     void decode();
 
     void fetchInc(Register16 *src, uint8_t * dst);
