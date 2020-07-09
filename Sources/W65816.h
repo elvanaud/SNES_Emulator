@@ -31,6 +31,7 @@ public:
     uint16_t getAdr();
     uint16_t getIDB();
     uint8_t getIR();
+    uint8_t getP();
 
     //Getters - Internal
     unsigned int getTCycle();

@@ -37,6 +37,11 @@ void W65816::instStage()
     ; //Dummy
 }
 
+uint8_t W65816::getP()
+{
+    return p.val;
+}
+
 uint16_t W65816::getPC()
 {
     return pc.val();
@@ -245,10 +250,6 @@ void W65816::decode()
             else pipeline.push_back(pipelineCycleN);
         }
     }
-
-    //lastPipelineStage = instructionStages[instructionStages.size()-1];
-
-    cout << "decode: " << pipeline.size() << endl;
 }
 
 bool W65816::VDA()
@@ -263,17 +264,15 @@ bool W65816::VPA()
 
 void W65816::dummyFetch(Register16 *src)
 {
-    //setInvalidAddress();
     vda = vpa = 0;
     bus->read(src->val());
 }
 
 void W65816::fetch(Register16 *src, uint8_t * dst)
 {
-    //setValidAddress();
     if(src == &pc){ vpa = true; vda = tcycle == 0; }
     else{ vda = true; vpa = false; }
-    //generateAddressWithBank();
+    //todo: generateAddressWithBank();
     bus->read(src->val());
     *dst =  bus->DMR();
 }
