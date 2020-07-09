@@ -114,9 +114,11 @@ private:
         uint8_t M() { if(!emulationMode) return (val>>5)&1; return mem8;}
         uint8_t X() { if(!emulationMode) return (val>>4)&1; return index8;}
         uint8_t B() { if(emulationMode) return (val>>4)&1; return false;} //throw ?
+        uint8_t E() { return emulationMode;}
         void setM(bool status) { if(!emulationMode) val = (val & ~(1<<5)) | (uint8_t(status)<<5); mem8 = status;}
         void setX(bool status) { if(!emulationMode) val = (val & ~(1<<4)) | (uint8_t(status)<<4); index8 = status;}
         void setB(bool status) { if(emulationMode) val = (val & ~(1<<4)) | (uint8_t(status)<<4); }
+        void setE(bool status) { emulationMode = status;}
     } p;
 
     //Internal Operations
@@ -129,6 +131,9 @@ private:
     void moveReg(uint8_t * src, uint8_t * dst);
 
     void instStage(); //Dummy operation
+
+    void updateStatusFlags(uint32_t v);
+    void checkSignedOverflow(int a, int b, int c);
 
     //Signals
     void incPC();

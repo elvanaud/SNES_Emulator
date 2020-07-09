@@ -66,28 +66,65 @@ unsigned int W65816::getTCycle()
     return tcycle;
 }
 
+void W65816::updateStatusFlags(uint32_t v)
+{
+    unsigned int offset = 7;
+    if(!p.mem8) offset = 15;
+
+    p.setN(v>>offset);
+    p.setC(v>>(offset+1));
+    p.setZ(v == 0);
+}
+
+void W65816::checkSignedOverflow(int a, int b, int c)
+{
+    p.setV((a == 0 && b == 0 && c == 1) || (a == 1 && b == 1 && c == 0));
+}
+
 void W65816::ADC()
 {
-    //check decimal mode
-    if(p.mem8)
+    uint32_t r = 0;
+    if(p.D())
     {
-        uint16_t res =  (acc.low)+idb.low+p.C();
-        //todo:check overflow
-        p.setC(res>>8);
-        res &= 0xFF;
-        p.setZ(res == 0);
-        p.setN(res>>7);
-        acc.low = res;
+        auto decimalAdd8bit = [](uint8_t a, uint8_t b)
+        {
+            uint16_t aLeft = a&0xF0;
+            uint16_t aRight = a&0x0F;
+            uint16_t bLeft = b&0xF0;
+            uint16_t bRight = b&0x0F;
+
+            uint32_t res = aRight+bRight;
+            if(res >= 0x0A)
+                res += 0x06;
+            res += aLeft+bLeft;
+            if((res>>4) >= 0x0A)
+                res += 0x60;
+
+            return res;
+        };
+
+        r = decimalAdd8bit(idb.low,acc.low);
+        if(!p.mem8) r = decimalAdd8bit(idb.high,acc.high+(r>>8));
+
+        acc.low = r&0xFF;
+        if(!p.mem8) acc.high = (r>>8)&0xFF;
     }
     else
     {
-        uint32_t res = acc.val()+idb.val()+p.C();
-        p.setC(res>>16);
-        res &= 0xFFFF;
-        p.setZ(res == 0);
-        p.setN(res>>15);
-        acc.set(res);
+        int offset = 7;
+        if(p.mem8) r =  (acc.low)+idb.low+p.C();
+        else { r = acc.val()+idb.val()+p.C(); offset = 15; }
+
+        int aSign = (acc.val()>>offset)&1;
+        int bSign = (idb.val()>>offset)&1;
+        int cSign = (r>>offset)&1;
+        checkSignedOverflow(aSign,bSign,cSign);
+
+        acc.low = r&0xFF;
+        if(!p.mem8) acc.high = (r>>8)&0xFF;
     }
+
+    updateStatusFlags(r);
 }
 
 void W65816::incPC()
