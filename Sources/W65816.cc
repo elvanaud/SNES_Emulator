@@ -69,7 +69,7 @@ unsigned int W65816::getTCycle()
 void W65816::ADC()
 {
     //check decimal mode
-    if(mem8)
+    if(p.mem8)
     {
         uint16_t res =  (acc.low)+idb.low+p.C();
         //todo:check overflow
@@ -126,7 +126,7 @@ bool W65816::isStageEnabled(Stage &st)
     {
         case Stage::SIG_ALWAYS: return true;
         case Stage::SIG_INST: return true;
-        case Stage::SIG_MEM16_ONLY: return !mem8;
+        case Stage::SIG_MEM16_ONLY: return !p.mem8;
         default: return true;
     }
     //return true;
