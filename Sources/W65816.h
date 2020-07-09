@@ -40,10 +40,8 @@ private:
     Bus * bus;
 
     vector<vector<StageType>> pipeline;
+    vector<StageType> lastPipelineStage;
     unsigned int tcycle = 0;
-    /*bool mem8 = true;
-    bool index8 = true;
-    bool emulationMode = true;*/
 
     bool vda = true;
     bool vpa = true;
@@ -53,7 +51,7 @@ private:
     //Private helper methods
     void reloadPipeline();
     void processSignals();
-    bool isStageEnabled(Stage &st);
+    bool isStageEnabled(Stage const & st);
     void initializeOpcodes();
     void initializeAddressingModes();
 

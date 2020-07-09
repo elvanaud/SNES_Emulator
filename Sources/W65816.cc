@@ -150,14 +150,18 @@ void W65816::reloadPipeline()
     tcycle = 0;
 
     vector<StageType> T1 = {Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&ir).get()};
-    //T1.push_back(lastStage);
+    for(StageType & st : lastPipelineStage)
+    {
+        T1.push_back(st);
+    }
+    lastPipelineStage.clear();
     pipeline.push_back(T1);
 
     vector<StageType> T2 = {Stage(Stage::SIG_ALWAYS,fetch,&pc,&adr.low).get(), Stage(Stage::SIG_ALWAYS,decode).get()};
     pipeline.push_back(T2);
 }
 
-bool W65816::isStageEnabled(Stage &st)
+bool W65816::isStageEnabled(Stage const& st)
 {
     switch(st.getSignal())
     {
@@ -179,11 +183,13 @@ void W65816::processSignals()
 
 void W65816::decode()
 {
-    for(auto &st : decodingTable[ir].Stages())
+    const auto & instructionStages = decodingTable[ir].Stages();
+    for(unsigned int i = 0; i < instructionStages.size(); ++i)
     {
+        const auto & stagesCycleN = instructionStages[i];
         vector<StageType> pipelineCycleN;
         bool stageGroupEmtpy = true;
-        for(Stage & stage : st)
+        for(const Stage & stage : stagesCycleN)
         {
             if(isStageEnabled(stage))
             {
@@ -191,8 +197,14 @@ void W65816::decode()
                 pipelineCycleN.push_back(stage.get());
             }
         }
-        if(!stageGroupEmtpy) pipeline.push_back(pipelineCycleN);
+        if(!stageGroupEmtpy)
+        {
+            if(i == instructionStages.size()-1) lastPipelineStage = pipelineCycleN;
+            else pipeline.push_back(pipelineCycleN);
+        }
     }
+
+    //lastPipelineStage = instructionStages[instructionStages.size()-1];
 
     cout << "decode: " << pipeline.size() << endl;
 }
