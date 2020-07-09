@@ -20,6 +20,9 @@ public:
 private:
     vector<vector<Stage>> stages;
     vector<std::function<void()>> signals;
+
+    unsigned int pipelineStage;
+    unsigned int stageNum;
 };
 
 #endif // ADDRESSINGMODE_H

@@ -28,6 +28,7 @@ void W65816::initializeAddressingModes()
 
 void W65816::initializeOpcodes()
 {
+    decodingTable[0x29] = Instruction("AND", Immediate, AND);
     decodingTable[0x69] = Instruction("ADC", Immediate, ADC);
 }
 
@@ -66,19 +67,47 @@ unsigned int W65816::getTCycle()
     return tcycle;
 }
 
-void W65816::updateStatusFlags(uint32_t v)
+void W65816::updateNZFlags(uint16_t v)
 {
     unsigned int offset = 7;
     if(!p.mem8) offset = 15;
 
     p.setN(v>>offset);
-    p.setC(v>>(offset+1));
     p.setZ(v == 0);
+}
+
+void W65816::updateStatusFlags(uint32_t v)
+{
+    unsigned int offset = 7;
+    if(!p.mem8) offset = 15;
+
+    p.setC(v>>(offset+1));
+
+    updateNZFlags(v);
 }
 
 void W65816::checkSignedOverflow(int a, int b, int c)
 {
     p.setV((a == 0 && b == 0 && c == 1) || (a == 1 && b == 1 && c == 0));
+}
+
+void W65816::setReg(Register16 & r, uint16_t v)
+{
+    if(p.mem8) r.low = v & 0xFF;
+    else r.set(v);
+}
+
+uint16_t W65816::getReg(Register16 & r)
+{
+    if(p.mem8) return r.low;
+    return r.val();
+}
+
+void W65816::AND()
+{
+    uint16_t res = getReg(acc) & getReg(idb);
+    updateNZFlags(res);
+    setReg(acc,res);
 }
 
 void W65816::ADC()
@@ -111,17 +140,16 @@ void W65816::ADC()
     }
     else
     {
-        int offset = 7;
-        if(p.mem8) r =  (acc.low)+idb.low+p.C();
-        else { r = acc.val()+idb.val()+p.C(); offset = 15; }
+        r = getReg(acc)+getReg(idb)+p.C();
 
+        int offset = 7;
+        if(!p.mem8) offset = 15;
         int aSign = (acc.val()>>offset)&1;
         int bSign = (idb.val()>>offset)&1;
         int cSign = (r>>offset)&1;
         checkSignedOverflow(aSign,bSign,cSign);
 
-        acc.low = r&0xFF;
-        if(!p.mem8) acc.high = (r>>8)&0xFF;
+        setReg(acc,r);
     }
 
     updateStatusFlags(r);
@@ -188,16 +216,16 @@ void W65816::decode()
     {
         const auto & stagesCycleN = instructionStages[i];
         vector<StageType> pipelineCycleN;
-        bool stageGroupEmtpy = true;
+        bool stageGroupEmpty = true;
         for(const Stage & stage : stagesCycleN)
         {
             if(isStageEnabled(stage))
             {
-                stageGroupEmtpy = false;
+                stageGroupEmpty = false;
                 pipelineCycleN.push_back(stage.get());
             }
         }
-        if(!stageGroupEmtpy)
+        if(!stageGroupEmpty)
         {
             if(i == instructionStages.size()-1) lastPipelineStage = pipelineCycleN;
             else pipeline.push_back(pipelineCycleN);

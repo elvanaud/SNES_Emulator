@@ -82,10 +82,13 @@ private:
         }
     };
 
-    Register16 pc;
+    Register16 pc; //Could be uint16_t directly ?
     Register16 adr;
+
     Register16 idb;
     Register16 acc;
+    Register16 x;
+    Register16 y;
 
     uint8_t ir;
 
@@ -119,6 +122,9 @@ private:
         void setE(bool status) { emulationMode = status;}
     } p;
 
+    void setReg(Register16 & r, uint16_t v); //TODO: How to differentiate between Index and ACC ???
+    uint16_t getReg(Register16 & r);
+
     //Internal Operations
     void decode();
 
@@ -131,6 +137,7 @@ private:
     void instStage(); //Dummy operation
 
     void updateStatusFlags(uint32_t v);
+    void updateNZFlags(uint16_t v);
     void checkSignedOverflow(int a, int b, int c);
 
     //Signals
@@ -142,6 +149,7 @@ private:
 
     //Instructions
     void ADC();
+    void AND();
 };
 
 #endif // W65816_H
