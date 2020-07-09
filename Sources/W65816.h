@@ -123,6 +123,8 @@ private:
         void setX(bool status) { if(!emulationMode) val = (val & ~(1<<4)) | (uint8_t(status)<<4); index8 = status;}
         void setB(bool status) { if(emulationMode) val = (val & ~(1<<4)) | (uint8_t(status)<<4); }
         void setE(bool status) { emulationMode = status;}
+
+        void update() {setM(M()); setX(X());}
     } p;
 
     void setReg(Register16 & r, uint16_t v); //TODO: How to differentiate between Index and ACC ???
@@ -137,19 +139,23 @@ private:
     void dummyFetch(Register16 *src);
     void moveReg(uint8_t * src, uint8_t * dst);
 
-    void instStage(); //Dummy operation
+    void dummyStage(); //Dummy operation
 
     void updateStatusFlags(uint32_t v, bool indexValue = false);
     void updateNZFlags(uint16_t v, bool indexValue = false);
     void checkSignedOverflow(int a, int b, int c);
 
     //Signals
-    void incPC();
+    void incPC(unsigned int whatCycle = 1);
     void opPrefetchInIDB();
+    //void invalidAddress();
+    bool invalidAddress = false;
 
     //Addressing Modes
-    enum AdrModeName {IMMEDIATE};
+    enum AdrModeName {IMMEDIATE,IMMEDIATE_SPECIAL,IMPLIED};
     AddressingMode Immediate = AddressingMode(AdrModeName::IMMEDIATE);
+    AddressingMode ImmediateSpecial = AddressingMode(AdrModeName::IMMEDIATE_SPECIAL);
+    AddressingMode Implied = AddressingMode(AdrModeName::IMPLIED);
 
     //Instructions
     void ADC();
@@ -159,6 +165,13 @@ private:
     void CPX();
     void CPY();
     void EOR();
+    void LDA();
+    void LDX();
+    void LDY();
+    void ORA();
+    void REP();
+    void SEC();
+    void SEP();
 };
 
 #endif // W65816_H

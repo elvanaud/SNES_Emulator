@@ -16,27 +16,40 @@ W65816::W65816()
     initializeAddressingModes();
     initializeOpcodes();
     reloadPipeline();
-    pc.set(0x100);
+    pc.set(0xFF);
 }
 
 void W65816::initializeAddressingModes()
 {
-    Immediate.setStages({{Stage(Stage::SIG_MODE16_ONLY,fetchInc,&pc,&idb.high)},{Stage(Stage::SIG_INST,instStage)}});
-    Immediate.setSignals({bind(incPC,this),bind(opPrefetchInIDB,this)});
+    Immediate.setStages({{Stage(Stage::SIG_MODE16_ONLY,fetchInc,&pc,&idb.high)},{Stage(Stage::SIG_INST,dummyStage)}});
+    Immediate.setSignals({bind(incPC,this,1),bind(opPrefetchInIDB,this)});
+
+    ImmediateSpecial.setStages({{Stage(Stage::SIG_INST,dummyStage)},{Stage(Stage::SIG_DUMMY_STAGE, dummyStage)}});
+    ImmediateSpecial.setSignals({bind(incPC,this,2),bind(opPrefetchInIDB,this)});
+
+    Implied.setStages({{Stage(Stage::SIG_INST,dummyStage)}});
+    Implied.setSignals({bind([](W65816* cpu){cpu->invalidAddress = true;},this)});
 }
 
 void W65816::initializeOpcodes()
 {
+    decodingTable[0x09] = Instruction("ORA", Immediate, ORA);
     decodingTable[0x29] = Instruction("AND", Immediate, AND);
+    decodingTable[0x38] = Instruction("SEC", Implied, SEC);
     decodingTable[0x49] = Instruction("EOR", Immediate, EOR);
     decodingTable[0x69] = Instruction("ADC", Immediate, ADC);
     decodingTable[0x89] = Instruction("BIT", Immediate, BIT);
+    decodingTable[0xA0] = Instruction("LDY", Immediate, LDY); decodingTable[0xA0].setIsIndexRelated(true);
+    decodingTable[0xA2] = Instruction("LDX", Immediate, LDX); decodingTable[0xA2].setIsIndexRelated(true);
+    decodingTable[0xA9] = Instruction("LDA", Immediate, LDA);
+    decodingTable[0xC2] = Instruction("REP", ImmediateSpecial, REP);
     decodingTable[0xC9] = Instruction("CMP", Immediate, CMP);
     decodingTable[0xE0] = Instruction("CPX", Immediate, CPX); decodingTable[0xE0].setIsIndexRelated(true);
+    decodingTable[0xE2] = Instruction("SEP", ImmediateSpecial, SEP);
     decodingTable[0xC0] = Instruction("CPY", Immediate, CPY); decodingTable[0xC0].setIsIndexRelated(true);
 }
 
-void W65816::instStage()
+void W65816::dummyStage()
 {
     ; //Dummy
 }
@@ -211,9 +224,60 @@ void W65816::EOR()
     setReg(acc,r);
 }
 
-void W65816::incPC()
+void W65816::LDA()
 {
-    if(tcycle == 1) ++pc;
+    uint16_t value = getReg(idb);
+    setReg(acc,value);
+    updateNZFlags(value);
+}
+
+void W65816::LDX()
+{
+    uint16_t value = getReg(idb);
+    setReg(x,value);
+    updateNZFlags(value,true);
+}
+
+void W65816::LDY()
+{
+    uint16_t value = getReg(idb);
+    setReg(y,value);
+    updateNZFlags(value,true);
+}
+
+void W65816::ORA()
+{
+    uint16_t res = getReg(acc) | getReg(idb);
+    setReg(acc,res);
+    updateNZFlags(res);
+}
+
+void W65816::REP()
+{
+    uint8_t mask = idb.low;
+    if(p.emulationMode) mask &= 0b11'00'1111;
+
+    p.val &= ~mask;
+    p.update();
+}
+
+void W65816::SEC()
+{
+    p.setC(true);
+}
+
+void W65816::SEP()
+{
+    uint8_t mask = idb.low;
+    if(p.emulationMode) mask &= 0b11'00'1111;
+
+    p.val |= mask;
+    p.update();
+}
+
+void W65816::incPC(unsigned int whatCycle)
+{
+    if(tcycle == whatCycle) ++pc;
     cout << "incPc" << endl;
 }
 
@@ -222,6 +286,11 @@ void W65816::opPrefetchInIDB()
     if(tcycle == 1) idb.low = adr.low;
     cout << "opPrefetchInIDB" << endl;
 }
+
+/*void W65816::invalidAddress()
+{
+    invalidAddress = true;
+}*/
 
 void W65816::attachBus(Bus * b)
 {
@@ -242,7 +311,7 @@ void W65816::reloadPipeline()
     lastPipelineStage.clear();
     pipeline.push_back(T1);
 
-    vector<StageType> T2 = {Stage(Stage::SIG_ALWAYS,fetch,&pc,&adr.low).get(), Stage(Stage::SIG_ALWAYS,decode).get()};
+    vector<StageType> T2 = {Stage(Stage::SIG_ALWAYS,decode).get(), Stage(Stage::SIG_ALWAYS,fetch,&pc,&adr.low).get()};
     pipeline.push_back(T2);
 }
 
@@ -289,6 +358,8 @@ void W65816::decode()
             else pipeline.push_back(pipelineCycleN);
         }
     }
+
+    processSignals();
 }
 
 bool W65816::VDA()
@@ -311,6 +382,7 @@ void W65816::fetch(Register16 *src, uint8_t * dst)
 {
     if(src == &pc){ vpa = true; vda = tcycle == 0; }
     else{ vda = true; vpa = false; }
+    if(invalidAddress){invalidAddress = false; vda = vpa = 0;}
     //todo: generateAddressWithBank();
     bus->read(src->val());
     *dst =  bus->DMR();
@@ -330,6 +402,7 @@ void W65816::fetchDec(Register16 *src, uint8_t * dst)
 
 void W65816::tick()
 {
+    vda = vpa = 0;
     for(auto &stage : pipeline[tcycle])
     {
         stage(this);
