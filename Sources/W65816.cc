@@ -46,24 +46,60 @@ uint16_t W65816::getAcc()
     return acc.val();
 }
 
+uint16_t W65816::getAdr()
+{
+    return adr.val();
+}
+
+uint16_t W65816::getIDB()
+{
+    return idb.val();
+}
+
 uint8_t W65816::getIR()
 {
     return ir;
 }
 
+unsigned int W65816::getTCycle()
+{
+    return tcycle;
+}
+
 void W65816::ADC()
 {
-    ++acc;
+    //check decimal mode
+    if(mem8)
+    {
+        uint16_t res =  (acc.low)+idb.low+p.C();
+        //todo:check overflow
+        p.setC(res>>8);
+        res &= 0xFF;
+        p.setZ(res == 0);
+        p.setN(res>>7);
+        acc.low = res;
+    }
+    else
+    {
+        uint32_t res = acc.val()+idb.val()+p.C();
+        p.setC(res>>16);
+        res &= 0xFFFF;
+        p.setZ(res == 0);
+        p.setN(res>>15);
+        acc.set(res);
+    }
 }
 
 void W65816::incPC()
 {
     if(tcycle == 1) ++pc;
+    cout << "incPc" << endl;
 }
 
 void W65816::opPrefetchInIDB()
 {
     if(tcycle == 1) idb.low = adr.low;
+    cout << "opPrefetchInIDB" << endl;
 }
 
 void W65816::attachBus(Bus * b)
@@ -89,6 +125,7 @@ bool W65816::isStageEnabled(Stage &st)
     switch(st.getSignal())
     {
         case Stage::SIG_ALWAYS: return true;
+        case Stage::SIG_INST: return true;
         case Stage::SIG_MEM16_ONLY: return !mem8;
         default: return true;
     }
@@ -108,15 +145,19 @@ void W65816::decode()
     for(auto &st : decodingTable[ir].Stages())
     {
         vector<StageType> pipelineCycleN;
+        bool stageGroupEmtpy = true;
         for(Stage & stage : st)
         {
             if(isStageEnabled(stage))
             {
+                stageGroupEmtpy = false;
                 pipelineCycleN.push_back(stage.get());
             }
         }
-        pipeline.push_back(pipelineCycleN);
+        if(!stageGroupEmtpy) pipeline.push_back(pipelineCycleN);
     }
+
+    cout << "decode: " << pipeline.size() << endl;
 }
 
 bool W65816::VDA()
@@ -166,7 +207,6 @@ void W65816::tick()
     }
     processSignals();
     //checkInterupts();
-    cout << tcycle << endl;
     ++tcycle;
 
     if(tcycle >= pipeline.size())

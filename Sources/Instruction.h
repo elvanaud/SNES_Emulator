@@ -14,11 +14,11 @@ class Instruction
 public:
     Instruction();
     template<class F,class ... Args>
-    Instruction(string opcodeASM, AddressingMode &adrMode,F inst,Args ... args)
+    Instruction(string opASM, AddressingMode &adrMd,F inst,Args ... args)
     {
-        opcodeASM = opcodeASM;
-        stages = adrMode.gen(bind(inst,_1,args...));
-        adrMode = adrMode;
+        opcodeASM = opASM;
+        stages = adrMd.gen(bind(inst,_1,args...));
+        adrMode = adrMd;
     }
 
     vector<vector<Stage>> Stages();

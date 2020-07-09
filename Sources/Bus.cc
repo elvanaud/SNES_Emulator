@@ -30,9 +30,11 @@ void Bus::run()
 {
     while(true)
     {
+        cout << "TCycle = " << cpu.getTCycle() << endl;
         cpu.tick();
 
-        cout << "PC = " << cpu.getPC() << "  ;  IR = " << (int)cpu.getIR() << "  ;  Acc = " << cpu.getAcc() << endl;
+        cout << "PC = " << cpu.getPC() << "  ;  IR = " << (int)cpu.getIR() << "  ;  Acc = " << cpu.getAcc() << "  ;  Adr = " << cpu.getAdr();
+        cout << "  ;  IDB = " << cpu.getIDB() <<endl;
 
         if(cpu.VDA() && cpu.VPA()) //Sync = Opcode Fetch
         {

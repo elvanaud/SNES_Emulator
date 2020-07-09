@@ -26,7 +26,11 @@ public:
 
     uint16_t getPC();
     uint16_t getAcc();
+    uint16_t getAdr();
+    uint16_t getIDB();
     uint8_t getIR();
+
+    unsigned int getTCycle();
 
 private:
     Bus * bus;
@@ -69,6 +73,16 @@ private:
     Register16 adr;
     Register16 idb;
     Register16 acc;
+
+    struct {
+        uint8_t val;
+        uint8_t C() { return (val>>0)&1; }
+        uint8_t Z() { return (val>>1)&1; }
+        uint8_t N() { return (val>>7)&1; }
+        void setC(bool status) { val = (val & ~(1<<0)) | (uint8_t(status)<<0); }
+        void setZ(bool status) { val = (val & ~(1<<1)) | (uint8_t(status)<<1); }
+        void setN(bool status) { val = (val & ~(1<<7)) | (uint8_t(status)<<7); }
+    } p;
 
     bool vda = true;
     bool vpa = true;
