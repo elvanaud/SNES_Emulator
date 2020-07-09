@@ -23,13 +23,13 @@ void W65816::initializeAddressingModes()
 {
     Immediate.setStages({{Stage(Stage::SIG_MEM16_ONLY,fetchInc,&pc,&idb.high)},{Stage(Stage::SIG_INST,instStage)}});
     Immediate.setSignals({bind(incPC,this),bind(opPrefetchInIDB,this)});
-
 }
 
 void W65816::initializeOpcodes()
 {
     decodingTable[0x29] = Instruction("AND", Immediate, AND);
     decodingTable[0x69] = Instruction("ADC", Immediate, ADC);
+    decodingTable[0x89] = Instruction("BIT", Immediate, BIT);
 }
 
 void W65816::instStage()
@@ -155,6 +155,19 @@ void W65816::ADC()
     updateStatusFlags(r);
 }
 
+void W65816::BIT()
+{
+    uint16_t v = getReg(idb);
+    if(decodingTable[ir].AdrMode().Name() != Immediate.Name())
+    {
+        p.setN((v>>7)&1);
+        p.setV((v>>6)&1);
+    }
+
+    uint16_t r = getReg(acc) & v;
+    p.setZ(r==0);
+}
+
 void W65816::incPC()
 {
     if(tcycle == 1) ++pc;
@@ -177,11 +190,12 @@ void W65816::reloadPipeline()
     pipeline.clear();
     tcycle = 0;
 
-    vector<StageType> T1 = {Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&ir).get()};
-    for(StageType & st : lastPipelineStage)
+    vector<StageType> T1 = lastPipelineStage; //Be careful to keep the previous inst stage before the new opcode fetch
+    T1.push_back(Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&ir).get());
+    /*for(StageType & st : lastPipelineStage)
     {
         T1.push_back(st);
-    }
+    }*/
     lastPipelineStage.clear();
     pipeline.push_back(T1);
 

@@ -145,11 +145,14 @@ private:
     void opPrefetchInIDB();
 
     //Addressing Modes
-    AddressingMode Immediate;
+public: enum AdrModeName {IMMEDIATE};
+private:
+    AddressingMode Immediate = AddressingMode(AdrModeName::IMMEDIATE);
 
     //Instructions
     void ADC();
     void AND();
+    void BIT();
 };
 
 #endif // W65816_H

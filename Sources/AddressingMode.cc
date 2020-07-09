@@ -1,8 +1,10 @@
 #include "AddressingMode.h"
 
-AddressingMode::AddressingMode()
+AddressingMode::AddressingMode(){}
+
+AddressingMode::AddressingMode(int id)
 {
-    //ctor
+    name = id;
 }
 
 void AddressingMode::setStages(vector<vector<Stage>> st)
@@ -36,4 +38,9 @@ vector<std::function<void()>> AddressingMode::Signals()
 void AddressingMode::setSignals(vector<std::function<void()>> s)
 {
     signals = s;
+}
+
+int AddressingMode::Name()
+{
+    return name;
 }

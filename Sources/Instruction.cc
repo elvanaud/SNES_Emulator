@@ -18,3 +18,8 @@ vector<std::function<void()>> Instruction::Signals()
 {
     return adrMode.Signals();
 }
+
+AddressingMode Instruction::AdrMode()
+{
+    return adrMode;
+}

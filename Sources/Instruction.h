@@ -23,7 +23,7 @@ public:
 
     vector<vector<Stage>> Stages();
     vector<std::function<void()>> Signals();
-
+    AddressingMode AdrMode();
 private:
     vector<vector<Stage>> stages;
     AddressingMode adrMode;
