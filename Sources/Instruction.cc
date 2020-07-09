@@ -23,3 +23,13 @@ AddressingMode Instruction::AdrMode()
 {
     return adrMode;
 }
+
+bool Instruction::isIndexRelated()
+{
+    return indexRelated;
+}
+
+void Instruction::setIsIndexRelated(bool idxR)
+{
+    indexRelated = idxR;
+}

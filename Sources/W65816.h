@@ -59,6 +59,8 @@ private:
     //Registers
     struct Register16
     {
+        Register16(bool idx = false) {isIndex = idx;}
+        bool isIndex = false;
         uint8_t low = 0,high = 0;
         uint16_t val() { return (uint16_t(high) << 8) | low; }
 
@@ -88,8 +90,8 @@ private:
 
     Register16 idb;
     Register16 acc;
-    Register16 x;
-    Register16 y;
+    Register16 x = Register16(true);
+    Register16 y = Register16(true);
 
     uint8_t ir;
 
@@ -137,8 +139,8 @@ private:
 
     void instStage(); //Dummy operation
 
-    void updateStatusFlags(uint32_t v);
-    void updateNZFlags(uint16_t v);
+    void updateStatusFlags(uint32_t v, bool indexValue = false);
+    void updateNZFlags(uint16_t v, bool indexValue = false);
     void checkSignedOverflow(int a, int b, int c);
 
     //Signals
@@ -146,14 +148,17 @@ private:
     void opPrefetchInIDB();
 
     //Addressing Modes
-public: enum AdrModeName {IMMEDIATE};
-private:
+    enum AdrModeName {IMMEDIATE};
     AddressingMode Immediate = AddressingMode(AdrModeName::IMMEDIATE);
 
     //Instructions
     void ADC();
     void AND();
     void BIT();
+    void CMP();
+    void CPX();
+    void CPY();
+    void EOR();
 };
 
 #endif // W65816_H

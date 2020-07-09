@@ -11,7 +11,7 @@ using namespace std::placeholders;
 class Stage
 {
 public:
-    enum Signal{SIG_ALWAYS,SIG_INST,SIG_MEM16_ONLY};
+    enum Signal{SIG_ALWAYS,SIG_INST,SIG_MEM16_ONLY,SIG_MODE16_ONLY};
 
     StageType get() const;
     Signal getSignal() const;

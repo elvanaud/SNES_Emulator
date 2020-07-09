@@ -18,6 +18,8 @@ Bus::Bus(W65816 & c) : cpu(c)
     ram[0x107] = 0x00;
     ram[0x108] = 0x89;
     ram[0x109] = 0x02;
+    ram[0x10A] = 0xC9;
+    ram[0x10B] = 0x0A;
 }
 
 void Bus::read(uint32_t adr)

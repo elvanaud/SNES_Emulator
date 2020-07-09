@@ -21,15 +21,19 @@ W65816::W65816()
 
 void W65816::initializeAddressingModes()
 {
-    Immediate.setStages({{Stage(Stage::SIG_MEM16_ONLY,fetchInc,&pc,&idb.high)},{Stage(Stage::SIG_INST,instStage)}});
+    Immediate.setStages({{Stage(Stage::SIG_MODE16_ONLY,fetchInc,&pc,&idb.high)},{Stage(Stage::SIG_INST,instStage)}});
     Immediate.setSignals({bind(incPC,this),bind(opPrefetchInIDB,this)});
 }
 
 void W65816::initializeOpcodes()
 {
     decodingTable[0x29] = Instruction("AND", Immediate, AND);
+    decodingTable[0x49] = Instruction("EOR", Immediate, EOR);
     decodingTable[0x69] = Instruction("ADC", Immediate, ADC);
     decodingTable[0x89] = Instruction("BIT", Immediate, BIT);
+    decodingTable[0xC9] = Instruction("CMP", Immediate, CMP);
+    decodingTable[0xE0] = Instruction("CPX", Immediate, CPX); decodingTable[0xE0].setIsIndexRelated(true);
+    decodingTable[0xC0] = Instruction("CPY", Immediate, CPY); decodingTable[0xC0].setIsIndexRelated(true);
 }
 
 void W65816::instStage()
@@ -72,23 +76,23 @@ unsigned int W65816::getTCycle()
     return tcycle;
 }
 
-void W65816::updateNZFlags(uint16_t v)
+void W65816::updateNZFlags(uint16_t v, bool indexValue)
 {
     unsigned int offset = 7;
-    if(!p.mem8) offset = 15;
+    if((!indexValue && !p.mem8) || (indexValue && !p.index8)) offset = 15;
 
     p.setN(v>>offset);
     p.setZ(v == 0);
 }
 
-void W65816::updateStatusFlags(uint32_t v)
+void W65816::updateStatusFlags(uint32_t v, bool indexValue)
 {
     unsigned int offset = 7;
-    if(!p.mem8) offset = 15;
+    if((!indexValue && !p.mem8) || (indexValue && !p.index8)) offset = 15;
 
     p.setC(v>>(offset+1));
 
-    updateNZFlags(v);
+    updateNZFlags(v,indexValue);
 }
 
 void W65816::checkSignedOverflow(int a, int b, int c)
@@ -98,13 +102,13 @@ void W65816::checkSignedOverflow(int a, int b, int c)
 
 void W65816::setReg(Register16 & r, uint16_t v)
 {
-    if(p.mem8) r.low = v & 0xFF;
+    if((r.isIndex && p.index8) || (!r.isIndex && p.mem8)) r.low = v & 0xFF;
     else r.set(v);
 }
 
 uint16_t W65816::getReg(Register16 & r)
 {
-    if(p.mem8) return r.low;
+    if((r.isIndex && p.index8) || (!r.isIndex && p.mem8)) return r.low;
     return r.val();
 }
 
@@ -173,6 +177,40 @@ void W65816::BIT()
     p.setZ(r==0);
 }
 
+void W65816::CMP()
+{
+    uint16_t a = getReg(acc);
+    uint16_t b = getReg(idb);
+    uint16_t r = a - b;
+    updateNZFlags(r);
+    p.setC(a >= b);
+}
+
+void W65816::CPX()
+{
+    uint16_t a = getReg(x);
+    uint16_t b = getReg(idb);
+    uint16_t r = a - b;
+    updateNZFlags(r,true);
+    p.setC(a >= b);
+}
+
+void W65816::CPY()
+{
+    uint16_t a = getReg(y);
+    uint16_t b = getReg(idb);
+    uint16_t r = a - b;
+    updateNZFlags(r,true);
+    p.setC(a >= b);
+}
+
+void W65816::EOR()
+{
+    uint16_t r = getReg(acc)^getReg(idb);
+    updateNZFlags(r);
+    setReg(acc,r);
+}
+
 void W65816::incPC()
 {
     if(tcycle == 1) ++pc;
@@ -215,6 +253,7 @@ bool W65816::isStageEnabled(Stage const& st)
         case Stage::SIG_ALWAYS: return true;
         case Stage::SIG_INST: return true;
         case Stage::SIG_MEM16_ONLY: return !p.mem8;
+        case Stage::SIG_MODE16_ONLY: if(decodingTable[ir].isIndexRelated()) return !p.index8; else return !p.mem8;
         default: return true;
     }
     //return true;

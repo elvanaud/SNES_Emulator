@@ -24,10 +24,14 @@ public:
     vector<vector<Stage>> Stages();
     vector<std::function<void()>> Signals();
     AddressingMode AdrMode();
+
+    bool isIndexRelated();
+    void setIsIndexRelated(bool idxR);
 private:
     vector<vector<Stage>> stages;
     AddressingMode adrMode;
     string opcodeASM;
+    bool indexRelated = false;
 };
 
 #endif // INSTRUCTION_H
