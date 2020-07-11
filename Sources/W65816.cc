@@ -28,7 +28,9 @@ void W65816::initializeAddressingModes()
     ImmediateSpecial.setSignals({bind(incPC,this,2),bind(opPrefetchInIDB,this)});
 
     Implied.setStages({{Stage(Stage::SIG_INST,dummyStage)}});
-    Implied.setSignals({bind([](W65816* cpu){cpu->invalidAddress = true;},this)});
+    //Implied.setSignals({bind(invalidPrefetch,this)});/*[](W65816* cpu){   if(cpu->invalidAddress) cpu->invalidAddress = false;
+                                                //if(cpu->tcycle == 1)cpu->invalidAddress = true; },this)});*/
+    Implied.setPredecodeSignals({bind(invalidPrefetch,this)});
 }
 
 void W65816::initializeOpcodes()
@@ -287,10 +289,13 @@ void W65816::opPrefetchInIDB()
     cout << "opPrefetchInIDB" << endl;
 }
 
-/*void W65816::invalidAddress()
+void W65816::invalidPrefetch()
 {
-    invalidAddress = true;
-}*/
+    //invalidAddress = true;
+    //if(forceInternalOperation) forceInternalOperation = false;
+    if(tcycle == 1)forceInternalOperation = true;
+    cout << "invalidPrefetch" << endl;
+}
 
 void W65816::attachBus(Bus * b)
 {
@@ -304,10 +309,6 @@ void W65816::reloadPipeline()
 
     vector<StageType> T1 = lastPipelineStage; //Be careful to keep the previous inst stage before the new opcode fetch
     T1.push_back(Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&ir).get());
-    /*for(StageType & st : lastPipelineStage)
-    {
-        T1.push_back(st);
-    }*/
     lastPipelineStage.clear();
     pipeline.push_back(T1);
 
@@ -317,7 +318,7 @@ void W65816::reloadPipeline()
 
 bool W65816::isStageEnabled(Stage const& st)
 {
-    switch(st.getSignal())
+    switch(st.getEnablingCondition())
     {
         case Stage::SIG_ALWAYS: return true;
         case Stage::SIG_INST: return true;
@@ -336,8 +337,17 @@ void W65816::processSignals()
     }
 }
 
+void W65816::preDecode()
+{
+    for (auto & sig : decodingTable[ir].PredecodeSignals())
+    {
+        sig();
+    }
+}
+
 void W65816::decode()
 {
+    preDecode();
     const auto & instructionStages = decodingTable[ir].Stages();
     for(unsigned int i = 0; i < instructionStages.size(); ++i)
     {
@@ -359,7 +369,7 @@ void W65816::decode()
         }
     }
 
-    processSignals();
+    //processSignals();
 }
 
 bool W65816::VDA()
@@ -374,15 +384,19 @@ bool W65816::VPA()
 
 void W65816::dummyFetch(Register16 *src)
 {
-    vda = vpa = 0;
+    handleValidAddressPINS(InternalOperation);
     bus->read(src->val());
 }
 
 void W65816::fetch(Register16 *src, uint8_t * dst)
 {
-    if(src == &pc){ vpa = true; vda = tcycle == 0; }
-    else{ vda = true; vpa = false; }
-    if(invalidAddress){invalidAddress = false; vda = vpa = 0;}
+    ValidAddressState state = DataFetch;
+    if(src == &pc)
+    {
+        state = OperandFetch;
+        if(tcycle == 0) state = OpcodeFetch;
+    }
+    handleValidAddressPINS(state);
     //todo: generateAddressWithBank();
     bus->read(src->val());
     *dst =  bus->DMR();
@@ -400,9 +414,24 @@ void W65816::fetchDec(Register16 *src, uint8_t * dst)
     --(*src);
 }
 
+void W65816::handleValidAddressPINS(ValidAddressState state)
+{
+    switch(state)
+    {
+        case InternalOperation: vda = vpa = 0; break;
+        case OpcodeFetch: vpa = vda = 1; break;
+        case OperandFetch: vda = 0; vpa = 1; break;
+        case DataFetch: vda = 1; vpa = 0; break;
+    }
+    if(forceInternalOperation)
+    {
+        vda = vpa = 0;
+        forceInternalOperation = false;
+    }
+}
 void W65816::tick()
 {
-    vda = vpa = 0;
+    handleValidAddressPINS(ValidAddressState::InternalOperation);
     for(auto &stage : pipeline[tcycle])
     {
         stage(this);

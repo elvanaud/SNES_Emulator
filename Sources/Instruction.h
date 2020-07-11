@@ -23,6 +23,7 @@ public:
 
     vector<vector<Stage>> Stages();
     vector<std::function<void()>> Signals();
+    vector<std::function<void()>> PredecodeSignals();
     AddressingMode AdrMode();
 
     bool isIndexRelated();

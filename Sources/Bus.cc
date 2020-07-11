@@ -51,6 +51,7 @@ void Bus::run()
         if((p>>1)&1) status+="Z"; else status += "-";
         if((p>>0)&1) status+="C"; else status += "-";
         cout << "Flags = " << status << endl;
+        cout << "VDA = " << cpu.VDA() << "  ;  VPA = " << cpu.VPA() << endl;
 
         if(cpu.VDA() && cpu.VPA()) //Sync = Opcode Fetch
         {

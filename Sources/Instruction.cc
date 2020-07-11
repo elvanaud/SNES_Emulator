@@ -19,6 +19,11 @@ vector<std::function<void()>> Instruction::Signals()
     return adrMode.Signals();
 }
 
+vector<std::function<void()>> Instruction::PredecodeSignals()
+{
+    return adrMode.PredecodeSignals();
+}
+
 AddressingMode Instruction::AdrMode()
 {
     return adrMode;

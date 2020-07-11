@@ -15,7 +15,7 @@ void AddressingMode::setStages(vector<vector<Stage>> st)
     {
         for(unsigned int j = 0; j < stages[i].size(); ++j)
         {
-            if (stages[i][j].getSignal() == Stage::SIG_INST)
+            if (stages[i][j].getEnablingCondition() == Stage::SIG_INST)
             {
                 pipelineStage = i;
                 stageNum = j;
@@ -35,9 +35,19 @@ vector<std::function<void()>> AddressingMode::Signals()
     return signals;
 }
 
+vector<std::function<void()>> AddressingMode::PredecodeSignals()
+{
+    return predecodeSignals;
+}
+
 void AddressingMode::setSignals(vector<std::function<void()>> s)
 {
     signals = s;
+}
+
+void AddressingMode::setPredecodeSignals(vector<std::function<void()>> s)
+{
+    predecodeSignals = s;
 }
 
 int AddressingMode::Name()

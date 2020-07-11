@@ -55,6 +55,10 @@ private:
     bool isStageEnabled(Stage const & st);
     void initializeOpcodes();
     void initializeAddressingModes();
+    enum ValidAddressState {OpcodeFetch, InternalOperation, DataFetch, OperandFetch};
+    void handleValidAddressPINS(ValidAddressState state);
+    bool forceInternalOperation = false;
+    void preDecode();
 
     //Registers
     struct Register16
@@ -97,7 +101,7 @@ private:
 
     //Status Register
     struct {
-        uint8_t val; //private and use setter ? => Update mem8,index8,etc...
+        uint8_t val = 0; //private and use setter ? => Update mem8,index8,etc...
         bool mem8 = true;
         bool index8 = true;
         bool emulationMode = true;
@@ -148,8 +152,8 @@ private:
     //Signals
     void incPC(unsigned int whatCycle = 1);
     void opPrefetchInIDB();
-    //void invalidAddress();
-    bool invalidAddress = false;
+    void invalidPrefetch();
+    //bool invalidAddress = false;
 
     //Addressing Modes
     enum AdrModeName {IMMEDIATE,IMMEDIATE_SPECIAL,IMPLIED};

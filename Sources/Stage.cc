@@ -8,7 +8,7 @@ std::function<void(W65816*)> Stage::get() const
     return func;
 }
 
-Stage::Signal Stage::getSignal() const
+Stage::EnablingCondition Stage::getEnablingCondition() const
 {
-    return signal;
+    return enablingCondition;
 }
