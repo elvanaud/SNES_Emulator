@@ -1,5 +1,5 @@
 #include "Bus.h"
-#include "W65816.h"
+#include "CPU/W65816.h"
 
 #include <cstdio>
 #include <iostream>

@@ -97,7 +97,7 @@ private:
     Register16 x = Register16(true);
     Register16 y = Register16(true);
 
-    uint8_t ir;
+    uint8_t ir; //Instruction Register
 
     //Status Register
     struct {
@@ -152,8 +152,9 @@ private:
     //Signals
     void incPC(unsigned int whatCycle = 1);
     void opPrefetchInIDB();
+
+    //Predecode Signals
     void invalidPrefetch();
-    //bool invalidAddress = false;
 
     //Addressing Modes
     enum AdrModeName {IMMEDIATE,IMMEDIATE_SPECIAL,IMPLIED};

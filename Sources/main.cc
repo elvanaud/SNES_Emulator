@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "W65816.h"
+#include "CPU/W65816.h"
 #include "Bus.h"
 
 using std::cout;
