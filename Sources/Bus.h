@@ -3,6 +3,7 @@
 
 #include <cstdint>
 
+#include "ConsoleDebugger.h"
 
 class W65816;
 
@@ -19,6 +20,7 @@ public:
     uint8_t DMR();
 private:
     W65816 &cpu;
+    ConsoleDebugger debugger;
 
     uint8_t dmr = 0;
     uint8_t ram[RAM_QUANTITY];

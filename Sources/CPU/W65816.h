@@ -13,9 +13,9 @@ class Bus;
 #include "Types.h"
 #include "AddressingMode.h"
 
-
 class W65816
 {
+    friend class CPU_Debugger;
 public:
     W65816();
     void attachBus(Bus * b);

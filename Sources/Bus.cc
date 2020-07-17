@@ -6,7 +6,7 @@
 using std::cout;
 using std::endl;
 
-Bus::Bus(W65816 & c) : cpu(c)
+Bus::Bus(W65816 & c) : cpu(c), debugger(cpu)
 {
     ram[0xFF]  = 0x38; //SEC
     ram[0x100] = 0x69; //ADC
@@ -39,6 +39,12 @@ void Bus::run()
 {
     while(true)
     {
+        if(debugger.isExecutionBlocked())
+        {
+            cout << "CPU Blocked" << endl;
+            getchar();
+            debugger.continueExec();
+        }
         cout << "TCycle = " << cpu.getTCycle() << endl;
         cpu.tick();
 
