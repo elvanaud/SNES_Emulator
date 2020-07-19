@@ -113,7 +113,11 @@ void W65816::updateNZFlags(uint16_t v, bool indexValue)
     unsigned int offset = 7;
     if((!indexValue && !p.mem8) || (indexValue && !p.index8)) offset = 15;
 
-    p.setN(v>>offset);
+    p.setN((v>>offset)&1);
+
+    if(offset == 15) v &= 0xFFFF;
+    else v &= 0xFF;
+
     p.setZ(v == 0);
 }
 
