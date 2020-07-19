@@ -108,7 +108,7 @@ private:
 
     //Status Register
     struct {
-        bool mem8 = true;
+        bool mem8 = true; //Should probably not be public
         bool index8 = true;
         bool emulationMode = true;
         //Common
@@ -127,18 +127,18 @@ private:
         //Depending on Mode
         uint8_t M() { if(!emulationMode) return (val>>5)&1; return mem8;}
         uint8_t X() { if(!emulationMode) return (val>>4)&1; return index8;}
-        uint8_t B() { if(emulationMode) return (val>>4)&1; return false;} //throw ?
+        uint8_t B() { if(emulationMode) return (val>>4)&1; return false;}
         uint8_t E() { return emulationMode;}
         void setM(bool status) { if(!emulationMode) val = (val & ~(1<<5)) | (uint8_t(status)<<5); mem8 = status;}
         void setX(bool status) { if(!emulationMode) val = (val & ~(1<<4)) | (uint8_t(status)<<4); index8 = status;}
         void setB(bool status) { if(emulationMode) val = (val & ~(1<<4)) | (uint8_t(status)<<4); }
-        void setE(bool status) { emulationMode = status;}
+        void setE(bool status) { emulationMode = status; /*if(emulationMode)*/ {setM(true); setX(true);}}
 
         void update() {setM(M()); setX(X());}
         void setVal(uint8_t v) {val = v; update();}
         uint8_t getVal() {return val;}
 
-        private: uint8_t val = 0;
+        private: uint8_t val = 0x30;
     } p;
 
     void setReg(Register16 & r, uint16_t v); //TODO: How to differentiate between Index and ACC ???
@@ -176,6 +176,7 @@ private:
     void ADC();
     void AND();
     void BIT();
+    void CLC();
     void CMP();
     void CPX();
     void CPY();
@@ -187,6 +188,7 @@ private:
     void REP();
     void SEC();
     void SEP();
+    void XCE();
 };
 
 #endif // W65816_H

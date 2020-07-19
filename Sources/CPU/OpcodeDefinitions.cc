@@ -3,6 +3,7 @@
 void W65816::initializeOpcodes()
 {
     decodingTable[0x09] = Instruction("ORA", Immediate, ORA);
+    decodingTable[0x18] = Instruction("CLC", Implied, CLC);
     decodingTable[0x29] = Instruction("AND", Immediate, AND);
     decodingTable[0x38] = Instruction("SEC", Implied, SEC);
     decodingTable[0x49] = Instruction("EOR", Immediate, EOR);
@@ -16,4 +17,5 @@ void W65816::initializeOpcodes()
     decodingTable[0xE0] = Instruction("CPX", Immediate, CPX); decodingTable[0xE0].setIsIndexRelated(true);
     decodingTable[0xE2] = Instruction("SEP", ImmediateSpecial, SEP);
     decodingTable[0xC0] = Instruction("CPY", Immediate, CPY); decodingTable[0xC0].setIsIndexRelated(true);
+    decodingTable[0xFB] = Instruction("XCE", Implied, XCE);
 }

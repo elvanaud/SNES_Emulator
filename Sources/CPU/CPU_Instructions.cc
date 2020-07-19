@@ -69,6 +69,11 @@ void W65816::BIT()
     p.setZ(r==0);
 }
 
+void W65816::CLC()
+{
+    p.setC(false);
+}
+
 void W65816::CMP()
 {
     uint16_t a = getReg(acc);
@@ -150,4 +155,11 @@ void W65816::SEP()
     if(p.emulationMode) mask &= 0b11'00'1111;
 
     p.setVal(p.getVal() | mask); //p.update();
+}
+
+void W65816::XCE()
+{
+    uint8_t cFlag = p.C();
+    p.setC(p.E());
+    p.setE(cFlag);
 }
