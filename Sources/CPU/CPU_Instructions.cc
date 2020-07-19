@@ -136,8 +136,7 @@ void W65816::REP()
     uint8_t mask = idb.low;
     if(p.emulationMode) mask &= 0b11'00'1111;
 
-    p.val &= ~mask;
-    p.update();
+    p.setVal(p.getVal() & ~mask); //p.update();
 }
 
 void W65816::SEC()
@@ -150,6 +149,5 @@ void W65816::SEP()
     uint8_t mask = idb.low;
     if(p.emulationMode) mask &= 0b11'00'1111;
 
-    p.val |= mask;
-    p.update();
+    p.setVal(p.getVal() | mask); //p.update();
 }

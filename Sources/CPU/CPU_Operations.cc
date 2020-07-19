@@ -66,8 +66,9 @@ void W65816::fetch(Register16 *src, uint8_t * dst)
         if(tcycle == 0) state = OpcodeFetch;
     }
     handleValidAddressPINS(state);
-    //todo: generateAddressWithBank();
-    bus->read(src->val());
+    //todo: generateAddressWithBank(); //Based on vda / vpa
+    addressBusBuffer = src->val();
+    bus->read(addressBusBuffer);
     *dst =  bus->DMR();
 }
 

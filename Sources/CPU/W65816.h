@@ -24,17 +24,23 @@ public:
     //Pins
     bool VDA();
     bool VPA();
+    bool E();
+    bool M();
+    bool X();
+
+    void RESET();
 
     //Getters - Registers
     uint16_t getPC();
     uint16_t getAcc();
-    uint16_t getAdr();
-    uint16_t getIDB();
     uint8_t getIR();
     uint8_t getP();
+    uint32_t getAddressBus();
 
     //Getters - Internal
     unsigned int getTCycle();
+    uint16_t getAdr();
+    uint16_t getIDB();
 
 private:
     //Private Internal State
@@ -91,6 +97,7 @@ private:
 
     Register16 pc; //Could be uint16_t directly ?
     Register16 adr;
+    uint32_t addressBusBuffer;
 
     Register16 idb;
     Register16 acc;
@@ -101,7 +108,6 @@ private:
 
     //Status Register
     struct {
-        uint8_t val = 0; //private and use setter ? => Update mem8,index8,etc...
         bool mem8 = true;
         bool index8 = true;
         bool emulationMode = true;
@@ -129,6 +135,10 @@ private:
         void setE(bool status) { emulationMode = status;}
 
         void update() {setM(M()); setX(X());}
+        void setVal(uint8_t v) {val = v; update();}
+        uint8_t getVal() {return val;}
+
+        private: uint8_t val = 0;
     } p;
 
     void setReg(Register16 & r, uint16_t v); //TODO: How to differentiate between Index and ACC ???

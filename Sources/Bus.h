@@ -2,6 +2,8 @@
 #define Bus_H
 
 #include <cstdint>
+#include <vector>
+using std::vector;
 
 #include "ConsoleDebugger.h"
 
@@ -18,6 +20,8 @@ public:
 
     void read(uint32_t adr);
     uint8_t DMR();
+
+    void copyInMemory(uint32_t adr, vector<uint8_t> const & buffer);
 private:
     W65816 &cpu;
     ConsoleDebugger debugger;

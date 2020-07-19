@@ -26,7 +26,7 @@ void W65816::attachBus(Bus * b)
 // ------- Getters ----------
 uint8_t W65816::getP()
 {
-    return p.val;
+    return p.getVal();
 }
 
 uint16_t W65816::getPC()
@@ -59,6 +59,11 @@ unsigned int W65816::getTCycle()
     return tcycle;
 }
 
+uint32_t W65816::getAddressBus()
+{
+    return addressBusBuffer;
+}
+
 // ---------- PINS ------------------
 bool W65816::VDA()
 {
@@ -68,6 +73,27 @@ bool W65816::VDA()
 bool W65816::VPA()
 {
     return vpa;
+}
+
+bool W65816::E()
+{
+    return p.emulationMode;
+}
+
+bool W65816::M()
+{
+    return p.M();
+}
+
+bool W65816::X()
+{
+    return p.X();
+}
+
+void RESET()
+{
+    //TODO: reset some flags
+    //TODO: reload pipeline with interupt content
 }
 
 void W65816::setReg(Register16 & r, uint16_t v)
@@ -148,6 +174,7 @@ void W65816::handleValidAddressPINS(ValidAddressState state)
         forceInternalOperation = false;
     }
 }
+
 void W65816::tick()
 {
     handleValidAddressPINS(ValidAddressState::InternalOperation);

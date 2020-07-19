@@ -21,6 +21,8 @@ Bus::Bus(W65816 & c) : cpu(c), debugger(cpu)
     ram[0x109] = 0x02;
     ram[0x10A] = 0xC9; //CMP
     ram[0x10B] = 0x0A;
+    ram[0x10C] = 0xA9; //LDA #42
+    ram[0x10D] = 42;
 }
 
 void Bus::read(uint32_t adr)
@@ -33,6 +35,15 @@ void Bus::read(uint32_t adr)
 uint8_t Bus::DMR()
 {
     return dmr;
+}
+
+void Bus::copyInMemory(uint32_t adr, vector<uint8_t> const & buffer)
+{
+    for(auto value : buffer)
+    {
+        ram[adr] = value;
+        ++adr;
+    }
 }
 
 void Bus::run()

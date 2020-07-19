@@ -8,6 +8,8 @@ CPU_Debugger::CPU_Debugger(W65816 & p_cpu) : cpu(p_cpu)
 bool CPU_Debugger::cpuBlocked()
 {
     if(!debuggerEnabled) return true;
+
+    return false;
 }
 
 void CPU_Debugger::continueExec()
