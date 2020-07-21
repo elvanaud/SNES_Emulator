@@ -107,6 +107,85 @@ TEST_CASE("CPU works", "[cpu]")
         }
     }
 
+    SECTION("SED, SEI, CLD,CLI,CLV")
+    {
+        vector<uint8_t> prog = {
+            0xC2,0xFF, //Clear P
+            0xE2,0x40, //Set V
+            0xB8, //Clear V
+            0xF8, //SED
+            0x78, //SEI
+            0xD8, //CLD
+            0x58 //CLI
+            };
+        bus.copyInMemory(cpu.getPC(),prog);
+
+        cpu.tick(); cpu.tick(); cpu.tick(); //REP
+        cpu.tick(); cpu.tick(); cpu.tick(); //SEP
+
+        uint8_t vFlag = (cpu.getP()>>6)&1;
+        uint8_t dFlag = (cpu.getP()>>3)&1;
+        uint8_t iFlag = (cpu.getP()>>2)&1;
+
+        REQUIRE(vFlag == 1);
+        REQUIRE(dFlag == 0);
+        REQUIRE(iFlag == 0);
+
+        cpu.tick(); cpu.tick(); //CLV
+        cpu.tick(); //Fetch SED
+
+        vFlag = (cpu.getP()>>6)&1;
+        dFlag = (cpu.getP()>>3)&1;
+        iFlag = (cpu.getP()>>2)&1;
+
+        REQUIRE(vFlag == 0);
+        REQUIRE(dFlag == 0);
+        REQUIRE(iFlag == 0);
+
+        cpu.tick();
+        cpu.tick(); //Fetch SEI
+
+        vFlag = (cpu.getP()>>6)&1;
+        dFlag = (cpu.getP()>>3)&1;
+        iFlag = (cpu.getP()>>2)&1;
+
+        REQUIRE(vFlag == 0);
+        REQUIRE(dFlag == 1);
+        REQUIRE(iFlag == 0);
+
+        cpu.tick();
+        cpu.tick(); //Fetch CLD
+
+        vFlag = (cpu.getP()>>6)&1;
+        dFlag = (cpu.getP()>>3)&1;
+        iFlag = (cpu.getP()>>2)&1;
+
+        REQUIRE(vFlag == 0);
+        REQUIRE(dFlag == 1);
+        REQUIRE(iFlag == 1);
+
+        cpu.tick();
+        cpu.tick(); //Fetch CLI
+
+        vFlag = (cpu.getP()>>6)&1;
+        dFlag = (cpu.getP()>>3)&1;
+        iFlag = (cpu.getP()>>2)&1;
+
+        REQUIRE(vFlag == 0);
+        REQUIRE(dFlag == 0);
+        REQUIRE(iFlag == 1);
+
+        cpu.tick();
+        cpu.tick();
+
+        vFlag = (cpu.getP()>>6)&1;
+        dFlag = (cpu.getP()>>3)&1;
+        iFlag = (cpu.getP()>>2)&1;
+
+        REQUIRE(vFlag == 0);
+        REQUIRE(dFlag == 0);
+        REQUIRE(iFlag == 0);
+    }
 
     SECTION("Instruction LDA - Immediate")
     {
@@ -133,34 +212,53 @@ TEST_CASE("CPU works", "[cpu]")
     {
         vector<uint8_t> prog = {0x18, 0xFB, 0xC2,0x20, 0xA9,0x0A,0x01, 0xA9,0x00,0xFF, 0xFB, 0xA9,0, 0x38}; //CLC, XCE, REP #$20, LDA #$010A, LDA #$FF00, XCE, LDA #0, SEC
         bus.copyInMemory(cpu.getPC(), prog);
+
         cpu.tick();cpu.tick(); //CLC
         cpu.tick();cpu.tick(); //XCE
         cpu.tick();cpu.tick();cpu.tick(); //REP
+
         REQUIRE_FALSE(cpu.M());
+
         cpu.tick(); cpu.tick(); cpu.tick(); //LDA
         cpu.tick(); //LDA fetch
+
         REQUIRE(cpu.VDA()); REQUIRE(cpu.VPA());
         REQUIRE(cpu.getAcc() == 0x010A);
+
         cpu.tick(); cpu.tick();
         cpu.tick(); // XCE fetch
+
         REQUIRE(cpu.getAcc() == 0xFF00);
+
         uint8_t nFlag = (cpu.getP()>>7)&1;
         uint8_t zFlag = (cpu.getP()>>1)&1;
+
         REQUIRE(nFlag == 1); REQUIRE(zFlag == 0);
+
         cpu.tick(); //XCE decode
+
         REQUIRE_FALSE(cpu.VDA()); REQUIRE_FALSE(cpu.VPA());
+
         cpu.tick(); //LDA fetch
+
         REQUIRE(cpu.E());
         REQUIRE(cpu.M());
+
         cpu.tick();
         cpu.tick(); //SEC fetch
+
         REQUIRE(cpu.VDA()); REQUIRE(cpu.VPA());
+
         uint8_t acc = cpu.getAcc() & 0xFF;
         REQUIRE(acc == 0);
+
         nFlag = (cpu.getP()>>7)&1;
         zFlag = (cpu.getP()>>1)&1;
+
         REQUIRE(nFlag == 0); REQUIRE(zFlag == 1);
+
         cpu.tick(); cpu.tick();
+
         uint8_t cFlag = cpu.getP() & 1;
         REQUIRE(cFlag == 1);
     }
@@ -249,6 +347,217 @@ TEST_CASE("CPU works", "[cpu]")
         REQUIRE(vFlag == 1);
 
         REQUIRE(cpu.getAcc() == 0x7F);
+    }
+
+    SECTION("Instruction ADC 16 bit, Binary- Immediate")
+    {
+        vector<uint8_t> prog = {
+            0x18, //CLC
+            0xFB, //XCE
+            0xC2,0x20, //REP #$20
+
+            0xA9,0x01,0x00, //LDA #$0001
+            0x69,0xFE,0xFF, //ADC #$FFFE (-2)
+            0x69,0xFE,0x7F, //ADC #$7FFE (+32766)
+            0x69,0x01,0x00  //ADC #$0001
+            };
+        bus.copyInMemory(cpu.getPC(), prog);
+
+        cpu.tick(); cpu.tick();  //CLC
+        cpu.tick(); cpu.tick();  //XCE
+        cpu.tick(); cpu.tick(); cpu.tick();  //REP #$20
+        cpu.tick(); cpu.tick(); cpu.tick(); //LDA #$0001
+        cpu.tick(); //Fetch ADC #$FFFE
+
+        uint8_t cFlag = (cpu.getP()>>0)&1;
+        uint8_t nFlag = (cpu.getP()>>7)&1;
+        uint8_t zFlag = (cpu.getP()>>1)&1;
+        uint8_t vFlag = (cpu.getP()>>6)&1;
+
+        REQUIRE(cFlag == 1);
+        REQUIRE(nFlag == 0);
+        REQUIRE(zFlag == 0);
+        REQUIRE(vFlag == 0);
+
+        REQUIRE(cpu.getAcc() == 0x0001);
+
+        cpu.tick(); cpu.tick(); //ADC #$FFFE
+        cpu.tick(); //Fetch ADC #$7FFE
+
+        cFlag = (cpu.getP()>>0)&1;
+        nFlag = (cpu.getP()>>7)&1;
+        zFlag = (cpu.getP()>>1)&1;
+        vFlag = (cpu.getP()>>6)&1;
+
+        REQUIRE(cFlag == 1);
+        REQUIRE(nFlag == 0);
+        REQUIRE(zFlag == 1);
+        REQUIRE(vFlag == 0);
+
+        REQUIRE(cpu.getAcc() == 0x0000);
+
+        cpu.tick(); cpu.tick(); //ADC #$7FFE
+        cpu.tick(); //Fetch ADC #$0001
+
+        cFlag = (cpu.getP()>>0)&1;
+        nFlag = (cpu.getP()>>7)&1;
+        zFlag = (cpu.getP()>>1)&1;
+        vFlag = (cpu.getP()>>6)&1;
+
+        REQUIRE(cFlag == 0);
+        REQUIRE(nFlag == 0);
+        REQUIRE(zFlag == 0);
+        REQUIRE(vFlag == 0);
+
+        REQUIRE(cpu.getAcc() == 0x7FFF);
+
+        cpu.tick(); cpu.tick(); //ADC #$0001
+        cpu.tick();
+
+        cFlag = (cpu.getP()>>0)&1;
+        nFlag = (cpu.getP()>>7)&1;
+        zFlag = (cpu.getP()>>1)&1;
+        vFlag = (cpu.getP()>>6)&1;
+
+        REQUIRE(cFlag == 0);
+        REQUIRE(nFlag == 1);
+        REQUIRE(zFlag == 0);
+        REQUIRE(vFlag == 1);
+
+        REQUIRE(cpu.getAcc() == 0x8000);
+    }
+
+    SECTION("Instruction ADC 8 bit, Decimal - Immediate")
+    {
+        vector<uint8_t> prog = {//nvz
+            0x18, //CLC
+            0xF8, //SED
+            0xA9,0x53, //LDA #$53
+            0x69,0x34, //ADC #$34
+            0x69,0x03, //ADC #$03
+            0x69,0x10, //ADC #$10
+            0x38, //SEC
+            0x69,0x09 //ADC #$09
+            };
+        bus.copyInMemory(cpu.getPC(), prog);
+
+        cpu.tick(); cpu.tick();
+        cpu.tick(); cpu.tick();
+        cpu.tick(); cpu.tick(); //LDA
+        cpu.tick(); cpu.tick(); //ADC $34
+        cpu.tick(); //Fetch ADC $03
+
+        uint8_t cFlag = (cpu.getP()>>0)&1;
+        uint8_t nFlag = (cpu.getP()>>7)&1;
+        uint8_t zFlag = (cpu.getP()>>1)&1;
+        //uint8_t vFlag = (cpu.getP()>>6)&1; //TODO: weird undocumented behavior
+
+        REQUIRE(cFlag == 0);
+        REQUIRE(nFlag == 1);
+        REQUIRE(zFlag == 0);
+
+        REQUIRE(cpu.getAcc() == 0x87);
+
+        cpu.tick();
+        cpu.tick(); //Fetch ADC $10
+
+        cFlag = (cpu.getP()>>0)&1;
+        nFlag = (cpu.getP()>>7)&1;
+        zFlag = (cpu.getP()>>1)&1;
+
+        REQUIRE(cFlag == 0);
+        REQUIRE(nFlag == 1);
+        REQUIRE(zFlag == 0);
+
+        REQUIRE(cpu.getAcc() == 0x90);
+
+        cpu.tick();
+        cpu.tick(); //Fetch SEC
+
+        cFlag = (cpu.getP()>>0)&1;
+        nFlag = (cpu.getP()>>7)&1;
+        zFlag = (cpu.getP()>>1)&1;
+
+        REQUIRE(cFlag == 1);
+        REQUIRE(nFlag == 0);
+        REQUIRE(zFlag == 1);
+
+        REQUIRE(cpu.getAcc() == 0x00);
+
+        cpu.tick();
+        cpu.tick(); //Fetch ADC $09
+        cpu.tick();
+        cpu.tick();
+
+        cFlag = (cpu.getP()>>0)&1;
+        nFlag = (cpu.getP()>>7)&1;
+        zFlag = (cpu.getP()>>1)&1;
+
+        REQUIRE(cFlag == 0);
+        REQUIRE(nFlag == 0);
+        REQUIRE(zFlag == 0);
+
+        REQUIRE(cpu.getAcc() == 0x10);
+    }
+
+    SECTION("Instruction ADC 16 bit, Decimal - Immediate")
+    {
+        vector<uint8_t> prog = {
+            0x18, //CLC
+            0xFB, //XCE
+            0xC2,0x20, //REP #$20
+            0xF8, //SED
+
+            0xA9,0x98,0x00, //LDA #$0098
+            0x69,0x01,0x00, //ADC #$0001
+            0x69,0x01,0x98, //ADC #$9801
+            0x69,0x99,0x00 //ADC #$0099
+            };
+        bus.copyInMemory(cpu.getPC(), prog);
+
+        cpu.tick(); cpu.tick(); //CLC
+        cpu.tick(); cpu.tick(); //XCE
+        cpu.tick(); cpu.tick(); cpu.tick(); //REP #$20
+        cpu.tick(); cpu.tick(); //SED
+        cpu.tick(); cpu.tick(); cpu.tick(); //LDA
+        cpu.tick(); cpu.tick(); cpu.tick();//ADC $0001
+        cpu.tick(); //Fetch ADC $9801
+
+        uint8_t cFlag = (cpu.getP()>>0)&1;
+        uint8_t nFlag = (cpu.getP()>>7)&1;
+        uint8_t zFlag = (cpu.getP()>>1)&1;
+
+        REQUIRE(cFlag == 0);
+        REQUIRE(nFlag == 0);
+        REQUIRE(zFlag == 0);
+
+        REQUIRE(cpu.getAcc() == 0x0100);
+
+        cpu.tick(); cpu.tick();
+        cpu.tick(); //Fetch ADC $0099
+
+        cFlag = (cpu.getP()>>0)&1;
+        nFlag = (cpu.getP()>>7)&1;
+        zFlag = (cpu.getP()>>1)&1;
+
+        REQUIRE(cFlag == 0);
+        REQUIRE(nFlag == 1);
+        REQUIRE(zFlag == 0);
+
+        REQUIRE(cpu.getAcc() == 0x9901);
+
+        cpu.tick(); cpu.tick();
+        cpu.tick();
+
+        cFlag = (cpu.getP()>>0)&1;
+        nFlag = (cpu.getP()>>7)&1;
+        zFlag = (cpu.getP()>>1)&1;
+
+        REQUIRE(cFlag == 1);
+        REQUIRE(nFlag == 0);
+        REQUIRE(zFlag == 1);
+
+        REQUIRE(cpu.getAcc() == 0x0000);
     }
 }
 

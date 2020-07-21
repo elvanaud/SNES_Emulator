@@ -33,8 +33,8 @@ void W65816::ADC()
             return res;
         };
 
-        r = decimalAdd8bit(idb.low,acc.low);
-        if(!p.mem8) r = decimalAdd8bit(idb.high,acc.high+(r>>8));
+        r = decimalAdd8bit(idb.low,acc.low+p.C());
+        if(!p.mem8) r = (decimalAdd8bit(idb.high,acc.high+(r>>8))<<8) | (r&0xFF);
 
         acc.low = r&0xFF;
         if(!p.mem8) acc.high = (r>>8)&0xFF;
@@ -72,6 +72,21 @@ void W65816::BIT()
 void W65816::CLC()
 {
     p.setC(false);
+}
+
+void W65816::CLD()
+{
+    p.setD(false);
+}
+
+void W65816::CLI()
+{
+    p.setI(false);
+}
+
+void W65816::CLV()
+{
+    p.setV(false);
 }
 
 void W65816::CMP()
@@ -147,6 +162,16 @@ void W65816::REP()
 void W65816::SEC()
 {
     p.setC(true);
+}
+
+void W65816::SED()
+{
+    p.setD(true);
+}
+
+void W65816::SEI()
+{
+    p.setI(true);
 }
 
 void W65816::SEP()

@@ -120,8 +120,8 @@ private:
         uint8_t N() { return (val>>7)&1; }
         void setC(bool status) { val = (val & ~(1<<0)) | (uint8_t(status)<<0); }
         void setZ(bool status) { val = (val & ~(1<<1)) | (uint8_t(status)<<1); }
-        void setD(bool status) { val = (val & ~(1<<2)) | (uint8_t(status)<<2); }
-        void setI(bool status) { val = (val & ~(1<<3)) | (uint8_t(status)<<3); }
+        void setD(bool status) { val = (val & ~(1<<3)) | (uint8_t(status)<<3); }
+        void setI(bool status) { val = (val & ~(1<<2)) | (uint8_t(status)<<2); }
         void setV(bool status) { val = (val & ~(1<<6)) | (uint8_t(status)<<6); }
         void setN(bool status) { val = (val & ~(1<<7)) | (uint8_t(status)<<7); }
         //Depending on Mode
@@ -177,6 +177,9 @@ private:
     void AND();
     void BIT();
     void CLC();
+    void CLD();
+    void CLI();
+    void CLV();
     void CMP();
     void CPX();
     void CPY();
@@ -187,6 +190,8 @@ private:
     void ORA();
     void REP();
     void SEC();
+    void SED();
+    void SEI();
     void SEP();
     void XCE();
 };
