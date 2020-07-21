@@ -12,7 +12,8 @@ void W65816::initializeAddressingModes()
     ImmediateSpecial.setSignals({bind(incPC,this,2),bind(opPrefetchInIDB,this)});
 
     Implied.setStages({{Stage(Stage::SIG_INST,dummyStage)}});
-    //Implied.setSignals({bind(invalidPrefetch,this)});/*[](W65816* cpu){   if(cpu->invalidAddress) cpu->invalidAddress = false;
-                                                //if(cpu->tcycle == 1)cpu->invalidAddress = true; },this)});*/
+    Implied.setPredecodeSignals({bind(invalidPrefetch,this)});
+
+    ImpliedSpecial.setStages({{Stage(Stage::SIG_INST,dummyStage)},{Stage(Stage::SIG_DUMMY_STAGE, dummyStage)}});
     Implied.setPredecodeSignals({bind(invalidPrefetch,this)});
 }

@@ -169,10 +169,11 @@ private:
     void invalidPrefetch();
 
     //Addressing Modes
-    enum AdrModeName {IMMEDIATE,IMMEDIATE_SPECIAL,IMPLIED};
+    enum AdrModeName {IMMEDIATE, IMMEDIATE_SPECIAL, IMPLIED, IMPLIED_SPECIAL};
     AddressingMode Immediate = AddressingMode(AdrModeName::IMMEDIATE);
     AddressingMode ImmediateSpecial = AddressingMode(AdrModeName::IMMEDIATE_SPECIAL);
     AddressingMode Implied = AddressingMode(AdrModeName::IMPLIED);
+    AddressingMode ImpliedSpecial = AddressingMode(AdrModeName::IMPLIED_SPECIAL);
 
     //Instructions
     void ADC();
@@ -211,6 +212,7 @@ private:
     void TXY();
     void TYA();
     void TYX();
+    void XBA();
     void XCE();
 };
 

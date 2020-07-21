@@ -38,6 +38,7 @@ void W65816::initializeOpcodes()
     decodingTable[0xE2] = Instruction("SEP", ImmediateSpecial, SEP);
     decodingTable[0xE8] = Instruction("INX", Implied, INX);
     decodingTable[0xEA] = Instruction("NOP", Implied, dummyStage);
+    decodingTable[0xEB] = Instruction("XBA", ImpliedSpecial, XBA);
     decodingTable[0xF8] = Instruction("SED", Implied, SED);
     decodingTable[0xFB] = Instruction("XCE", Implied, XCE);
 }

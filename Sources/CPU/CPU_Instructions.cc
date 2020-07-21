@@ -292,6 +292,14 @@ void W65816::TYX()
     updateNZFlags(x.val(),true);
 }
 
+void W65816::XBA()
+{
+    uint8_t tmp = acc.high;
+    acc.high = acc.low;
+    acc.low = tmp;
+    updateNZFlags(uint16_t(acc.low)<<8, false,true); //Force16 and offset the low byte so it is recognized as the upper half
+}
+
 void W65816::XCE()
 {
     uint8_t cFlag = p.C();
