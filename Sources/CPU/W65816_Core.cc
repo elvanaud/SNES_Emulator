@@ -108,10 +108,10 @@ uint16_t W65816::getReg(Register16 & r)
     return r.val();
 }
 
-void W65816::updateNZFlags(uint16_t v, bool indexValue)
+void W65816::updateNZFlags(uint16_t v, bool indexValue, bool force16)
 {
     unsigned int offset = 7;
-    if((!indexValue && !p.mem8) || (indexValue && !p.index8)) offset = 15;
+    if((!indexValue && !p.mem8) || (indexValue && !p.index8) || force16) offset = 15;
 
     p.setN((v>>offset)&1);
 

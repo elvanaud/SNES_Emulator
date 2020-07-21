@@ -116,11 +116,43 @@ void W65816::CPY()
     p.setC(a >= b);
 }
 
+void W65816::DEX()
+{
+    uint16_t r = getReg(x);
+    --r;
+    updateNZFlags(r,true);
+    setReg(x,r);
+}
+
+void W65816::DEY()
+{
+    uint16_t r = getReg(y);
+    --r;
+    updateNZFlags(r,true);
+    setReg(y,r);
+}
+
 void W65816::EOR()
 {
     uint16_t r = getReg(acc)^getReg(idb);
     updateNZFlags(r);
     setReg(acc,r);
+}
+
+void W65816::INX()
+{
+    uint16_t r = getReg(x);
+    ++r;
+    updateNZFlags(r,true);
+    setReg(x,r);
+}
+
+void W65816::INY()
+{
+    uint16_t r = getReg(y);
+    ++r;
+    updateNZFlags(r,true);
+    setReg(y,r);
 }
 
 void W65816::LDA()
@@ -156,7 +188,13 @@ void W65816::REP()
     uint8_t mask = idb.low;
     if(p.emulationMode) mask &= 0b11'00'1111;
 
-    p.setVal(p.getVal() & ~mask); //p.update();
+    p.setVal(p.getVal() & ~mask);
+
+    if(p.index8)
+    {
+        x.high = 0;
+        y.high = 0;
+    }
 }
 
 void W65816::SEC()
@@ -179,7 +217,79 @@ void W65816::SEP()
     uint8_t mask = idb.low;
     if(p.emulationMode) mask &= 0b11'00'1111;
 
-    p.setVal(p.getVal() | mask); //p.update();
+    p.setVal(p.getVal() | mask);
+}
+
+void W65816::TAX()
+{
+    setReg(x,acc.val());
+    updateNZFlags(x.val(),true);
+}
+
+void W65816::TAY()
+{
+    setReg(y,acc.val());
+    updateNZFlags(y.val(),true);
+}
+
+void W65816::TCD()
+{
+    d.set(acc.val());
+    updateNZFlags(d.val(),false,true); //Use force16 here
+}
+
+void W65816::TCS()
+{
+    s.low = acc.low;
+    if(!p.emulationMode) s.high = acc.high;
+}
+
+void W65816::TDC()
+{
+    acc.set(d.val());
+    updateNZFlags(acc.val(),false,true); //Use force16 here
+}
+
+void W65816::TSC()
+{
+    acc.set(s.val());
+    updateNZFlags(acc.val(),false,true); //Use force16 here
+}
+
+void W65816::TSX()
+{
+    setReg(x,s.val());
+    updateNZFlags(x.val(),true);
+}
+
+void W65816::TXA()
+{
+    setReg(acc,x.val());
+    updateNZFlags(acc.val());
+}
+
+void W65816::TXS()
+{
+    s.low = x.low;
+    if(!p.emulationMode) s.high = x.high;
+}
+
+void W65816::TXY()
+{
+    setReg(y,x.val());
+    updateNZFlags(y.val(),true);
+}
+
+void W65816::TYA()
+{
+    setReg(acc,y.val());
+    updateNZFlags(acc.val());
+}
+
+void W65816::TYX()
+{
+    setReg(x,y.val());
+    updateNZFlags(x.val(),true);
 }
 
 void W65816::XCE()

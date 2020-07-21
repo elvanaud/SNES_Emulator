@@ -559,9 +559,91 @@ TEST_CASE("CPU works", "[cpu]")
 
         REQUIRE(cpu.getAcc() == 0x0000);
     }
+
+    SECTION("AND - Immediate")
+    {
+        vector<uint8_t> prog = {
+            0x38, //SEC
+            0xA9,0x91, //LDA #$91
+            0x29,0xA1, //AND #$A1
+            0x29,0x00 //AND #$00
+            };
+        bus.copyInMemory(cpu.getPC(), prog);
+
+        cpu.tick(); cpu.tick();  //SEC
+        cpu.tick(); cpu.tick();  //LDA #$98
+        cpu.tick(); //Fetch AND #$B1
+
+        uint8_t nFlag = (cpu.getP()>>7)&1;
+        uint8_t zFlag = (cpu.getP()>>1)&1;
+
+        REQUIRE(nFlag == 1);
+        REQUIRE(zFlag == 0);
+
+        REQUIRE(cpu.getAcc() == 0x91);
+
+        cpu.tick(); //AND #$B1
+        cpu.tick(); //Fetch AND #$00
+
+        nFlag = (cpu.getP()>>7)&1;
+        zFlag = (cpu.getP()>>1)&1;
+
+        REQUIRE(nFlag == 1);
+        REQUIRE(zFlag == 0);
+
+        REQUIRE(cpu.getAcc() == 0x81);
+
+        cpu.tick(); //AND #$00
+        cpu.tick(); //Fetch ..
+
+        nFlag = (cpu.getP()>>7)&1;
+        zFlag = (cpu.getP()>>1)&1;
+        uint8_t cFlag = (cpu.getP()>>0)&1;
+
+        REQUIRE(nFlag == 0);
+        REQUIRE(zFlag == 1);
+        REQUIRE(cFlag == 1); //The carry hasn't been affected
+
+        REQUIRE(cpu.getAcc() == 0x00);
+    }
 }
 
 TEST_CASE("CPU Reset", "[!mayfail]") //TODO
 {
     REQUIRE(false);
 }
+
+TEST_CASE("Decimal Mode V flag behavior", "[!mayfail]") //TODO
+{
+    REQUIRE(false);
+}
+
+TEST_CASE("Test X,Y Reg lose their high part when going native mode", "[!mayfail]") //TODO
+{
+    REQUIRE(false);
+}
+
+
+/*
+    void ADC(); //Tested
+    void AND(); //Tested
+    void BIT();
+    void CLC(); //Tested
+    void CLD(); //Tested
+    void CLI(); //Tested
+    void CLV(); //Tested
+    void CMP();
+    void CPX();
+    void CPY();
+    void EOR();
+    void LDA(); //Tested
+    void LDX();
+    void LDY();
+    void ORA();
+    void REP(); //Tested
+    void SEC(); //Tested
+    void SED(); //Tested
+    void SEI(); //Tested
+    void SEP(); //Tested
+    void XCE(); //Tested
+*/

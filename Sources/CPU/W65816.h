@@ -72,7 +72,7 @@ private:
         Register16(bool idx = false) {isIndex = idx;}
         bool isIndex = false;
         uint8_t low = 0,high = 0;
-        uint16_t val() { return (uint16_t(high) << 8) | low; }
+        uint16_t val() { return (uint16_t(high) << 8) | low; } //TODO: high=0 when index8
 
         void set(uint16_t v)
         {
@@ -103,6 +103,8 @@ private:
     Register16 acc;
     Register16 x = Register16(true);
     Register16 y = Register16(true);
+    Register16 d;
+    Register16 s;
 
     uint8_t ir; //Instruction Register
 
@@ -156,7 +158,7 @@ private:
     void dummyStage(); //Dummy operation
 
     void updateStatusFlags(uint32_t v, bool indexValue = false);
-    void updateNZFlags(uint16_t v, bool indexValue = false);
+    void updateNZFlags(uint16_t v, bool indexValue = false, bool force16 = false);
     void checkSignedOverflow(int a, int b, int c);
 
     //Signals
@@ -183,7 +185,11 @@ private:
     void CMP();
     void CPX();
     void CPY();
+    void DEX();
+    void DEY();
     void EOR();
+    void INX();
+    void INY();
     void LDA();
     void LDX();
     void LDY();
@@ -193,6 +199,18 @@ private:
     void SED();
     void SEI();
     void SEP();
+    void TAX();
+    void TAY();
+    void TCD();
+    void TCS();
+    void TDC();
+    void TSC();
+    void TSX();
+    void TXA();
+    void TXS();
+    void TXY();
+    void TYA();
+    void TYX();
     void XCE();
 };
 
