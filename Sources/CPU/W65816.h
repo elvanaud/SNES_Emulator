@@ -169,11 +169,14 @@ private:
     void invalidPrefetch();
 
     //Addressing Modes
-    enum AdrModeName {IMMEDIATE, IMMEDIATE_SPECIAL, IMPLIED, IMPLIED_SPECIAL};
-    AddressingMode Immediate = AddressingMode(AdrModeName::IMMEDIATE);
-    AddressingMode ImmediateSpecial = AddressingMode(AdrModeName::IMMEDIATE_SPECIAL);
-    AddressingMode Implied = AddressingMode(AdrModeName::IMPLIED);
-    AddressingMode ImpliedSpecial = AddressingMode(AdrModeName::IMPLIED_SPECIAL);
+    enum AdrModeName {IMMEDIATE, IMMEDIATE_SPECIAL, IMPLIED, IMPLIED_SPECIAL, ABSOLUTE};
+
+    AddressingMode Immediate            = AddressingMode(AdrModeName::IMMEDIATE);
+    AddressingMode ImmediateSpecial     = AddressingMode(AdrModeName::IMMEDIATE_SPECIAL);
+    AddressingMode Implied              = AddressingMode(AdrModeName::IMPLIED);
+    AddressingMode ImpliedSpecial       = AddressingMode(AdrModeName::IMPLIED_SPECIAL);
+    AddressingMode Absolute             = AddressingMode(AdrModeName::ABSOLUTE);
+
 
     //Instructions
     void ADC();
@@ -196,6 +199,7 @@ private:
     void LDY();
     void ORA();
     void REP();
+    void SBC();
     void SEC();
     void SED();
     void SEI();

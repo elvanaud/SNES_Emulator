@@ -46,7 +46,7 @@ void W65816::ADC()
         int offset = 7;
         if(!p.mem8) offset = 15;
         int aSign = (acc.val()>>offset)&1;
-        int bSign = (idb.val()>>offset)&1;
+        int bSign = ((idb.val()+p.C())>>offset)&1;
         int cSign = (r>>offset)&1;
         checkSignedOverflow(aSign,bSign,cSign);
 
@@ -195,6 +195,21 @@ void W65816::REP()
         x.high = 0;
         y.high = 0;
     }
+}
+
+void W65816::SBC()
+{
+    if(p.D())
+    {
+        uint16_t complement = p.mem8 ? 0x99 : 0x9999;
+        setReg(idb, complement - getReg(idb));
+        //ADC(); //acc+(-idb-1)+p.c
+    }
+    else
+    {
+        setReg(idb,~getReg(idb)); //1's complement (adding the carry will make it 2's complement, not adding it will make -idb-1(borrow)
+    }
+    ADC();
 }
 
 void W65816::SEC()

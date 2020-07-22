@@ -606,6 +606,181 @@ TEST_CASE("CPU works", "[cpu]")
 
         REQUIRE(cpu.getAcc() == 0x00);
     }
+
+    SECTION("Instruction SBC 8 bit, Binary- Immediate")
+    {
+        vector<uint8_t> prog = {
+            //0x18, //CLC
+            0x38, //SEC
+            0xA9,0x3A, //LDA #$3A
+            0xE9,0x01, //SBC #$01
+            0xE9,0x39, //SBC #$39
+            0xE9,0x01, //SBC #$01
+            0xE9,0x01, //SBC #$01
+            0xE9,0x80  //SBC #$80
+            };
+        bus.copyInMemory(cpu.getPC(), prog);
+
+        cpu.tick(); cpu.tick(); //SEC
+        cpu.tick(); cpu.tick(); //LDA #$3A
+        cpu.tick(); cpu.tick(); //SBC #$01
+        cpu.tick(); //Fetch SBC #$39
+
+        uint8_t cFlag = (cpu.getP()>>0)&1;
+        uint8_t nFlag = (cpu.getP()>>7)&1;
+        uint8_t zFlag = (cpu.getP()>>1)&1;
+        uint8_t vFlag = (cpu.getP()>>6)&1;
+
+        REQUIRE(cFlag == 1);
+        REQUIRE(nFlag == 0);
+        REQUIRE(zFlag == 0);
+        REQUIRE(vFlag == 0);
+
+        REQUIRE(cpu.getAcc() == 0x39);
+
+        cpu.tick(); //SBC #$39
+        cpu.tick(); //Fetch SBC #$01
+
+        cFlag = (cpu.getP()>>0)&1;
+        nFlag = (cpu.getP()>>7)&1;
+        zFlag = (cpu.getP()>>1)&1;
+        vFlag = (cpu.getP()>>6)&1;
+
+        REQUIRE(cFlag == 1);
+        REQUIRE(nFlag == 0);
+        REQUIRE(zFlag == 1);
+        REQUIRE(vFlag == 0);
+
+        REQUIRE(cpu.getAcc() == 0x00);
+
+        cpu.tick(); //SBC #$01
+        cpu.tick(); //Fetch SBC #$01
+
+        cFlag = (cpu.getP()>>0)&1;
+        nFlag = (cpu.getP()>>7)&1;
+        zFlag = (cpu.getP()>>1)&1;
+        vFlag = (cpu.getP()>>6)&1;
+
+        REQUIRE(cFlag == 0);
+        REQUIRE(nFlag == 1);
+        REQUIRE(zFlag == 0);
+        REQUIRE(vFlag == 0);
+
+        REQUIRE(cpu.getAcc() == 0xFF);
+
+        cpu.tick(); //SBC #$01
+        cpu.tick(); //Fetch SBC #$80
+
+        cFlag = (cpu.getP()>>0)&1;
+        nFlag = (cpu.getP()>>7)&1;
+        zFlag = (cpu.getP()>>1)&1;
+        vFlag = (cpu.getP()>>6)&1;
+
+        REQUIRE(cFlag == 1);
+        REQUIRE(nFlag == 1);
+        REQUIRE(zFlag == 0);
+        REQUIRE(vFlag == 0);
+
+        REQUIRE(cpu.getAcc() == 0xFD);
+
+        cpu.tick(); cpu.tick(); //SBC #$80
+
+        cFlag = (cpu.getP()>>0)&1;
+        nFlag = (cpu.getP()>>7)&1;
+        zFlag = (cpu.getP()>>1)&1;
+        vFlag = (cpu.getP()>>6)&1;
+
+        REQUIRE(cFlag == 1);
+        REQUIRE(nFlag == 0);
+        REQUIRE(zFlag == 0);
+        REQUIRE(vFlag == 1);
+
+        REQUIRE(cpu.getAcc() == 0x7D);
+    }
+
+    SECTION("Instruction SBC 8 bit, Decimal- Immediate")
+    {
+        vector<uint8_t> prog = {
+            //0x18, //CLC
+            0xF8, //SED
+            0x38, //SEC
+            0xA9,0x54, //LDA #$54
+            0xE9,0x34, //SBC #$34
+            0xE9,0x01, //SBC #$01
+            0xE9,0x30, //SBC #$30
+            0xE9,0x01, //SBC #$01
+            0xE9,0x87  //SBC #$87
+            };
+        bus.copyInMemory(cpu.getPC(), prog);
+
+        cpu.tick(); cpu.tick(); //SED
+        cpu.tick(); cpu.tick(); //SEC
+        cpu.tick(); cpu.tick(); //LDA #$54
+        cpu.tick(); cpu.tick(); //SBC #$34
+        cpu.tick(); //Fetch SBC #$01
+
+        uint8_t cFlag = (cpu.getP()>>0)&1;
+        uint8_t nFlag = (cpu.getP()>>7)&1;
+        uint8_t zFlag = (cpu.getP()>>1)&1;
+
+        REQUIRE(cFlag == 1);
+        REQUIRE(nFlag == 0);
+        REQUIRE(zFlag == 0);
+
+        REQUIRE(cpu.getAcc() == 0x20);
+
+        cpu.tick(); //SBC #$01
+        cpu.tick(); //Fetch SBC #$30
+
+        cFlag = (cpu.getP()>>0)&1;
+        nFlag = (cpu.getP()>>7)&1;
+        zFlag = (cpu.getP()>>1)&1;
+
+        REQUIRE(cFlag == 1);
+        REQUIRE(nFlag == 0);
+        REQUIRE(zFlag == 0);
+
+        REQUIRE(cpu.getAcc() == 0x19);
+
+        cpu.tick(); //SBC #$30
+        cpu.tick(); //Fetch SBC #$01
+
+        cFlag = (cpu.getP()>>0)&1;
+        nFlag = (cpu.getP()>>7)&1;
+        zFlag = (cpu.getP()>>1)&1;
+
+        REQUIRE(cFlag == 0);
+        REQUIRE(nFlag == 1);
+        REQUIRE(zFlag == 0);
+
+        REQUIRE(cpu.getAcc() == 0x89);
+
+        cpu.tick(); //SBC #$01
+        cpu.tick(); //Fetch SBC #$87
+
+        cFlag = (cpu.getP()>>0)&1;
+        nFlag = (cpu.getP()>>7)&1;
+        zFlag = (cpu.getP()>>1)&1;
+
+        REQUIRE(cFlag == 1);
+        REQUIRE(nFlag == 1);
+        REQUIRE(zFlag == 0);
+
+        REQUIRE(cpu.getAcc() == 0x87);
+
+        cpu.tick(); //SBC #$87
+        cpu.tick();
+
+        cFlag = (cpu.getP()>>0)&1;
+        nFlag = (cpu.getP()>>7)&1;
+        zFlag = (cpu.getP()>>1)&1;
+
+        REQUIRE(cFlag == 1);
+        REQUIRE(nFlag == 0);
+        REQUIRE(zFlag == 1);
+
+        REQUIRE(cpu.getAcc() == 0x00);
+    }
 }
 
 TEST_CASE("CPU Reset", "[!mayfail]") //TODO
@@ -619,6 +794,11 @@ TEST_CASE("Decimal Mode V flag behavior", "[!mayfail]") //TODO
 }
 
 TEST_CASE("Test X,Y Reg lose their high part when going native mode", "[!mayfail]") //TODO
+{
+    REQUIRE(false);
+}
+
+TEST_CASE("Edge case for carry with ADC: 0x80+0x7F+C=1 Overflow or not ?") //See ken shiriff's blog on 6502 v flag
 {
     REQUIRE(false);
 }
