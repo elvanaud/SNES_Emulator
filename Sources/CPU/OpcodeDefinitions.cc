@@ -22,9 +22,13 @@ void W65816::initializeOpcodes()
     decodingTable[0x88] = Instruction("DEY", Implied, DEY);
     decodingTable[0x89] = Instruction("BIT", Immediate, BIT);
     decodingTable[0x8A] = Instruction("TXA", Implied, TXA);
+    decodingTable[0x8C] = Instruction("STY", AbsoluteWrite, STY); decodingTable[0x8C].setIsIndexRelated(true);
+    decodingTable[0x8D] = Instruction("STA", AbsoluteWrite, STA);
+    decodingTable[0x8E] = Instruction("STX", AbsoluteWrite, STX); decodingTable[0x8E].setIsIndexRelated(true);
     decodingTable[0x98] = Instruction("TYA", Implied, TYA);
     decodingTable[0x9A] = Instruction("TXS", Implied, TXS);
     decodingTable[0x9B] = Instruction("TXY", Implied, TXY);
+    decodingTable[0x9C] = Instruction("STZ", AbsoluteWrite, STZ);
     decodingTable[0xA0] = Instruction("LDY", Immediate, LDY); decodingTable[0xA0].setIsIndexRelated(true);
     decodingTable[0xA2] = Instruction("LDX", Immediate, LDX); decodingTable[0xA2].setIsIndexRelated(true);
     decodingTable[0xA9] = Instruction("LDA", Immediate, LDA);

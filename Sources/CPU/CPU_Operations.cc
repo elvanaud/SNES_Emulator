@@ -83,3 +83,23 @@ void W65816::fetchDec(Register16 *src, uint8_t * dst)
     fetch(src,dst);
     --(*src);
 }
+
+void W65816::write(Register16 *adr, uint8_t * data)
+{
+    handleValidAddressPINS(DataFetch);
+    //todo: generateAddressWithBank(); //Based on vda / vpa
+    addressBusBuffer = adr->val();
+    bus->write(addressBusBuffer, *data);
+}
+
+void W65816::writeInc(Register16 * adr, uint8_t * data)
+{
+    write(adr,data);
+    ++(*adr);
+}
+
+void W65816::writeDec(Register16 * adr, uint8_t * data)
+{
+    write(adr,data);
+    --(*adr);
+}

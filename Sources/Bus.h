@@ -19,6 +19,7 @@ public:
     void run();
 
     void read(uint32_t adr);
+    void write(uint32_t adr, uint8_t data);
     uint8_t DMR();
 
     void copyInMemory(uint32_t adr, vector<uint8_t> const & buffer);

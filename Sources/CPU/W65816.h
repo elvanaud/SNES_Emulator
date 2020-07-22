@@ -154,6 +154,9 @@ private:
     void fetch(Register16 *src, uint8_t * dst);
     void dummyFetch(Register16 *src);
     void moveReg(uint8_t * src, uint8_t * dst);
+    void write(Register16 * adr, uint8_t * data);
+    void writeInc(Register16 * adr, uint8_t * data);
+    void writeDec(Register16 * adr, uint8_t * data);
 
     void dummyStage(); //Dummy operation
 
@@ -169,13 +172,14 @@ private:
     void invalidPrefetch();
 
     //Addressing Modes
-    enum AdrModeName {IMMEDIATE, IMMEDIATE_SPECIAL, IMPLIED, IMPLIED_SPECIAL, ABSOLUTE};
+    enum AdrModeName {IMMEDIATE, IMMEDIATE_SPECIAL, IMPLIED, IMPLIED_SPECIAL, ABSOLUTE, ABSOLUTE_WRITE};
 
     AddressingMode Immediate            = AddressingMode(AdrModeName::IMMEDIATE);
     AddressingMode ImmediateSpecial     = AddressingMode(AdrModeName::IMMEDIATE_SPECIAL);
     AddressingMode Implied              = AddressingMode(AdrModeName::IMPLIED);
     AddressingMode ImpliedSpecial       = AddressingMode(AdrModeName::IMPLIED_SPECIAL);
     AddressingMode Absolute             = AddressingMode(AdrModeName::ABSOLUTE);
+    AddressingMode AbsoluteWrite        = AddressingMode(AdrModeName::ABSOLUTE_WRITE);
 
 
     //Instructions
@@ -204,6 +208,10 @@ private:
     void SED();
     void SEI();
     void SEP();
+    void STA();
+    void STX();
+    void STY();
+    void STZ();
     void TAX();
     void TAY();
     void TCD();

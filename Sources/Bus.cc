@@ -32,6 +32,14 @@ void Bus::read(uint32_t adr)
     dmr = ram[adr];
 }
 
+void Bus::write(uint32_t adr, uint8_t data)
+{
+    if (!cpu.VDA() && !cpu.VPA()) return;
+
+    dmr = data;
+    ram[adr] = dmr;
+}
+
 uint8_t Bus::DMR()
 {
     return dmr;

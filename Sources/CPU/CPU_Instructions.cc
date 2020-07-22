@@ -202,8 +202,7 @@ void W65816::SBC()
     if(p.D())
     {
         uint16_t complement = p.mem8 ? 0x99 : 0x9999;
-        setReg(idb, complement - getReg(idb));
-        //ADC(); //acc+(-idb-1)+p.c
+        setReg(idb, complement - getReg(idb)); //acc+(-idb-1)+p.c
     }
     else
     {
@@ -233,6 +232,26 @@ void W65816::SEP()
     if(p.emulationMode) mask &= 0b11'00'1111;
 
     p.setVal(p.getVal() | mask);
+}
+
+void W65816::STA()
+{
+    setReg(idb, acc.val());
+}
+
+void W65816::STX()
+{
+    setReg(idb, x.val());
+}
+
+void W65816::STY()
+{
+    setReg(idb, y.val());
+}
+
+void W65816::STZ()
+{
+    setReg(idb, 0);
 }
 
 void W65816::TAX()
