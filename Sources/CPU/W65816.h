@@ -66,6 +66,10 @@ private:
     bool forceInternalOperation = false;
     void preDecode();
 
+    void updateStatusFlags(uint32_t v, bool indexValue = false);
+    void updateNZFlags(uint16_t v, bool indexValue = false, bool force16 = false);
+    void checkSignedOverflow(int a, int b, int c);
+
     //Registers
     struct Register16
     {
@@ -105,6 +109,9 @@ private:
     Register16 y = Register16(true);
     Register16 d;
     Register16 s;
+
+    uint8_t dbr = 0;
+    uint8_t pbr = 0;
 
     uint8_t ir; //Instruction Register
 
@@ -153,16 +160,15 @@ private:
     void fetchDec(Register16 *src, uint8_t * dst);
     void fetch(Register16 *src, uint8_t * dst);
     void dummyFetch(Register16 *src);
+    void dummyFetch();
     void moveReg(uint8_t * src, uint8_t * dst);
     void write(Register16 * adr, uint8_t * data);
     void writeInc(Register16 * adr, uint8_t * data);
     void writeDec(Register16 * adr, uint8_t * data);
+    void push(uint8_t * src);
+    void pop(uint8_t * dst);
 
     void dummyStage(); //Dummy operation
-
-    void updateStatusFlags(uint32_t v, bool indexValue = false);
-    void updateNZFlags(uint16_t v, bool indexValue = false, bool force16 = false);
-    void checkSignedOverflow(int a, int b, int c);
 
     void decReg(Register16 * reg);
 
@@ -174,7 +180,7 @@ private:
     void invalidPrefetch();
 
     //Addressing Modes
-    enum AdrModeName {IMMEDIATE, IMMEDIATE_SPECIAL, IMPLIED, IMPLIED_SPECIAL, ABSOLUTE, ABSOLUTE_WRITE, ABSOLUTE_RMW};
+    enum AdrModeName {IMMEDIATE, IMMEDIATE_SPECIAL, IMPLIED, IMPLIED_SPECIAL, ABSOLUTE, ABSOLUTE_WRITE, ABSOLUTE_RMW, ABSOLUTE_JMP, ABSOLUTE_JSR};
 
     AddressingMode Immediate            = AddressingMode(AdrModeName::IMMEDIATE);
     AddressingMode ImmediateSpecial     = AddressingMode(AdrModeName::IMMEDIATE_SPECIAL);
@@ -183,6 +189,8 @@ private:
     AddressingMode Absolute             = AddressingMode(AdrModeName::ABSOLUTE);
     AddressingMode AbsoluteWrite        = AddressingMode(AdrModeName::ABSOLUTE_WRITE);
     AddressingMode AbsoluteRMW          = AddressingMode(AdrModeName::ABSOLUTE_RMW);
+    AddressingMode AbsoluteJMP          = AddressingMode(AdrModeName::ABSOLUTE_JMP);
+    AddressingMode AbsoluteJSR          = AddressingMode(AdrModeName::ABSOLUTE_JSR);
 
 
     //Instructions

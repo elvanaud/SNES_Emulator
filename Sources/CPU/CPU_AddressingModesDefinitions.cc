@@ -29,4 +29,14 @@ void W65816::initializeAddressingModes()
                             {Stage(Stage::SIG_MODE16_ONLY,fetch,&adr,&idb.high)},{Stage(Stage::SIG_INST,dummyStage),Stage(Stage::SIG_MODE8_ONLY,decReg,&adr)},
                             {Stage(Stage::SIG_MODE16_ONLY,writeDec,&adr,&idb.high)},{Stage(Stage::SIG_ALWAYS,write,&adr,&idb.low)},{Stage(Stage::SIG_DUMMY_STAGE, dummyStage)}});
     AbsoluteRMW.setSignals({bind(incPC,this,1)});
+
+    AbsoluteJMP.setStages({{Stage(Stage::SIG_ALWAYS,fetch,&pc,&pc.high),Stage(Stage::SIG_ALWAYS,moveReg,&adr.low,&pc.low)},{Stage(Stage::SIG_INST,dummyStage)}});
+    AbsoluteJMP.setSignals({bind(incPC,this,1)});
+
+    AbsoluteJSR.setStages({ {Stage(Stage::SIG_ALWAYS,fetch,&pc,&adr.high)},
+                            {Stage(Stage::SIG_ALWAYS, dummyFetch,&pc)},
+                            {Stage(Stage::SIG_ALWAYS,push,&pc.high),Stage(Stage::SIG_ALWAYS,moveReg,&adr.high,&pc.high)},
+                            {Stage(Stage::SIG_ALWAYS,push,&pc.low),Stage(Stage::SIG_ALWAYS,moveReg,&adr.low,&pc.low)},
+                            {Stage(Stage::SIG_INST,dummyStage)}});
+    AbsoluteJSR.setSignals({bind(incPC,this,1)});
 }

@@ -51,10 +51,17 @@ void W65816::dummyStage()
     ; //Dummy
 }
 
+void W65816::dummyFetch()
+{
+    handleValidAddressPINS(InternalOperation);
+    bus->read(addressBusBuffer);
+}
+
 void W65816::dummyFetch(Register16 *src)
 {
     handleValidAddressPINS(InternalOperation);
-    bus->read(src->val());
+    addressBusBuffer = src->val();
+    bus->read(addressBusBuffer);
 }
 
 void W65816::fetch(Register16 *src, uint8_t * dst)
@@ -84,6 +91,11 @@ void W65816::fetchDec(Register16 *src, uint8_t * dst)
     --(*src);
 }
 
+void W65816::moveReg(uint8_t * src, uint8_t * dst)
+{
+    *dst = *src;
+}
+
 void W65816::write(Register16 *adr, uint8_t * data)
 {
     handleValidAddressPINS(DataFetch);
@@ -102,6 +114,18 @@ void W65816::writeDec(Register16 * adr, uint8_t * data)
 {
     write(adr,data);
     --(*adr);
+}
+
+void W65816::push(uint8_t * src)
+{
+    //TODO: handle forced bank 0
+    writeDec(&s,src);
+    //--s;
+}
+
+void W65816::pop(uint8_t * dst)
+{
+    fetchInc(&s,dst);
 }
 
 void W65816::decReg(Register16 * reg)

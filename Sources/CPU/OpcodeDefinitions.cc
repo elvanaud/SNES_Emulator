@@ -9,6 +9,7 @@ void W65816::initializeOpcodes()
     decodingTable[0x18] = Instruction("CLC", Implied, CLC);
     decodingTable[0x1B] = Instruction("TCS", Implied, TCS);
     decodingTable[0x1C] = Instruction("TRB", AbsoluteRMW, TRB);
+    decodingTable[0x20] = Instruction("JSR", AbsoluteJSR, dummyStage);
     decodingTable[0x29] = Instruction("AND", Immediate, AND);
     decodingTable[0x2C] = Instruction("BIT", Absolute, BIT);
     decodingTable[0x2D] = Instruction("AND", Absolute, AND);
@@ -16,6 +17,7 @@ void W65816::initializeOpcodes()
     decodingTable[0x38] = Instruction("SEC", Implied, SEC);
     decodingTable[0x3B] = Instruction("TSC", Implied, TSC);
     decodingTable[0x49] = Instruction("EOR", Immediate, EOR);
+    decodingTable[0x4C] = Instruction("JMP", AbsoluteJMP, dummyStage);
     decodingTable[0x4D] = Instruction("EOR", Absolute, EOR);
     decodingTable[0x4E] = Instruction("LSR", AbsoluteRMW, LSR);
     decodingTable[0x58] = Instruction("CLI", Implied, CLI);
