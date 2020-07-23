@@ -11,7 +11,7 @@ using namespace std::placeholders;
 class Stage
 {
 public:
-    enum EnablingCondition{SIG_ALWAYS,SIG_INST,SIG_DUMMY_STAGE,SIG_MEM16_ONLY,SIG_MODE16_ONLY};
+    enum EnablingCondition{SIG_ALWAYS,SIG_INST,SIG_DUMMY_STAGE,SIG_MEM16_ONLY,SIG_MODE16_ONLY,SIG_MODE8_ONLY};
 
     StageType get() const;
     EnablingCondition getEnablingCondition() const;

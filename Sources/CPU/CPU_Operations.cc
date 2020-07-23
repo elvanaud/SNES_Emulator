@@ -103,3 +103,8 @@ void W65816::writeDec(Register16 * adr, uint8_t * data)
     write(adr,data);
     --(*adr);
 }
+
+void W65816::decReg(Register16 * reg)
+{
+    --(*reg);
+}

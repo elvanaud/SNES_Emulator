@@ -158,7 +158,8 @@ bool W65816::isStageEnabled(Stage const& st)
         case Stage::SIG_INST: return true;
         case Stage::SIG_MEM16_ONLY: return !p.mem8;
         case Stage::SIG_MODE16_ONLY: if(decodingTable[ir].isIndexRelated()) return !p.index8; else return !p.mem8;
-        default: return true;
+        case Stage::SIG_MODE8_ONLY: if(decodingTable[ir].isIndexRelated()) return p.index8; else return p.mem8;
+        //default: return true;
     }
     //return true;
 }

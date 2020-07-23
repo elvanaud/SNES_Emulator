@@ -164,6 +164,8 @@ private:
     void updateNZFlags(uint16_t v, bool indexValue = false, bool force16 = false);
     void checkSignedOverflow(int a, int b, int c);
 
+    void decReg(Register16 * reg);
+
     //Signals
     void incPC(unsigned int whatCycle = 1);
     void opPrefetchInIDB();
@@ -172,7 +174,7 @@ private:
     void invalidPrefetch();
 
     //Addressing Modes
-    enum AdrModeName {IMMEDIATE, IMMEDIATE_SPECIAL, IMPLIED, IMPLIED_SPECIAL, ABSOLUTE, ABSOLUTE_WRITE};
+    enum AdrModeName {IMMEDIATE, IMMEDIATE_SPECIAL, IMPLIED, IMPLIED_SPECIAL, ABSOLUTE, ABSOLUTE_WRITE, ABSOLUTE_RMW};
 
     AddressingMode Immediate            = AddressingMode(AdrModeName::IMMEDIATE);
     AddressingMode ImmediateSpecial     = AddressingMode(AdrModeName::IMMEDIATE_SPECIAL);
@@ -180,11 +182,13 @@ private:
     AddressingMode ImpliedSpecial       = AddressingMode(AdrModeName::IMPLIED_SPECIAL);
     AddressingMode Absolute             = AddressingMode(AdrModeName::ABSOLUTE);
     AddressingMode AbsoluteWrite        = AddressingMode(AdrModeName::ABSOLUTE_WRITE);
+    AddressingMode AbsoluteRMW          = AddressingMode(AdrModeName::ABSOLUTE_RMW);
 
 
     //Instructions
     void ADC();
     void AND();
+    void ASL();
     void BIT();
     void CLC();
     void CLD();
@@ -193,16 +197,21 @@ private:
     void CMP();
     void CPX();
     void CPY();
+    void DEC();
     void DEX();
     void DEY();
     void EOR();
+    void INC();
     void INX();
     void INY();
     void LDA();
     void LDX();
     void LDY();
+    void LSR();
     void ORA();
     void REP();
+    void ROL();
+    void ROR();
     void SBC();
     void SEC();
     void SED();
@@ -217,6 +226,8 @@ private:
     void TCD();
     void TCS();
     void TDC();
+    void TRB();
+    void TSB();
     void TSC();
     void TSX();
     void TXA();

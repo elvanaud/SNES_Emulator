@@ -56,6 +56,19 @@ void W65816::ADC()
     updateStatusFlags(r);
 }
 
+void W65816::ASL()
+{
+    int offset = 7;
+    if(!p.mem8) offset = 15;
+
+    uint16_t val = getReg(idb);
+    uint8_t newC = (val>>offset)&1;
+    val<<=1;
+    p.setC(newC);
+    updateNZFlags(val);
+    setReg(idb,val);
+}
+
 void W65816::BIT()
 {
     uint16_t v = getReg(idb);
@@ -116,6 +129,14 @@ void W65816::CPY()
     p.setC(a >= b);
 }
 
+void W65816::DEC()
+{
+    uint16_t val = getReg(idb);
+    --val;
+    updateNZFlags(val);
+    setReg(idb,val);
+}
+
 void W65816::DEX()
 {
     uint16_t r = getReg(x);
@@ -137,6 +158,14 @@ void W65816::EOR()
     uint16_t r = getReg(acc)^getReg(idb);
     updateNZFlags(r);
     setReg(acc,r);
+}
+
+void W65816::INC()
+{
+    uint16_t val = getReg(idb);
+    ++val;
+    updateNZFlags(val);
+    setReg(idb,val);
 }
 
 void W65816::INX()
@@ -176,6 +205,16 @@ void W65816::LDY()
     updateNZFlags(value,true);
 }
 
+void W65816::LSR()
+{
+    uint16_t val = getReg(idb);
+    uint8_t newC = val & 1;
+    val>>=1;
+    p.setC(newC);
+    updateNZFlags(val);
+    setReg(idb,val);
+}
+
 void W65816::ORA()
 {
     uint16_t res = getReg(acc) | getReg(idb);
@@ -195,6 +234,34 @@ void W65816::REP()
         x.high = 0;
         y.high = 0;
     }
+}
+
+void W65816::ROL()
+{
+    int offset = 7;
+    if(!p.mem8) offset = 15;
+
+    uint16_t val = getReg(idb);
+    uint8_t newC = (val>>offset)&1;
+    val<<=1;
+    val |= p.C();
+    p.setC(newC);
+    updateNZFlags(val);
+    setReg(idb,val);
+}
+
+void W65816::ROR()
+{
+    int offset = 7;
+    if(!p.mem8) offset = 15;
+
+    uint16_t val = getReg(idb);
+    uint8_t newC = val&1; //(val>>offset)&1;
+    val>>=1;
+    val |= uint16_t(p.C())<<offset;
+    p.setC(newC);
+    updateNZFlags(val);
+    setReg(idb,val);
 }
 
 void W65816::SBC()
@@ -282,6 +349,20 @@ void W65816::TDC()
 {
     acc.set(d.val());
     updateNZFlags(acc.val(),false,true); //Use force16 here
+}
+
+void W65816::TRB()
+{
+    uint16_t val = getReg(idb);
+    setReg(idb, ~getReg(acc) & val);
+    p.setZ((getReg(acc) & val) == 0);
+}
+
+void W65816::TSB()
+{
+    uint16_t val = getReg(idb);
+    setReg(idb, getReg(acc) | val);
+    p.setZ((getReg(acc) & val) == 0);
 }
 
 void W65816::TSC()
