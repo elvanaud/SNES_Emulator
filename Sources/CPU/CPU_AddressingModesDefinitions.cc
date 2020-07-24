@@ -107,6 +107,17 @@ void W65816::initializeAddressingModes()
     AbsoluteXWrite.setSignals({bind(incPC,this,1)});
 
 
+    AbsoluteXRMW.setStages({    {Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&adr.high),Stage(Stage::SIG_ALWAYS,halfAdd,&adr.low,&x.low)},
+                                {Stage(Stage::SIG_X_CROSS_PAGE,dummyFetchLong,&dbr,&adr),Stage(Stage::SIG_X_CROSS_PAGE,fixCarry,&adr.high,&x.high)},
+                                {Stage(Stage::SIG_ALWAYS,fetchInc,&adr,&idb.low)},
+                                {Stage(Stage::SIG_MODE16_ONLY,fetch,&adr,&idb.high)},
+                                {Stage(Stage::SIG_INST,dummyStage),Stage(Stage::SIG_MODE8_ONLY,decReg,&adr)},
+                                {Stage(Stage::SIG_MODE16_ONLY,writeDec,&adr,&idb.high)},
+                                {Stage(Stage::SIG_ALWAYS,write,&adr,&idb.low},
+                                {Stage(Stage::SIG_DUMMY_STAGE,dummyStage)}});
+    AbsoluteXRMW.setSignals({bind(incPC,this,1)});
+
+
     AbsoluteY.setStages({   {Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&adr.high),Stage(Stage::SIG_ALWAYS,halfAdd,&adr.low,&y.low)},
                             {Stage(Stage::SIG_Y_CROSS_PAGE,dummyFetchLong,&dbr,&adr),Stage(Stage::SIG_Y_CROSS_PAGE,fixCarry,&adr.high,&y.high)},
                             {Stage(Stage::SIG_ALWAYS,fetchInc,&adr,&idb.low)},
