@@ -64,7 +64,11 @@ private:
     enum ValidAddressState {OpcodeFetch, InternalOperation, DataFetch, OperandFetch};
     void handleValidAddressPINS(ValidAddressState state);
     bool forceInternalOperation = false;
+    bool forceTmpBank = false;
     void preDecode();
+
+    void generateAddress(uint8_t bank, uint16_t adr);
+    void generateAddress(uint16_t adr);
 
     void updateStatusFlags(uint32_t v, bool indexValue = false);
     void updateNZFlags(uint16_t v, bool indexValue = false, bool force16 = false);
@@ -112,6 +116,7 @@ private:
 
     uint8_t dbr = 0;
     uint8_t pbr = 0;
+    uint8_t tmpBank;
 
     uint8_t ir; //Instruction Register
 
@@ -159,12 +164,23 @@ private:
     void fetchInc(Register16 *src, uint8_t * dst);
     void fetchDec(Register16 *src, uint8_t * dst);
     void fetch(Register16 *src, uint8_t * dst);
+
+    void fetchLong(uint8_t * bank, Register16 *src, uint8_t * dst);
+    void fetchIncLong(uint8_t * bank, Register16 *src, uint8_t * dst);
+
     void dummyFetch(Register16 *src);
-    void dummyFetch();
+    void dummyFetchLast();
+
     void moveReg(uint8_t * src, uint8_t * dst);
+
     void write(Register16 * adr, uint8_t * data);
     void writeInc(Register16 * adr, uint8_t * data);
     void writeDec(Register16 * adr, uint8_t * data);
+
+    void writeLong(uint8_t * bank, Register16 * adr, uint8_t * data);
+    void writeIncLong(uint8_t * bank, Register16 * adr, uint8_t * data);
+    void writeDecLong(uint8_t * bank, Register16 * adr, uint8_t * data);
+
     void push(uint8_t * src);
     void pop(uint8_t * dst);
 
@@ -180,7 +196,7 @@ private:
     void invalidPrefetch();
 
     //Addressing Modes
-    enum AdrModeName {IMMEDIATE, IMMEDIATE_SPECIAL, IMPLIED, IMPLIED_SPECIAL, ABSOLUTE, ABSOLUTE_WRITE, ABSOLUTE_RMW, ABSOLUTE_JMP, ABSOLUTE_JSR};
+    enum AdrModeName {IMMEDIATE, IMMEDIATE_SPECIAL, IMPLIED, IMPLIED_SPECIAL, ABSOLUTE, ABSOLUTE_WRITE, ABSOLUTE_RMW, ABSOLUTE_JMP, ABSOLUTE_JSR, ABSOLUTE_LONG, ABSOLUTE_LONG_WRITE};
 
     AddressingMode Immediate            = AddressingMode(AdrModeName::IMMEDIATE);
     AddressingMode ImmediateSpecial     = AddressingMode(AdrModeName::IMMEDIATE_SPECIAL);
@@ -191,6 +207,8 @@ private:
     AddressingMode AbsoluteRMW          = AddressingMode(AdrModeName::ABSOLUTE_RMW);
     AddressingMode AbsoluteJMP          = AddressingMode(AdrModeName::ABSOLUTE_JMP);
     AddressingMode AbsoluteJSR          = AddressingMode(AdrModeName::ABSOLUTE_JSR);
+    AddressingMode AbsoluteLong         = AddressingMode(AdrModeName::ABSOLUTE_LONG);
+    AddressingMode AbsoluteLongWrite    = AddressingMode(AdrModeName::ABSOLUTE_LONG_WRITE);
 
 
     //Instructions

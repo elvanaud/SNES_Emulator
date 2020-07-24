@@ -34,9 +34,20 @@ void W65816::initializeAddressingModes()
     AbsoluteJMP.setSignals({bind(incPC,this,1)});
 
     AbsoluteJSR.setStages({ {Stage(Stage::SIG_ALWAYS,fetch,&pc,&adr.high)},
-                            {Stage(Stage::SIG_ALWAYS, dummyFetch,&pc)},
+                            {Stage(Stage::SIG_ALWAYS,dummyFetchLast)},
                             {Stage(Stage::SIG_ALWAYS,push,&pc.high),Stage(Stage::SIG_ALWAYS,moveReg,&adr.high,&pc.high)},
                             {Stage(Stage::SIG_ALWAYS,push,&pc.low),Stage(Stage::SIG_ALWAYS,moveReg,&adr.low,&pc.low)},
                             {Stage(Stage::SIG_INST,dummyStage)}});
     AbsoluteJSR.setSignals({bind(incPC,this,1)});
+
+    AbsoluteLong.setStages({{Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&adr.high)},{Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&tmpBank)},{Stage(Stage::SIG_ALWAYS,fetchIncLong,&tmpBank,&adr,&idb.low)},
+                            {Stage(Stage::SIG_MODE16_ONLY,fetchLong,&tmpBank,&adr,&idb.high)},{Stage(Stage::SIG_INST,dummyStage)}});
+    AbsoluteLong.setSignals({bind(incPC,this,1)});
+
+    AbsoluteLongWrite.setStages({   {Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&adr.high)},
+                                    {Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&tmpBank),Stage(Stage::SIG_INST,dummyStage)},
+                                    {Stage(Stage::SIG_ALWAYS,writeIncLong,&tmpBank,&adr,&idb.low)},
+                                    {Stage(Stage::SIG_MODE16_ONLY,writeLong,&tmpBank,&adr,&idb.high)},
+                                    {Stage(Stage::SIG_DUMMY_STAGE,dummyStage)}});
+    AbsoluteLongWrite.setSignals({bind(incPC,this,1)});
 }

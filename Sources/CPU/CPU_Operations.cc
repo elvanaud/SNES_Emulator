@@ -51,7 +51,7 @@ void W65816::dummyStage()
     ; //Dummy
 }
 
-void W65816::dummyFetch()
+void W65816::dummyFetchLast()
 {
     handleValidAddressPINS(InternalOperation);
     bus->read(addressBusBuffer);
@@ -60,7 +60,7 @@ void W65816::dummyFetch()
 void W65816::dummyFetch(Register16 *src)
 {
     handleValidAddressPINS(InternalOperation);
-    addressBusBuffer = src->val();
+    generateAddress(src->val());
     bus->read(addressBusBuffer);
 }
 
@@ -73,8 +73,7 @@ void W65816::fetch(Register16 *src, uint8_t * dst)
         if(tcycle == 0) state = OpcodeFetch;
     }
     handleValidAddressPINS(state);
-    //todo: generateAddressWithBank(); //Based on vda / vpa
-    addressBusBuffer = src->val();
+    generateAddress(src->val());
     bus->read(addressBusBuffer);
     *dst =  bus->DMR();
 }
@@ -91,6 +90,20 @@ void W65816::fetchDec(Register16 *src, uint8_t * dst)
     --(*src);
 }
 
+void W65816::fetchLong(uint8_t * bank, Register16 *src, uint8_t * dst)
+{
+    forceTmpBank = true;
+    tmpBank = *bank;
+    fetch(src,dst);
+    forceTmpBank = false;
+}
+
+void W65816::fetchIncLong(uint8_t * bank, Register16 *src, uint8_t * dst)
+{
+    fetchLong(bank,src,dst);
+    ++(*src);
+}
+
 void W65816::moveReg(uint8_t * src, uint8_t * dst)
 {
     *dst = *src;
@@ -99,8 +112,7 @@ void W65816::moveReg(uint8_t * src, uint8_t * dst)
 void W65816::write(Register16 *adr, uint8_t * data)
 {
     handleValidAddressPINS(DataFetch);
-    //todo: generateAddressWithBank(); //Based on vda / vpa
-    addressBusBuffer = adr->val();
+    generateAddress(adr->val());
     bus->write(addressBusBuffer, *data);
 }
 
@@ -116,16 +128,45 @@ void W65816::writeDec(Register16 * adr, uint8_t * data)
     --(*adr);
 }
 
+void W65816::writeLong(uint8_t * bank, Register16 * adr, uint8_t * data)
+{
+    forceTmpBank = true;
+    tmpBank = *bank;
+    write(adr,data);
+    forceTmpBank = false;
+}
+
+void W65816::writeIncLong(uint8_t * bank, Register16 * adr, uint8_t * data)
+{
+    writeLong(bank,adr,data);
+    ++(*adr);
+}
+
+void W65816::writeDecLong(uint8_t * bank, Register16 * adr, uint8_t * data)
+{
+    writeLong(bank,adr,data);
+    --(*adr);
+}
+
 void W65816::push(uint8_t * src)
 {
-    //TODO: handle forced bank 0
-    writeDec(&s,src);
-    //--s;
+    /*handleValidAddressPINS(DataFetch);
+    generateAddress(0,s.val());
+    bus->write(addressBusBuffer, *src);
+    --s;*/
+    tmpBank = 0;
+    writeDecLong(&tmpBank,&s,src);
 }
 
 void W65816::pop(uint8_t * dst)
 {
-    fetchInc(&s,dst);
+    /*handleValidAddressPINS(DataFetch);
+    generateAddress(0,s.val());
+    bus->read(addressBusBuffer);
+    *dst =  bus->DMR();
+    ++s;*/
+    tmpBank = 0;
+    fetchIncLong(&tmpBank,&s,dst);
 }
 
 void W65816::decReg(Register16 * reg)

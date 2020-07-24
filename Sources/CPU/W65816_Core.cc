@@ -179,6 +179,21 @@ void W65816::handleValidAddressPINS(ValidAddressState state)
     }
 }
 
+void W65816::generateAddress(uint8_t bank, uint16_t adr)
+{
+    addressBusBuffer = uint32_t(bank)<<16;
+    addressBusBuffer |= adr;
+}
+
+void W65816::generateAddress(uint16_t adr)
+{
+    addressBusBuffer = 0;
+    if(forceTmpBank) {addressBusBuffer = uint32_t(tmpBank)<<16;}
+    else if(vpa) {addressBusBuffer = uint32_t(pbr)<<16;}
+    else if(vda) {addressBusBuffer = uint32_t(dbr)<<16;}
+    addressBusBuffer |= adr;
+}
+
 void W65816::tick()
 {
     handleValidAddressPINS(ValidAddressState::InternalOperation);
