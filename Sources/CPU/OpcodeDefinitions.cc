@@ -58,7 +58,7 @@ void W65816::initializeOpcodes()
     decodingTable[0x8E] = Instruction("STX", AbsoluteWrite, STX); decodingTable[0x8E].setIsIndexRelated(true);
     decodingTable[0x8F] = Instruction("STA", AbsoluteLongWrite, STA);
     decodingTable[0x98] = Instruction("TYA", Implied, TYA);
-    decodingTable[0x99] = Instruction("STA", AbsoluteY, STA);
+    decodingTable[0x99] = Instruction("STA", AbsoluteYWrite, STA);
     decodingTable[0x9A] = Instruction("TXS", Implied, TXS);
     decodingTable[0x9B] = Instruction("TXY", Implied, TXY);
     decodingTable[0x9C] = Instruction("STZ", AbsoluteWrite, STZ);

@@ -152,6 +152,7 @@ void W65816::reloadPipeline()
 
 bool W65816::isStageEnabled(Stage const& st)
 {
+    uint8_t op;
     switch(st.getEnablingCondition())
     {
         case Stage::SIG_ALWAYS: return true;
@@ -160,8 +161,8 @@ bool W65816::isStageEnabled(Stage const& st)
         case Stage::SIG_MODE16_ONLY: if(decodingTable[ir].isIndexRelated()) return !p.index8; else return !p.mem8;
         case Stage::SIG_MODE8_ONLY: if(decodingTable[ir].isIndexRelated()) return p.index8; else return p.mem8;
         case Stage::SIG_DUMMY_STAGE: return true;
-        case Stage::SIG_X_CROSS_PAGE: uint8_t op = bus->privateRead(pc.val()); return op > op+x.low;
-        case Stage::SIG_Y_CROSS_PAGE: uint8_t op = bus->privateRead(pc.val()); return op > op+y.low;
+        case Stage::SIG_X_CROSS_PAGE: op = bus->privateRead(pc.val()); return op > op+x.low;
+        case Stage::SIG_Y_CROSS_PAGE: op = bus->privateRead(pc.val()); return op > op+y.low;
     }
 }
 
