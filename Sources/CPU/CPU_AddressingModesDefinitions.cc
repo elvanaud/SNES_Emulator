@@ -74,6 +74,23 @@ void W65816::initializeAddressingModes()
                                 {Stage(Stage::SIG_INST,dummyStage)}});
     AbsoluteLongJSL.setSignals({bind(incPC,this,1)});
 
+
+    AbsoluteXLong.setStages({   {Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&adr.high),Stage(Stage::SIG_ALWAYS,halfAdd,&adr.low,&x.low)},
+                                {Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&tmpBank),Stage(Stage::SIG_X_CROSS_PAGE,fixCarry,&adr.high,&x.high)},
+                                {Stage(Stage::SIG_ALWAYS,fetchIncLong,&tmpBank,&adr,&idb.low)},
+                                {Stage(Stage::SIG_MODE16_ONLY,fetchLong,&tmpBank,&adr,&idb.high)},
+                                {Stage(Stage::SIG_INST,dummyStage)}});
+    AbsoluteXLong.setSignals({bind(incPC,this,1)});
+
+
+    AbsoluteXLongWrite.setStages({  {Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&adr.high),Stage(Stage::SIG_ALWAYS,halfAdd,&adr.low,&x.low)},
+                                    {Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&tmpBank),Stage(Stage::SIG_X_CROSS_PAGE,fixCarry,&adr.high,&x.high)},
+                                    {Stage(Stage::SIG_INST,dummyStage),Stage(Stage::SIG_ALWAYS,writeIncLong,&tmpBank,&adr,&idb.low)},
+                                    {Stage(Stage::SIG_MODE16_ONLY,writeLong,&tmpBank,&adr,&idb.high)},
+                                    {Stage(Stage::SIG_DUMMY_STAGE,dummyStage)}});
+    AbsoluteXLongWrite.setSignals({bind(incPC,this,1)});
+
+
     AbsoluteX.setStages({   {Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&adr.high),Stage(Stage::SIG_ALWAYS,halfAdd,&adr.low,&x.low)},
                             {Stage(Stage::SIG_X_CROSS_PAGE,dummyFetchLong,&dbr,&adr),Stage(Stage::SIG_X_CROSS_PAGE,fixCarry,&adr.high,&x.high)},
                             {Stage(Stage::SIG_ALWAYS,fetchInc,&adr,&idb.low)},
