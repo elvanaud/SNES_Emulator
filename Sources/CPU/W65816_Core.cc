@@ -161,6 +161,7 @@ bool W65816::isStageEnabled(Stage const& st)
         case Stage::SIG_MODE8_ONLY: if(decodingTable[ir].isIndexRelated()) return p.index8; else return p.mem8;
         case Stage::SIG_DUMMY_STAGE: return true;
         case Stage::SIG_X_CROSS_PAGE: uint8_t op = bus->privateRead(pc.val()); return op > op+x.low;
+        case Stage::SIG_Y_CROSS_PAGE: uint8_t op = bus->privateRead(pc.val()); return op > op+y.low;
     }
 }
 

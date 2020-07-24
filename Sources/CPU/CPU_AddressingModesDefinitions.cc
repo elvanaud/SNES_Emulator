@@ -105,4 +105,12 @@ void W65816::initializeAddressingModes()
                                 {Stage(Stage::SIG_MODE16_ONLY,write,&adr,&idb.high)},
                                 {Stage(Stage::SIG_DUMMY_STAGE,dummyStage)}});
     AbsoluteXWrite.setSignals({bind(incPC,this,1)});
+
+
+    AbsoluteY.setStages({   {Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&adr.high),Stage(Stage::SIG_ALWAYS,halfAdd,&adr.low,&y.low)},
+                            {Stage(Stage::SIG_Y_CROSS_PAGE,dummyFetchLong,&dbr,&adr),Stage(Stage::SIG_Y_CROSS_PAGE,fixCarry,&adr.high,&y.high)},
+                            {Stage(Stage::SIG_ALWAYS,fetchInc,&adr,&idb.low)},
+                            {Stage(Stage::SIG_MODE16_ONLY,fetch,&adr,&idb.high)},
+                            {Stage(Stage::SIG_INST,dummyStage)}});
+    AbsoluteY.setSignals({bind(incPC,this,1)});
 }

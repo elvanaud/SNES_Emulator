@@ -206,7 +206,7 @@ private:
         IMPLIED, IMPLIED_SPECIAL,
         ABSOLUTE, ABSOLUTE_WRITE, ABSOLUTE_RMW, ABSOLUTE_JMP, ABSOLUTE_JSR, ABSOLUTE_LONG,
             ABSOLUTE_LONG_WRITE, ABSOLUTE_LONG_JMP, ABSOLUTE_LONG_JSL, ABSOLUTE_LONG_X, ABSOLUTE_X,
-            ABSOLUTE_X_WRITE, ABSOLUTE_X_LONG_WRITE};
+            ABSOLUTE_X_WRITE, ABSOLUTE_X_LONG_WRITE, ABSOLUTE_X_RMW, ABSOLUTE_Y};
 
     AddressingMode Immediate            = AddressingMode(AdrModeName::IMMEDIATE);
     AddressingMode ImmediateSpecial     = AddressingMode(AdrModeName::IMMEDIATE_SPECIAL);
@@ -225,6 +225,8 @@ private:
     AddressingMode AbsoluteX            = AddressingMode(AdrModeName::ABSOLUTE_X);
     AddressingMode AbsoluteXWrite       = AddressingMode(AdrModeName::ABSOLUTE_X_WRITE);
     AddressingMode AbsoluteXLongWrite   = AddressingMode(AdrModeName::ABSOLUTE_X_LONG_WRITE);
+    AddressingMode AbsoluteXRMW         = AddressingMode(AdrModeName::ABSOLUTE_X_RMW);
+    AddressingMode AbsoluteY            = AddressingMode(AdrModeName::ABSOLUTE_Y);
 
 
     //Instructions
