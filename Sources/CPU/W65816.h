@@ -200,7 +200,7 @@ private:
     enum AdrModeName {
         IMMEDIATE, IMMEDIATE_SPECIAL,
         IMPLIED, IMPLIED_SPECIAL,
-        ABSOLUTE, ABSOLUTE_WRITE, ABSOLUTE_RMW, ABSOLUTE_JMP, ABSOLUTE_JSR, ABSOLUTE_LONG, ABSOLUTE_LONG_WRITE, ABSOLUTE_LONG_JMP};
+        ABSOLUTE, ABSOLUTE_WRITE, ABSOLUTE_RMW, ABSOLUTE_JMP, ABSOLUTE_JSR, ABSOLUTE_LONG, ABSOLUTE_LONG_WRITE, ABSOLUTE_LONG_JMP, ABSOLUTE_LONG_JSL};
 
     AddressingMode Immediate            = AddressingMode(AdrModeName::IMMEDIATE);
     AddressingMode ImmediateSpecial     = AddressingMode(AdrModeName::IMMEDIATE_SPECIAL);
@@ -214,6 +214,7 @@ private:
     AddressingMode AbsoluteLong         = AddressingMode(AdrModeName::ABSOLUTE_LONG);
     AddressingMode AbsoluteLongWrite    = AddressingMode(AdrModeName::ABSOLUTE_LONG_WRITE);
     AddressingMode AbsoluteLongJMP      = AddressingMode(AdrModeName::ABSOLUTE_LONG_JMP);
+    AddressingMode AbsoluteLongJSL      = AddressingMode(AdrModeName::ABSOLUTE_LONG_JSL);
 
 
     //Instructions

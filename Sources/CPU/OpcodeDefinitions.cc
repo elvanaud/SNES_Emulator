@@ -11,6 +11,7 @@ void W65816::initializeOpcodes()
     decodingTable[0x1B] = Instruction("TCS", Implied, TCS);
     decodingTable[0x1C] = Instruction("TRB", AbsoluteRMW, TRB);
     decodingTable[0x20] = Instruction("JSR", AbsoluteJSR, dummyStage);
+    decodingTable[0x22] = Instruction("JSL", AbsoluteLongJSL, dummyStage);
     decodingTable[0x29] = Instruction("AND", Immediate, AND);
     decodingTable[0x2C] = Instruction("BIT", Absolute, BIT);
     decodingTable[0x2D] = Instruction("AND", Absolute, AND);
