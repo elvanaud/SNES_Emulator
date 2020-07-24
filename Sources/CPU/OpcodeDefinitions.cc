@@ -25,6 +25,7 @@ void W65816::initializeOpcodes()
     decodingTable[0x4F] = Instruction("EOR", AbsoluteLong, EOR);
     decodingTable[0x58] = Instruction("CLI", Implied, CLI);
     decodingTable[0x5B] = Instruction("TCD", Implied, TCD);
+    decodingTable[0x5C] = Instruction("JMP", AbsoluteLongJMP, dummyStage);
     decodingTable[0x69] = Instruction("ADC", Immediate, ADC);
     decodingTable[0x6D] = Instruction("ADC", Absolute, ADC);
     decodingTable[0x6E] = Instruction("ROR", AbsoluteRMW, ROR);

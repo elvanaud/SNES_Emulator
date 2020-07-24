@@ -104,9 +104,14 @@ void W65816::fetchIncLong(uint8_t * bank, Register16 *src, uint8_t * dst)
     ++(*src);
 }
 
-void W65816::moveReg(uint8_t * src, uint8_t * dst)
+void W65816::moveReg8(uint8_t * src, uint8_t * dst)
 {
     *dst = *src;
+}
+
+void W65816::moveReg16(Register16 * src, Register16 * dst)
+{
+    dst->set(src->val());
 }
 
 void W65816::write(Register16 *adr, uint8_t * data)
