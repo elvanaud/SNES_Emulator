@@ -21,3 +21,8 @@ void W65816::invalidPrefetch()
     if(tcycle == 1)forceInternalOperation = true;
     //cout << "invalidPrefetch" << endl;
 }
+
+void W65816::accPrefetchInIDB()
+{
+    if(tcycle == 1) idb.set(acc.val());
+}

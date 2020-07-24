@@ -132,4 +132,8 @@ void W65816::initializeAddressingModes()
                                 {Stage(Stage::SIG_MODE16_ONLY,write,&adr,&idb.high)},
                                 {Stage(Stage::SIG_DUMMY_STAGE,dummyStage)}});
     AbsoluteYWrite.setSignals({bind(incPC,this,1)});
+
+
+    Accumulator.setStages({{Stage(Stage::SIG_INST,dummyStage),Stage(Stage::SIG_ALWAYS,moveReg8,&idb.low,&acc.low),Stage(Stage::SIG_MODE16_ONLY,moveReg8,&idb.high,&acc.high)}});
+    Accumulator.setPredecodeSignals({bind(invalidPrefetch,this),bind(accPrefetchInIDB,this)});
 }
