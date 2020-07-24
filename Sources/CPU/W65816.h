@@ -169,6 +169,7 @@ private:
     void fetchIncLong(uint8_t * bank, Register16 *src, uint8_t * dst);
 
     void dummyFetch(Register16 *src);
+    void dummyFetchLong(uint8_t *bank,Register16 *src);
     void dummyFetchLast();
 
     void moveReg8(uint8_t * src, uint8_t * dst);
@@ -185,6 +186,9 @@ private:
     void push(uint8_t * src);
     void pop(uint8_t * dst);
 
+    void halfAdd(uint8_t * dst, uint8_t * op); uint8_t internalCarryBuffer = 0;
+    void fixCarry(uint8_t * dst, uint8_t * op);
+
     void dummyStage(); //Dummy operation
 
     void decReg(Register16 * reg);
@@ -200,7 +204,9 @@ private:
     enum AdrModeName {
         IMMEDIATE, IMMEDIATE_SPECIAL,
         IMPLIED, IMPLIED_SPECIAL,
-        ABSOLUTE, ABSOLUTE_WRITE, ABSOLUTE_RMW, ABSOLUTE_JMP, ABSOLUTE_JSR, ABSOLUTE_LONG, ABSOLUTE_LONG_WRITE, ABSOLUTE_LONG_JMP, ABSOLUTE_LONG_JSL};
+        ABSOLUTE, ABSOLUTE_WRITE, ABSOLUTE_RMW, ABSOLUTE_JMP, ABSOLUTE_JSR, ABSOLUTE_LONG,
+            ABSOLUTE_LONG_WRITE, ABSOLUTE_LONG_JMP, ABSOLUTE_LONG_JSL, ABSOLUTE_LONG_X, ABSOLUTE_X,
+            ABSOLUTE_X_WRITE};
 
     AddressingMode Immediate            = AddressingMode(AdrModeName::IMMEDIATE);
     AddressingMode ImmediateSpecial     = AddressingMode(AdrModeName::IMMEDIATE_SPECIAL);
@@ -215,6 +221,9 @@ private:
     AddressingMode AbsoluteLongWrite    = AddressingMode(AdrModeName::ABSOLUTE_LONG_WRITE);
     AddressingMode AbsoluteLongJMP      = AddressingMode(AdrModeName::ABSOLUTE_LONG_JMP);
     AddressingMode AbsoluteLongJSL      = AddressingMode(AdrModeName::ABSOLUTE_LONG_JSL);
+    AddressingMode AbsoluteLongX        = AddressingMode(AdrModeName::ABSOLUTE_LONG_X);
+    AddressingMode AbsoluteX            = AddressingMode(AdrModeName::ABSOLUTE_X);
+    AddressingMode AbsoluteXWrite       = AddressingMode(AdrModeName::ABSOLUTE_X_WRITE);
 
 
     //Instructions

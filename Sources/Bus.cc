@@ -29,7 +29,12 @@ void Bus::read(uint32_t adr)
 {
     if (!cpu.VDA() && !cpu.VPA()) return;
 
-    dmr = ram[adr];
+    dmr = ram[adr]; //TODO: Might use privateRead in the future
+}
+
+uint8_t Bus::privateRead(uint32_t adr)
+{
+    return ram[adr];
 }
 
 void Bus::write(uint32_t adr, uint8_t data)

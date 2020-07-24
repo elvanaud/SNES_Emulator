@@ -146,7 +146,7 @@ void W65816::reloadPipeline()
     lastPipelineStage.clear();
     pipeline.push_back(T1);
 
-    vector<StageType> T2 = {Stage(Stage::SIG_ALWAYS,decode).get(), Stage(Stage::SIG_ALWAYS,fetch,&pc,&adr.low).get()};
+    vector<StageType> T2 = {Stage(Stage::SIG_ALWAYS,decode).get(), Stage(Stage::SIG_ALWAYS,fetch,&pc,&adr.low).get()}; //Careful to keep the decode before the fetch
     pipeline.push_back(T2);
 }
 
@@ -160,6 +160,7 @@ bool W65816::isStageEnabled(Stage const& st)
         case Stage::SIG_MODE16_ONLY: if(decodingTable[ir].isIndexRelated()) return !p.index8; else return !p.mem8;
         case Stage::SIG_MODE8_ONLY: if(decodingTable[ir].isIndexRelated()) return p.index8; else return p.mem8;
         case Stage::SIG_DUMMY_STAGE: return true;
+        case Stage::SIG_X_CROSS_PAGE: uint8_t op = bus->privateRead(pc.val()); return op > op+x.low;
     }
 }
 

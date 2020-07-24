@@ -64,6 +64,14 @@ void W65816::dummyFetch(Register16 *src)
     bus->read(addressBusBuffer);
 }
 
+void W65816::dummyFetchLong(uint8_t * bank, Register16 *src)
+{
+    forceTmpBank = true;
+    tmpBank = *bank;
+    dummyFetch(src);
+    forceTmpBank = false;
+}
+
 void W65816::fetch(Register16 *src, uint8_t * dst)
 {
     ValidAddressState state = DataFetch;
@@ -172,6 +180,19 @@ void W65816::pop(uint8_t * dst)
     ++s;*/
     tmpBank = 0;
     fetchIncLong(&tmpBank,&s,dst);
+}
+
+void W65816::halfAdd(uint8_t * dst, uint8_t * op)
+{
+    uint16_t r = uint16_t(*dst) + *op;
+    internalCarryBuffer = r>>8;
+    *dst = r;
+}
+
+void W65816::fixCarry(uint8_t * dst, uint8_t * op)
+{
+    *dst = *dst + *op + internalCarryBuffer;
+    internalCarryBuffer = 0;
 }
 
 void W65816::decReg(Register16 * reg)

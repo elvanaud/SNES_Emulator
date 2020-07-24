@@ -19,6 +19,7 @@ public:
     void run();
 
     void read(uint32_t adr);
+    uint8_t privateRead(uint32_t adr);
     void write(uint32_t adr, uint8_t data);
     uint8_t DMR();
 
