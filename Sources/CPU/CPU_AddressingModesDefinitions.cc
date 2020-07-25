@@ -183,4 +183,14 @@ void W65816::initializeAddressingModes()
                             {Stage(Stage::SIG_MODE16_ONLY,writeLong,&ZERO,&adr,&idb.high)},
                             {Stage(Stage::SIG_DUMMY_STAGE,dummyStage)}});
     DirectWrite.setSignals({bind(incPC,this,1),bind(dhPrefetchInAdr,this)});
+
+
+    DirectRMW.setStages({   {Stage(Stage::SIG_DL_NOT_ZERO,halfAdd,&adr.low,&d.low),Stage(Stage::SIG_DL_NOT_ZERO,fixCarry,&adr.high,&ZERO)},
+                            {Stage(Stage::SIG_ALWAYS,fetchIncLong,&ZERO,&adr,&idb.low)},
+                            {Stage(Stage::SIG_MODE16_ONLY,fetchLong,&ZERO,&adr,&idb.high)},
+                            {Stage(Stage::SIG_INST,dummyStage),Stage(Stage::SIG_MODE8_ONLY,decReg,&adr)},
+                            {Stage(Stage::SIG_MODE16_ONLY,writeDecLong,&ZERO,&adr,&idb.high)},
+                            {Stage(Stage::SIG_ALWAYS,writeLong,&ZERO,&adr,&idb.low)}
+                            {Stage(Stage::SIG_DUMMY_STAGE,dummyStage)}});
+    DirectRMW.setSignals({bind(incPC,this,1),bind(dhPrefetchInAdr,this)});
 }
