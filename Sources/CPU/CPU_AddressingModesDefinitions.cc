@@ -195,6 +195,26 @@ void W65816::initializeAddressingModes()
     DirectRMW.setSignals({bind(incPC,this,1),bind(dhPrefetchInAdr,this)});
 
 
+    DirectXIndirect.setStages({ {Stage(Stage::SIG_DL_NOT_ZERO,halfAdd,&adr.low,&d.low),Stage(Stage::SIG_DL_NOT_ZERO,fixCarry,&adr.high,&ZERO)},
+                                {Stage(Stage::SIG_ALWAYS,fullAdd,&adr,&x)},
+                                {Stage(Stage::SIG_ALWAYS,fetchIncLong,&ZERO,&adr,&idb.low)},
+                                {Stage(Stage::SIG_ALWAYS,fetchLong,&ZERO,&adr,&adr.high),Stage(Stage::SIG_ALWAYS,moveReg8,&idb.low,&adr.low)},
+                                {Stage(Stage::SIG_ALWAYS,fetchIncLong,&ZERO,&adr,&idb.low)},
+                                {Stage(Stage::SIG_MODE16_ONLY,fetchLong,&ZERO,&adr,&idb.high)},
+                                {Stage(Stage::SIG_INST,dummyStage)}});
+    DirectXIndirect.setSignals({bind(incPC,this,1),bind(dhPrefetchInAdr,this)});
+
+    DirectXIndirectWrite.setStages({{Stage(Stage::SIG_DL_NOT_ZERO,halfAdd,&adr.low,&d.low),Stage(Stage::SIG_DL_NOT_ZERO,fixCarry,&adr.high,&ZERO)},
+                                    {Stage(Stage::SIG_ALWAYS,fullAdd,&adr,&x)},
+                                    {Stage(Stage::SIG_ALWAYS,fetchIncLong,&ZERO,&adr,&idb.low)},
+                                    {Stage(Stage::SIG_ALWAYS,fetchLong,&ZERO,&adr,&adr.high),Stage(Stage::SIG_ALWAYS,moveReg8,&idb.low,&adr.low)},
+                                    {Stage(Stage::SIG_INST,dummyStage),Stage(Stage::SIG_ALWAYS,writeIncLong,&ZERO,&adr,&idb.low)},
+                                    {Stage(Stage::SIG_MODE16_ONLY,writeLong,&ZERO,&adr,&idb.high)},
+                                    {Stage(Stage::SIG_DUMMY_STAGE,dummyStage)}});
+    DirectXIndirectWrite.setSignals({bind(incPC,this,1),bind(dhPrefetchInAdr,this)});
+
+
+
     DirectX.setStages({ {Stage(Stage::SIG_DL_NOT_ZERO,halfAdd,&adr.low,&d.low),Stage(Stage::SIG_DL_NOT_ZERO,fixCarry,&adr.high,&ZERO)},
                         {Stage(Stage::SIG_ALWAYS,fullAdd,&adr,&x)},
                         {Stage(Stage::SIG_ALWAYS,fetchIncLong,&ZERO,&adr,&idb.low)},

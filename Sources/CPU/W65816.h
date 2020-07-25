@@ -214,7 +214,10 @@ private:
             ABSOLUTE_X_WRITE, ABSOLUTE_X_LONG_WRITE, ABSOLUTE_X_RMW, ABSOLUTE_Y, ABSOLUTE_Y_WRITE,
             ABSOLUTE_X_INDIRECT_JMP, ABSOLUTE_X_INDIRECT_JSR, ABSOLUTE_INDIRECT_JML, ABSOLUTE_INDIRECT_JMP,
         ACCUMULATOR,
-        DIRECT, DIRECT_WRITE, DIRECT_RMW, DIRECT_X, DIRECT_X_WRITE, DIRECT_X_RMW, DIRECT_Y, DIRECT_Y_WRITE};
+        DIRECT, DIRECT_WRITE, DIRECT_RMW, DIRECT_X_INDIRECT, DIRECT_X_INDIRECT_WRITE, DIRECT_INDIRECT,
+            DIRECT_INDIRECT_WRITE, DIRECT_INDIRECT_Y, DIRECT_INDIRECT_Y_WRITE, DIRECT_INDIRECT_Y_LONG,
+            DIRECT_INDIRECT_Y_LONG_WRITE, DIRECT_INDIRECT_LONG, DIRECT_INDIRECT_LONG_WRITE,
+            DIRECT_X, DIRECT_X_WRITE, DIRECT_X_RMW, DIRECT_Y, DIRECT_Y_WRITE};
 
     AddressingMode Immediate            = AddressingMode(AdrModeName::IMMEDIATE);
     AddressingMode ImmediateSpecial     = AddressingMode(AdrModeName::IMMEDIATE_SPECIAL);
@@ -244,6 +247,10 @@ private:
     AddressingMode Direct               = AddressingMode(AdrModeName::DIRECT);
     AddressingMode DirectWrite          = AddressingMode(AdrModeName::DIRECT_WRITE);
     AddressingMode DirectRMW            = AddressingMode(AdrModeName::DIRECT_RMW);
+    AddressingMode DirectXIndirect      = AddressingMode(AdrModeName::DIRECT_X_INDIRECT);
+    AddressingMode DirectXIndirectWrite = AddressingMode(AdrModeName::DIRECT_X_INDIRECT_WRITE);
+
+
     AddressingMode DirectX              = AddressingMode(AdrModeName::DIRECT_X);
     AddressingMode DirectXWrite         = AddressingMode(AdrModeName::DIRECT_X_WRITE);
     AddressingMode DirectXRMW           = AddressingMode(AdrModeName::DIRECT_X_RMW);
