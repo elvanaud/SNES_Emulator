@@ -116,6 +116,7 @@ void W65816::initializeOpcodes()
     decodingTable[0xF8] = Instruction("SED", Implied, SED);
     decodingTable[0xF9] = Instruction("SBC", AbsoluteY, SBC);
     decodingTable[0xFB] = Instruction("XCE", Implied, XCE);
+    decodingTable[0xFC] = Instruction("JSR", AbsoluteXIndirectJSR, dummyStage);
     decodingTable[0xFD] = Instruction("SBC", AbsoluteX, SBC);
     decodingTable[0xFE] = Instruction("INC", AbsoluteXRMW, INC);
     decodingTable[0xFF] = Instruction("SBC", AbsoluteXLong, SBC);

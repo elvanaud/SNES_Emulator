@@ -135,11 +135,22 @@ void W65816::initializeAddressingModes()
 
 
     AbsoluteXIndirectJMP.setStages({    {Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&adr.high)},
-                                        {Stage(Stage::SIG_ALWAYS,fullAdd,&adr,&x)},
+                                        {Stage(Stage::SIG_ALWAYS,dummyFetchLast),(Stage::SIG_ALWAYS,fullAdd,&adr,&x)},
                                         {Stage(Stage::SIG_ALWAYS,fetchIncLong,&pbr,&adr,&pc.low)},
                                         {Stage(Stage::SIG_ALWAYS,fetchLong,&pbr,&adr,&pc.high)},
                                         {Stage(Stage::SIG_INST,dummyStage)}});
     AbsoluteXIndirectJMP.setSignals({bind(incPC,this,1)});
+
+
+    AbsoluteXIndirectJSR.setStages({    {Stage(Stage::SIG_ALWAYS,push,&pc.high)},
+                                        {Stage(Stage::SIG_ALWAYS,push,&pc.low)},
+                                        {Stage(Stage::SIG_ALWAYS,fetch,&pc,&adr.high)},
+                                        {Stage(Stage::SIG_ALWAYS,dummyFetchLast),Stage(Stage::SIG_ALWAYS,fullAdd,&adr,&x)},
+                                        {Stage(Stage::SIG_ALWAYS,fetchIncLong,&pbr,&adr,&pc.low)},
+                                        {Stage(Stage::SIG_ALWAYS,fetchLong,&pbr,&adr,&pc.high)},
+                                        {Stage(Stage::SIG_INST,dummyStage)}});
+    AbsoluteXIndirectJSR.setSignals({bind(incPC,this,1)});
+
 
     Accumulator.setStages({{Stage(Stage::SIG_INST,dummyStage),Stage(Stage::SIG_ALWAYS,moveReg8,&idb.low,&acc.low),Stage(Stage::SIG_MODE16_ONLY,moveReg8,&idb.high,&acc.high)}});
     Accumulator.setPredecodeSignals({bind(invalidPrefetch,this),bind(accPrefetchInIDB,this)});
