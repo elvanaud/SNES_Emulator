@@ -53,6 +53,7 @@ void W65816::initializeOpcodes()
     decodingTable[0x78] = Instruction("SEI", Implied, SEI);
     decodingTable[0x79] = Instruction("ADC", AbsoluteY, ADC);
     decodingTable[0x7B] = Instruction("TDC", Implied, TDC);
+    decodingTable[0x7C] = Instruction("JMP", AbsoluteXIndirectJMP, dummyStage);
     decodingTable[0x7D] = Instruction("ADC", AbsoluteX, ADC);
     decodingTable[0x7E] = Instruction("ROR", AbsoluteXRMW, ROR);
     decodingTable[0x7F] = Instruction("ADC", AbsoluteXLong, ADC);

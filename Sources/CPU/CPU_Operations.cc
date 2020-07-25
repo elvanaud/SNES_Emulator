@@ -195,6 +195,11 @@ void W65816::fixCarry(uint8_t * dst, uint8_t * op)
     internalCarryBuffer = 0;
 }
 
+void W65816::fullAdd(Register16 * dst, Register16 * op)
+{
+    dst->set(dst->val()+op->val());
+}
+
 void W65816::decReg(Register16 * reg)
 {
     --(*reg);
