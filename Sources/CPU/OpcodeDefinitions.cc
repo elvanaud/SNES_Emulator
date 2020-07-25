@@ -6,6 +6,7 @@ void W65816::initializeOpcodes()
     decodingTable[0x04] = Instruction("TSB", DirectRMW, TSB);
     decodingTable[0x05] = Instruction("ORA", Direct, ORA);
     decodingTable[0x06] = Instruction("ASL", DirectRMW, ASL);
+    decodingTable[0x07] = Instruction("ORA", DirectIndirectLong, ORA);
     decodingTable[0x09] = Instruction("ORA", Immediate, ORA);
     decodingTable[0x0A] = Instruction("ASL", Accumulator, ASL);
     decodingTable[0x0C] = Instruction("TSB", AbsoluteRMW, TSB);
@@ -32,6 +33,7 @@ void W65816::initializeOpcodes()
     decodingTable[0x24] = Instruction("BIT", Direct, BIT);
     decodingTable[0x25] = Instruction("AND", Direct, AND);
     decodingTable[0x26] = Instruction("ROL", DirectRMW, ROL);
+    decodingTable[0x27] = Instruction("AND", DirectIndirectLong, AND);
     decodingTable[0x29] = Instruction("AND", Immediate, AND);
     decodingTable[0x2A] = Instruction("ROL", Accumulator, ROL);
     decodingTable[0x2C] = Instruction("BIT", Absolute, BIT);
@@ -55,6 +57,7 @@ void W65816::initializeOpcodes()
     decodingTable[0x41] = Instruction("EOR", DirectXIndirect, EOR);
     decodingTable[0x45] = Instruction("EOR", Direct, EOR);
     decodingTable[0x46] = Instruction("LSR", DirectRMW, LSR);
+    decodingTable[0x47] = Instruction("EOR", DirectIndirectLong, EOR);
     decodingTable[0x49] = Instruction("EOR", Immediate, EOR);
     decodingTable[0x4A] = Instruction("LSR", Accumulator, LSR);
     decodingTable[0x4C] = Instruction("JMP", AbsoluteJMP, dummyStage);
@@ -77,6 +80,7 @@ void W65816::initializeOpcodes()
     decodingTable[0x64] = Instruction("STZ", DirectWrite, STZ);
     decodingTable[0x65] = Instruction("ADC", Direct, ADC);
     decodingTable[0x66] = Instruction("ROR", DirectRMW, ROR);
+    decodingTable[0x67] = Instruction("ADC", DirectIndirectLong, ADC);
     decodingTable[0x69] = Instruction("ADC", Immediate, ADC);
     decodingTable[0x6A] = Instruction("ROR", Accumulator, ROR);
     decodingTable[0x6C] = Instruction("JMP", AbsoluteIndirectJMP, dummyStage);
@@ -100,6 +104,7 @@ void W65816::initializeOpcodes()
     decodingTable[0x84] = Instruction("STY", DirectWrite, STY); decodingTable[0x84].setIsIndexRelated(true);
     decodingTable[0x85] = Instruction("STA", DirectWrite, STA);
     decodingTable[0x86] = Instruction("STX", DirectWrite, STX); decodingTable[0x86].setIsIndexRelated(true);
+    decodingTable[0x87] = Instruction("STA", DirectIndirectLongWrite, STA);
     decodingTable[0x88] = Instruction("DEY", Implied, DEY);
     decodingTable[0x89] = Instruction("BIT", Immediate, BIT);
     decodingTable[0x8A] = Instruction("TXA", Implied, TXA);
@@ -127,6 +132,7 @@ void W65816::initializeOpcodes()
     decodingTable[0xA4] = Instruction("LDY", Direct, LDY); decodingTable[0xA4].setIsIndexRelated(true);
     decodingTable[0xA5] = Instruction("LDA", Direct, LDA);
     decodingTable[0xA6] = Instruction("LDX", Direct, LDX); decodingTable[0xA6].setIsIndexRelated(true);
+    decodingTable[0xA7] = Instruction("LDA", DirectIndirectLong, LDA);
     decodingTable[0xA9] = Instruction("LDA", Immediate, LDA);
     decodingTable[0xAA] = Instruction("TAX", Implied, TAX);
     decodingTable[0xAB] = Instruction("TAY", Implied, TAY);
@@ -154,6 +160,7 @@ void W65816::initializeOpcodes()
     decodingTable[0xC4] = Instruction("CPY", Direct, CPY); decodingTable[0xC4].setIsIndexRelated(true);
     decodingTable[0xC5] = Instruction("CMP", Direct, CMP);
     decodingTable[0xC6] = Instruction("DEC", DirectRMW, DEC);
+    decodingTable[0xC7] = Instruction("CMP", DirectIndirectLong, CMP);
     decodingTable[0xC8] = Instruction("INY", Implied, INY);
     decodingTable[0xC9] = Instruction("CMP", Immediate, CMP);
     decodingTable[0xCA] = Instruction("DEX", Implied, DEX);
@@ -178,6 +185,7 @@ void W65816::initializeOpcodes()
     decodingTable[0xE4] = Instruction("CPX", Direct, CPX); decodingTable[0xE4].setIsIndexRelated(true);
     decodingTable[0xE5] = Instruction("SBC", Direct, SBC);
     decodingTable[0xE6] = Instruction("INC", DirectRMW, INC);
+    decodingTable[0xE7] = Instruction("SBC", DirectIndirectLong, SBC);
     decodingTable[0xE8] = Instruction("INX", Implied, INX);
     decodingTable[0xE9] = Instruction("SBC", Immediate, SBC);
     decodingTable[0xEA] = Instruction("NOP", Implied, dummyStage);

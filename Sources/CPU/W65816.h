@@ -255,7 +255,8 @@ private:
     AddressingMode DirectIndirectYWrite     = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y_WRITE);
     AddressingMode DirectIndirectYLong      = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y);
     AddressingMode DirectIndirectYLongWrite = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y_WRITE);
-
+    AddressingMode DirectIndirectLong       = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y);
+    AddressingMode DirectIndirectLongWrite  = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y_WRITE);
     AddressingMode DirectX                  = AddressingMode(AdrModeName::DIRECT_X);
     AddressingMode DirectXWrite             = AddressingMode(AdrModeName::DIRECT_X_WRITE);
     AddressingMode DirectXRMW               = AddressingMode(AdrModeName::DIRECT_X_RMW);
