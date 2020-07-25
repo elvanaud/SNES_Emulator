@@ -5,36 +5,31 @@ using namespace std::placeholders;
 
 void W65816::initializeAddressingModes()
 {
-    Immediate.setStages({{Stage(Stage::SIG_MODE16_ONLY,fetchInc,&pc,&idb.high)},{Stage(Stage::SIG_INST,dummyStage)}});
-    Immediate.setSignals({bind(incPC,this,1),bind(opPrefetchInIDB,this)});
-
-    ImmediateSpecial.setStages({{Stage(Stage::SIG_INST,dummyStage)},{Stage(Stage::SIG_DUMMY_STAGE, dummyStage)}});
-    ImmediateSpecial.setSignals({bind(incPC,this,2),bind(opPrefetchInIDB,this)});
-
-    Implied.setStages({{Stage(Stage::SIG_INST,dummyStage)}});
-    Implied.setPredecodeSignals({bind(invalidPrefetch,this)});
-
-    ImpliedSpecial.setStages({{Stage(Stage::SIG_INST,dummyStage)},{Stage(Stage::SIG_DUMMY_STAGE, dummyStage)}});
-    ImpliedSpecial.setPredecodeSignals({bind(invalidPrefetch,this)});
-
-
-    Absolute.setStages({{Stage(Stage::SIG_ALWAYS, fetchInc,&pc,&adr.high)},{Stage(Stage::SIG_ALWAYS,fetchInc,&adr,&idb.low)},
-                       {Stage(Stage::SIG_MODE16_ONLY,fetch,&adr,&idb.high)},{Stage(Stage::SIG_INST,dummyStage)}});
+    Absolute.setStages({{Stage(Stage::SIG_ALWAYS, fetchInc,&pc,&adr.high)},
+                        {Stage(Stage::SIG_ALWAYS,fetchInc,&adr,&idb.low)},
+                        {Stage(Stage::SIG_MODE16_ONLY,fetch,&adr,&idb.high)},
+                        {Stage(Stage::SIG_INST,dummyStage)}});
     Absolute.setSignals({bind(incPC,this,1)});
 
 
-    AbsoluteWrite.setStages({{Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&adr.high),Stage(Stage::SIG_INST,dummyStage)},{Stage(Stage::SIG_ALWAYS,writeInc,&adr,&idb.low)},
-                            {Stage(Stage::SIG_MODE16_ONLY,write,&adr,&idb.high)},{Stage(Stage::SIG_DUMMY_STAGE,dummyStage)}});
+    AbsoluteWrite.setStages({   {Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&adr.high),Stage(Stage::SIG_INST,dummyStage)},
+                                {Stage(Stage::SIG_ALWAYS,writeInc,&adr,&idb.low)},
+                                {Stage(Stage::SIG_MODE16_ONLY,write,&adr,&idb.high)},
+                                {Stage(Stage::SIG_DUMMY_STAGE,dummyStage)}});
     AbsoluteWrite.setSignals({bind(incPC,this,1)});
 
 
-    AbsoluteRMW.setStages({ {Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&adr.high)},{Stage(Stage::SIG_ALWAYS,fetchInc,&adr,&idb.low)},
-                            {Stage(Stage::SIG_MODE16_ONLY,fetch,&adr,&idb.high)},{Stage(Stage::SIG_ALWAYS,dummyFetchLast),Stage(Stage::SIG_INST,dummyStage),Stage(Stage::SIG_MODE8_ONLY,decReg,&adr)},
-                            {Stage(Stage::SIG_MODE16_ONLY,writeDec,&adr,&idb.high)},{Stage(Stage::SIG_ALWAYS,write,&adr,&idb.low)},{Stage(Stage::SIG_DUMMY_STAGE, dummyStage)}});
+    AbsoluteRMW.setStages({ {Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&adr.high)},
+                            {Stage(Stage::SIG_ALWAYS,fetchInc,&adr,&idb.low)},
+                            {Stage(Stage::SIG_MODE16_ONLY,fetch,&adr,&idb.high)},
+                            {Stage(Stage::SIG_ALWAYS,dummyFetchLast),Stage(Stage::SIG_INST,dummyStage),Stage(Stage::SIG_MODE8_ONLY,decReg,&adr)},
+                            {Stage(Stage::SIG_MODE16_ONLY,writeDec,&adr,&idb.high)},{Stage(Stage::SIG_ALWAYS,write,&adr,&idb.low)},
+                            {Stage(Stage::SIG_DUMMY_STAGE, dummyStage)}});
     AbsoluteRMW.setSignals({bind(incPC,this,1)});
 
 
-    AbsoluteJMP.setStages({{Stage(Stage::SIG_ALWAYS,fetch,&pc,&pc.high),Stage(Stage::SIG_ALWAYS,moveReg8,&adr.low,&pc.low)},{Stage(Stage::SIG_INST,dummyStage)}});
+    AbsoluteJMP.setStages({ {Stage(Stage::SIG_ALWAYS,fetch,&pc,&pc.high),Stage(Stage::SIG_ALWAYS,moveReg8,&adr.low,&pc.low)},
+                            {Stage(Stage::SIG_INST,dummyStage)}});
     AbsoluteJMP.setSignals({bind(incPC,this,1)});
 
 
@@ -46,8 +41,11 @@ void W65816::initializeAddressingModes()
     AbsoluteJSR.setSignals({bind(incPC,this,1)});
 
 
-    AbsoluteLong.setStages({{Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&adr.high)},{Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&tmpBank)},{Stage(Stage::SIG_ALWAYS,fetchIncLong,&tmpBank,&adr,&idb.low)},
-                            {Stage(Stage::SIG_MODE16_ONLY,fetchLong,&tmpBank,&adr,&idb.high)},{Stage(Stage::SIG_INST,dummyStage)}});
+    AbsoluteLong.setStages({{Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&adr.high)},
+                            {Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&tmpBank)},
+                            {Stage(Stage::SIG_ALWAYS,fetchIncLong,&tmpBank,&adr,&idb.low)},
+                            {Stage(Stage::SIG_MODE16_ONLY,fetchLong,&tmpBank,&adr,&idb.high)},
+                            {Stage(Stage::SIG_INST,dummyStage)}});
     AbsoluteLong.setSignals({bind(incPC,this,1)});
 
 
@@ -234,7 +232,7 @@ void W65816::initializeAddressingModes()
     DirectIndirectY.setStages({ {Stage(Stage::SIG_DL_NOT_ZERO,dummyFetchLast),Stage(Stage::SIG_DL_NOT_ZERO,halfAdd,&adr.low,&d.low),Stage(Stage::SIG_DL_NOT_ZERO,fixCarry,&adr.high,&ZERO)},
                                 {Stage(Stage::SIG_ALWAYS,fetchIncLong,&ZERO,&adr,&idb.low)},
                                 {Stage(Stage::SIG_ALWAYS,fetchLong,&ZERO,&adr,&adr.high),Stage(Stage::SIG_ALWAYS,moveReg8,&idb.low,&adr.low),Stage(Stage::SIG_ALWAYS,halfAdd,&adr.low,&y.low)},
-                                {Stage(Stage::SIG_INDIRECT_Y_CROSS_PAGE_OR_X16,dummyFetch,&adr),(Stage::SIG_INDIRECT_Y_CROSS_PAGE_OR_X16,fixCarry,&adr.high,&y.high)},
+                                {Stage(Stage::SIG_INDIRECT_Y_CROSS_PAGE_OR_X16,dummyFetch,&adr),Stage(Stage::SIG_INDIRECT_Y_CROSS_PAGE_OR_X16,fixCarry,&adr.high,&y.high)},
                                 {Stage(Stage::SIG_ALWAYS,fetchInc,&adr,&idb.low)},
                                 {Stage(Stage::SIG_MODE16_ONLY,fetch,&adr,&idb.high)},
                                 {Stage(Stage::SIG_INST,dummyStage)}});
@@ -244,7 +242,7 @@ void W65816::initializeAddressingModes()
     DirectIndirectYWrite.setStages({{Stage(Stage::SIG_DL_NOT_ZERO,dummyFetchLast),Stage(Stage::SIG_DL_NOT_ZERO,halfAdd,&adr.low,&d.low),Stage(Stage::SIG_DL_NOT_ZERO,fixCarry,&adr.high,&ZERO)},
                                     {Stage(Stage::SIG_ALWAYS,fetchIncLong,&ZERO,&adr,&idb.low)},
                                     {Stage(Stage::SIG_ALWAYS,fetchLong,&ZERO,&adr,&adr.high),Stage(Stage::SIG_ALWAYS,moveReg8,&idb.low,&adr.low),Stage(Stage::SIG_ALWAYS,halfAdd,&adr.low,&y.low)},
-                                    {Stage(Stage::SIG_INDIRECT_Y_CROSS_PAGE_OR_X16,dummyFetch,&adr),(Stage::SIG_INDIRECT_Y_CROSS_PAGE_OR_X16,fixCarry,&adr.high,&y.high)},
+                                    {Stage(Stage::SIG_INDIRECT_Y_CROSS_PAGE_OR_X16,dummyFetch,&adr),Stage(Stage::SIG_INDIRECT_Y_CROSS_PAGE_OR_X16,fixCarry,&adr.high,&y.high)},
                                     {Stage(Stage::SIG_INST,dummyStage),Stage(Stage::SIG_ALWAYS,writeInc,&adr,&idb.low)},
                                     {Stage(Stage::SIG_MODE16_ONLY,write,&adr,&idb.high)},
                                     {Stage(Stage::SIG_DUMMY_STAGE,dummyStage)}});
@@ -332,4 +330,24 @@ void W65816::initializeAddressingModes()
                             {Stage(Stage::SIG_MODE16_ONLY,writeLong,&ZERO,&adr,&idb.high)},
                             {Stage(Stage::SIG_DUMMY_STAGE,dummyStage)}});
     DirectYWrite.setSignals({bind(incPC,this,1),bind(dhPrefetchInAdr,this)});
+
+
+    Immediate.setStages({   {Stage(Stage::SIG_MODE16_ONLY,fetchInc,&pc,&idb.high)},
+                            {Stage(Stage::SIG_INST,dummyStage)}});
+    Immediate.setSignals({bind(incPC,this,1),bind(opPrefetchInIDB,this)});
+
+
+    ImmediateSpecial.setStages({{Stage(Stage::SIG_INST,dummyStage)},
+                                {Stage(Stage::SIG_DUMMY_STAGE, dummyStage)}});
+    ImmediateSpecial.setSignals({bind(incPC,this,2),bind(opPrefetchInIDB,this)});
+
+
+    Implied.setStages({{Stage(Stage::SIG_INST,dummyStage)}});
+    Implied.setPredecodeSignals({bind(invalidPrefetch,this)});
+
+
+    ImpliedSpecial.setStages({  {Stage(Stage::SIG_INST,dummyStage)},
+                                {Stage(Stage::SIG_DUMMY_STAGE, dummyStage)}});
+    ImpliedSpecial.setPredecodeSignals({bind(invalidPrefetch,this)});
+
 }

@@ -207,8 +207,6 @@ private:
 
     //Addressing Modes
     enum AdrModeName {
-        IMMEDIATE, IMMEDIATE_SPECIAL,
-        IMPLIED, IMPLIED_SPECIAL,
         ABSOLUTE, ABSOLUTE_WRITE, ABSOLUTE_RMW, ABSOLUTE_JMP, ABSOLUTE_JSR, ABSOLUTE_LONG,
             ABSOLUTE_LONG_WRITE, ABSOLUTE_LONG_JMP, ABSOLUTE_LONG_JSL, ABSOLUTE_LONG_X, ABSOLUTE_X,
             ABSOLUTE_X_WRITE, ABSOLUTE_X_LONG_WRITE, ABSOLUTE_X_RMW, ABSOLUTE_Y, ABSOLUTE_Y_WRITE,
@@ -217,12 +215,10 @@ private:
         DIRECT, DIRECT_WRITE, DIRECT_RMW, DIRECT_X_INDIRECT, DIRECT_X_INDIRECT_WRITE, DIRECT_INDIRECT,
             DIRECT_INDIRECT_WRITE, DIRECT_INDIRECT_Y, DIRECT_INDIRECT_Y_WRITE, DIRECT_INDIRECT_Y_LONG,
             DIRECT_INDIRECT_Y_LONG_WRITE, DIRECT_INDIRECT_LONG, DIRECT_INDIRECT_LONG_WRITE,
-            DIRECT_X, DIRECT_X_WRITE, DIRECT_X_RMW, DIRECT_Y, DIRECT_Y_WRITE};
+            DIRECT_X, DIRECT_X_WRITE, DIRECT_X_RMW, DIRECT_Y, DIRECT_Y_WRITE,
+        IMMEDIATE, IMMEDIATE_SPECIAL,
+        IMPLIED, IMPLIED_SPECIAL};
 
-    AddressingMode Immediate                = AddressingMode(AdrModeName::IMMEDIATE);
-    AddressingMode ImmediateSpecial         = AddressingMode(AdrModeName::IMMEDIATE_SPECIAL);
-    AddressingMode Implied                  = AddressingMode(AdrModeName::IMPLIED);
-    AddressingMode ImpliedSpecial           = AddressingMode(AdrModeName::IMPLIED_SPECIAL);
     AddressingMode Absolute                 = AddressingMode(AdrModeName::ABSOLUTE);
     AddressingMode AbsoluteWrite            = AddressingMode(AdrModeName::ABSOLUTE_WRITE);
     AddressingMode AbsoluteRMW              = AddressingMode(AdrModeName::ABSOLUTE_RMW);
@@ -262,6 +258,10 @@ private:
     AddressingMode DirectXRMW               = AddressingMode(AdrModeName::DIRECT_X_RMW);
     AddressingMode DirectY                  = AddressingMode(AdrModeName::DIRECT_Y);
     AddressingMode DirectYWrite             = AddressingMode(AdrModeName::DIRECT_Y_WRITE);
+    AddressingMode Immediate                = AddressingMode(AdrModeName::IMMEDIATE);
+    AddressingMode ImmediateSpecial         = AddressingMode(AdrModeName::IMMEDIATE_SPECIAL);
+    AddressingMode Implied                  = AddressingMode(AdrModeName::IMPLIED);
+    AddressingMode ImpliedSpecial           = AddressingMode(AdrModeName::IMPLIED_SPECIAL);
 
 
     //Instructions
