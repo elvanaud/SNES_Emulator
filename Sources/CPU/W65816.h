@@ -251,6 +251,8 @@ private:
     AddressingMode DirectXIndirectWrite = AddressingMode(AdrModeName::DIRECT_X_INDIRECT_WRITE);
     AddressingMode DirectIndirect       = AddressingMode(AdrModeName::DIRECT_INDIRECT);
     AddressingMode DirectIndirectWrite  = AddressingMode(AdrModeName::DIRECT_INDIRECT_WRITE);
+    AddressingMode DirectIndirectY      = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y);
+    AddressingMode DirectIndirectYWrite = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y_WRITE);
 
     AddressingMode DirectX              = AddressingMode(AdrModeName::DIRECT_X);
     AddressingMode DirectXWrite         = AddressingMode(AdrModeName::DIRECT_X_WRITE);
