@@ -251,6 +251,26 @@ void W65816::initializeAddressingModes()
     DirectIndirectYWrite.setSignals({bind(incPC,this,1),bind(dhPrefetchInAdr,this)});
 
 
+    DirectIndirectYLong.setStages({ {Stage(Stage::SIG_DL_NOT_ZERO,dummyFetchLast),Stage(Stage::SIG_DL_NOT_ZERO,halfAdd,&adr.low,&d.low),Stage(Stage::SIG_DL_NOT_ZERO,fixCarry,&adr.high,&ZERO)},
+                                    {Stage(Stage::SIG_ALWAYS,fetchIncLong,&ZERO,&adr,&idb.low)},
+                                    {Stage(Stage::SIG_ALWAYS,fetchIncLong,&ZERO,&adr,&idb.high),Stage(Stage::SIG_ALWAYS,halfAdd,&idb.low,&y.low)},
+                                    {Stage(Stage::SIG_ALWAYS,fetchLong,&ZERO,&adr,&tmpBank),Stage(Stage::SIG_INDIRECT_Y_CROSS_PAGE_OR_X16,fixCarry,&idb.high,&y.high)},
+                                    {Stage(Stage::SIG_ALWAYS,moveReg16,&idb,&adr),Stage(Stage::SIG_ALWAYS,fetchIncLong,&tmpBank,&adr,&idb.low)},
+                                    {Stage(Stage::SIG_MODE16_ONLY,fetchLong,&tmpBank,&adr,&idb.high)},
+                                    {Stage(Stage::SIG_INST,dummyStage)}});
+    DirectIndirectYLong.setSignals({bind(incPC,this,1),bind(dhPrefetchInAdr,this)});
+
+
+    DirectIndirectYLongWrite.setStages({{Stage(Stage::SIG_DL_NOT_ZERO,dummyFetchLast),Stage(Stage::SIG_DL_NOT_ZERO,halfAdd,&adr.low,&d.low),Stage(Stage::SIG_DL_NOT_ZERO,fixCarry,&adr.high,&ZERO)},
+                                        {Stage(Stage::SIG_ALWAYS,fetchIncLong,&ZERO,&adr,&idb.low)},
+                                        {Stage(Stage::SIG_ALWAYS,fetchIncLong,&ZERO,&adr,&idb.high),Stage(Stage::SIG_ALWAYS,halfAdd,&idb.low,&y.low)},
+                                        {Stage(Stage::SIG_ALWAYS,fetchLong,&ZERO,&adr,&tmpBank),Stage(Stage::SIG_INDIRECT_Y_CROSS_PAGE_OR_X16,fixCarry,&idb.high,&y.high),Stage(Stage::SIG_ALWAYS,moveReg16,&idb,&adr)},
+                                        {Stage(Stage::SIG_INST,dummyStage),Stage(Stage::SIG_ALWAYS,writeIncLong,&tmpBank,&adr,&idb.low)},
+                                        {Stage(Stage::SIG_MODE16_ONLY,writeLong,&tmpBank,&adr,&idb.high)},
+                                        {Stage(Stage::SIG_DUMMY_STAGE,dummyStage)}});
+    DirectIndirectYLongWrite.setSignals({bind(incPC,this,1),bind(dhPrefetchInAdr,this)});
+
+
     DirectX.setStages({ {Stage(Stage::SIG_DL_NOT_ZERO,dummyFetchLast),Stage(Stage::SIG_DL_NOT_ZERO,halfAdd,&adr.low,&d.low),Stage(Stage::SIG_DL_NOT_ZERO,fixCarry,&adr.high,&ZERO)},
                         {Stage(Stage::SIG_ALWAYS,dummyFetchLast),Stage(Stage::SIG_ALWAYS,fullAdd,&adr,&x)},
                         {Stage(Stage::SIG_ALWAYS,fetchIncLong,&ZERO,&adr,&idb.low)},
