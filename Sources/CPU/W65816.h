@@ -200,6 +200,7 @@ private:
     void incPC(unsigned int whatCycle = 1);
     void opPrefetchInIDB();
     void accPrefetchInIDB();
+    void dhPrefetchInAdr();
 
     //Predecode Signals
     void invalidPrefetch();
@@ -211,8 +212,9 @@ private:
         ABSOLUTE, ABSOLUTE_WRITE, ABSOLUTE_RMW, ABSOLUTE_JMP, ABSOLUTE_JSR, ABSOLUTE_LONG,
             ABSOLUTE_LONG_WRITE, ABSOLUTE_LONG_JMP, ABSOLUTE_LONG_JSL, ABSOLUTE_LONG_X, ABSOLUTE_X,
             ABSOLUTE_X_WRITE, ABSOLUTE_X_LONG_WRITE, ABSOLUTE_X_RMW, ABSOLUTE_Y, ABSOLUTE_Y_WRITE,
-            ABSOLUTE_X_INDIRECT_JMP,ABSOLUTE_X_INDIRECT_JSR,ABSOLUTE_INDIRECT_JML,ABSOLUTE_INDIRECT_JMP,
-        ACCUMULATOR};
+            ABSOLUTE_X_INDIRECT_JMP, ABSOLUTE_X_INDIRECT_JSR, ABSOLUTE_INDIRECT_JML, ABSOLUTE_INDIRECT_JMP,
+        ACCUMULATOR,
+        DIRECT, DIRECT_WRITE};
 
     AddressingMode Immediate            = AddressingMode(AdrModeName::IMMEDIATE);
     AddressingMode ImmediateSpecial     = AddressingMode(AdrModeName::IMMEDIATE_SPECIAL);
@@ -239,6 +241,8 @@ private:
     AddressingMode AbsoluteIndirectJML  = AddressingMode(AdrModeName::ABSOLUTE_INDIRECT_JML);
     AddressingMode AbsoluteIndirectJMP  = AddressingMode(AdrModeName::ABSOLUTE_INDIRECT_JMP);
     AddressingMode Accumulator          = AddressingMode(AdrModeName::ACCUMULATOR);
+    AddressingMode Direct               = AddressingMode(AdrModeName::DIRECT);
+    AddressingMode DirectWrite          = AddressingMode(AdrModeName::DIRECT_WRITE);
 
 
     //Instructions

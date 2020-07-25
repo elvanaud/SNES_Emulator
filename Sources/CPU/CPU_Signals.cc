@@ -26,3 +26,8 @@ void W65816::accPrefetchInIDB()
 {
     if(tcycle == 1) idb.set(acc.val());
 }
+
+void W65816::dhPrefetchInAdr()
+{
+    if(tcycle == 1) adr.high = d.high;
+}
