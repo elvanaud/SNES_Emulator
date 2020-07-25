@@ -135,7 +135,7 @@ void W65816::initializeAddressingModes()
 
 
     AbsoluteXIndirectJMP.setStages({    {Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&adr.high)},
-                                        {Stage(Stage::SIG_ALWAYS,dummyFetchLast),(Stage::SIG_ALWAYS,fullAdd,&adr,&x)},
+                                        {Stage(Stage::SIG_ALWAYS,dummyFetchLast),Stage(Stage::SIG_ALWAYS,fullAdd,&adr,&x)},
                                         {Stage(Stage::SIG_ALWAYS,fetchIncLong,&pbr,&adr,&pc.low)},
                                         {Stage(Stage::SIG_ALWAYS,fetchLong,&pbr,&adr,&pc.high)},
                                         {Stage(Stage::SIG_INST,dummyStage)}});
@@ -150,6 +150,21 @@ void W65816::initializeAddressingModes()
                                         {Stage(Stage::SIG_ALWAYS,fetchLong,&pbr,&adr,&pc.high)},
                                         {Stage(Stage::SIG_INST,dummyStage)}});
     AbsoluteXIndirectJSR.setSignals({bind(incPC,this,1)});
+
+
+    AbsoluteIndirectJML.setStages({ {Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&adr.high)},
+                                    {Stage(Stage::SIG_ALWAYS,fetchIncLong,&ZERO,&adr,&pc.low)},
+                                    {Stage(Stage::SIG_ALWAYS,fetchIncLong,&ZERO,&adr,&pc.high)},
+                                    {Stage(Stage::SIG_ALWAYS,fetchLong,&ZERO,&adr,&pbr)},
+                                    {Stage(Stage::SIG_INST,dummyStage)}});
+    AbsoluteIndirectJML.setSignals({bind(incPC,this,1)});
+
+
+    AbsoluteIndirectJMP.setStages({ {Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&adr.high)},
+                                    {Stage(Stage::SIG_ALWAYS,fetchIncLong,&ZERO,&adr,&pc.low)},
+                                    {Stage(Stage::SIG_ALWAYS,fetchLong,&ZERO,&adr,&pc.high)},
+                                    {Stage(Stage::SIG_INST,dummyStage)}});
+    AbsoluteIndirectJMP.setSignals({bind(incPC,this,1)});
 
 
     Accumulator.setStages({{Stage(Stage::SIG_INST,dummyStage),Stage(Stage::SIG_ALWAYS,moveReg8,&idb.low,&acc.low),Stage(Stage::SIG_MODE16_ONLY,moveReg8,&idb.high,&acc.high)}});
