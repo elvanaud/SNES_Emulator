@@ -217,7 +217,8 @@ private:
             DIRECT_INDIRECT_Y_LONG_WRITE, DIRECT_INDIRECT_LONG, DIRECT_INDIRECT_LONG_WRITE,
             DIRECT_X, DIRECT_X_WRITE, DIRECT_X_RMW, DIRECT_Y, DIRECT_Y_WRITE,
         IMMEDIATE, IMMEDIATE_SPECIAL,
-        IMPLIED, IMPLIED_SPECIAL};
+        IMPLIED, IMPLIED_SPECIAL,
+        STACK_POP, STACK_POP_8, STACK_POP_16, STACK_PUSH, STACK_PUSH_8, STACK_PUSH_16};
 
     AddressingMode Absolute                 = AddressingMode(AdrModeName::ABSOLUTE);
     AddressingMode AbsoluteWrite            = AddressingMode(AdrModeName::ABSOLUTE_WRITE);
@@ -262,6 +263,12 @@ private:
     AddressingMode ImmediateSpecial         = AddressingMode(AdrModeName::IMMEDIATE_SPECIAL);
     AddressingMode Implied                  = AddressingMode(AdrModeName::IMPLIED);
     AddressingMode ImpliedSpecial           = AddressingMode(AdrModeName::IMPLIED_SPECIAL);
+    AddressingMode StackPop                 = AddressingMode(AdrModeName::STACK_POP);
+    AddressingMode StackPop8                = AddressingMode(AdrModeName::STACK_POP_8);
+    AddressingMode StackPop16               = AddressingMode(AdrModeName::STACK_POP_16);
+    AddressingMode StackPush                = AddressingMode(AdrModeName::STACK_PUSH);
+    AddressingMode StackPush8               = AddressingMode(AdrModeName::STACK_PUSH_8);
+    AddressingMode StackPush16              = AddressingMode(AdrModeName::STACK_PUSH_16);
 
 
     //Instructions
@@ -288,6 +295,19 @@ private:
     void LDY();
     void LSR();
     void ORA();
+    void PHA();
+    void PHB();
+    void PHP();
+    void PHD();
+    void PHK();
+    void PHX();
+    void PHY();
+    void PLA();
+    void PLB();
+    void PLD();
+    void PLP();
+    void PLX();
+    void PLY();
     void REP();
     void ROL();
     void ROR();

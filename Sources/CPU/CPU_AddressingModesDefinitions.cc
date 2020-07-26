@@ -350,4 +350,40 @@ void W65816::initializeAddressingModes()
                                 {Stage(Stage::SIG_DUMMY_STAGE, dummyStage)}});
     ImpliedSpecial.setPredecodeSignals({bind(invalidPrefetch,this)});
 
+
+    StackPop.setStages({{Stage(Stage::SIG_DUMMY_STAGE,dummyStage)}, //The inc is supposed to happen here but I do it all in the "pop" operation
+                        {Stage(Stage::SIG_ALWAYS,pop,&idb.low)},
+                        {Stage(Stage::SIG_MODE16_ONLY,pop,&idb.high)},
+                        {Stage(Stage::SIG_INST,dummyStage)}});
+    StackPop.setPredecodeSignals({bind(invalidPrefetch,this)});
+
+
+    StackPop8.setStages({{Stage(Stage::SIG_DUMMY_STAGE,dummyStage)},
+                        {Stage(Stage::SIG_ALWAYS,pop,&idb.low)},
+                        {Stage(Stage::SIG_INST,dummyStage)}});
+    StackPop8.setPredecodeSignals({bind(invalidPrefetch,this)});
+
+
+    StackPop16.setStages({  {Stage(Stage::SIG_DUMMY_STAGE,dummyStage)},
+                            {Stage(Stage::SIG_ALWAYS,pop,&idb.low)},
+                            {Stage(Stage::SIG_ALWAYS,pop,&idb.high)},
+                            {Stage(Stage::SIG_INST,dummyStage)}});
+    StackPop16.setPredecodeSignals({bind(invalidPrefetch,this)});
+
+
+    StackPush.setStages({   {Stage(Stage::SIG_INST,dummyStage),Stage(Stage::SIG_MODE16_ONLY,push,&idb.high)},
+                            {Stage(Stage::SIG_ALWAYS,push,&idb.low)},
+                            {Stage(Stage::SIG_DUMMY_STAGE,dummyStage)}});
+    StackPush.setPredecodeSignals({bind(invalidPrefetch,this)});
+
+
+    StackPush8.setStages({  {Stage(Stage::SIG_INST,dummyStage),Stage(Stage::SIG_ALWAYS,push,&idb.low)},
+                            {Stage(Stage::SIG_DUMMY_STAGE,dummyStage)}});
+    StackPush8.setPredecodeSignals({bind(invalidPrefetch,this)});
+
+
+    StackPush16.setStages({ {Stage(Stage::SIG_INST,dummyStage),Stage(Stage::SIG_ALWAYS,push,&idb.high)},
+                            {Stage(Stage::SIG_ALWAYS,push,&idb.low)},
+                            {Stage(Stage::SIG_DUMMY_STAGE,dummyStage)}});
+    StackPush16.setPredecodeSignals({bind(invalidPrefetch,this)});
 }

@@ -222,6 +222,79 @@ void W65816::ORA()
     updateNZFlags(res);
 }
 
+void W65816::PHA()
+{
+    idb.set(acc.val());
+    updateNZFlags(getReg(acc));
+}
+
+void W65816::PHB()
+{
+    idb.set(dbr);
+}
+
+void W65816::PHP()
+{
+    idb.set(p.getVal());
+}
+
+void W65816::PHD()
+{
+    idb.set(d.val());
+}
+
+void W65816::PHK()
+{
+    idb.set(pbr);
+}
+
+void W65816::PHX()
+{
+    idb.set(x.val());
+}
+
+void W65816::PHY()
+{
+    idb.set(y.val());
+}
+
+void W65816::PLA()
+{
+    setReg(acc,idb.val());
+    updateNZFlags(getReg(acc));
+}
+
+void W65816::PLB()
+{
+    dbr = idb.low;
+    //updateNZFlags(dbr); need to force 8 bit (I'll do that manually here =>)
+    p.setZ(dbr == 0);
+    p.setN(dbr>>7);
+}
+
+void W65816::PLD()
+{
+    d.set(idb.val());
+    updateNZFlags(d.val(), false, true); //use force16 here
+}
+
+void W65816::PLP()
+{
+    p.setVal(idb.low);
+}
+
+void W65816::PLX()
+{
+    setReg(x,idb.val());
+    updateNZFlags(x.val(),true);
+}
+
+void W65816::PLY()
+{
+    setReg(y,idb.val());
+    updateNZFlags(y.val(),true);
+}
+
 void W65816::REP()
 {
     uint8_t mask = idb.low;

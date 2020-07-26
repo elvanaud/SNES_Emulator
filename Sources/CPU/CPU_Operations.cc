@@ -179,7 +179,8 @@ void W65816::pop(uint8_t * dst)
     *dst =  bus->DMR();
     ++s;*/
     tmpBank = 0;
-    fetchIncLong(&tmpBank,&s,dst);
+    ++s;
+    fetchLong(&tmpBank,&s,dst);
 }
 
 void W65816::halfAdd(uint8_t * dst, uint8_t * op)
