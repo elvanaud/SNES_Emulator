@@ -223,7 +223,7 @@ private:
         IMMEDIATE, IMMEDIATE_SPECIAL,
         IMPLIED, IMPLIED_SPECIAL,
         STACK_POP, STACK_POP_8, STACK_POP_16, STACK_PUSH, STACK_PUSH_8, STACK_PUSH_16,
-        RELATIVE_BRANCH};
+        RELATIVE_BRANCH, RELATIVE_BRANCH_LONG};
 
     AddressingMode Absolute                 = AddressingMode(AdrModeName::ABSOLUTE);
     AddressingMode AbsoluteWrite            = AddressingMode(AdrModeName::ABSOLUTE_WRITE);
@@ -275,6 +275,7 @@ private:
     AddressingMode StackPush8               = AddressingMode(AdrModeName::STACK_PUSH_8);
     AddressingMode StackPush16              = AddressingMode(AdrModeName::STACK_PUSH_16);
     AddressingMode RelativeBranch           = AddressingMode(AdrModeName::RELATIVE_BRANCH);
+    AddressingMode RelativeBranchLong       = AddressingMode(AdrModeName::RELATIVE_BRANCH_LONG);
 
 
     //Instructions

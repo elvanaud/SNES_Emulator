@@ -115,6 +115,7 @@ void W65816::initializeOpcodes()
     decodingTable[0x7F] = Instruction("ADC", AbsoluteXLong, ADC);
     decodingTable[0x80] = Instruction("BRA", RelativeBranch, BRA);
     decodingTable[0x81] = Instruction("STA", DirectXIndirectWrite, STA);
+    decodingTable[0x82] = Instruction("BRL", RelativeBranchLong, dummyStage);
     decodingTable[0x84] = Instruction("STY", DirectWrite, STY); decodingTable[0x84].setIsIndexRelated(true);
     decodingTable[0x85] = Instruction("STA", DirectWrite, STA);
     decodingTable[0x86] = Instruction("STX", DirectWrite, STX); decodingTable[0x86].setIsIndexRelated(true);
