@@ -165,6 +165,8 @@ bool W65816::isStageEnabled(Stage const& st)
         case Stage::SIG_Y_CROSS_PAGE: op = bus->privateRead(pc.val()); return op > op+y.low;
         case Stage::SIG_DL_NOT_ZERO: return d.low != 0;
         case Stage::SIG_INDIRECT_Y_CROSS_PAGE_OR_X16: op = bus->privateRead(bus->privateRead(pc.val())+d.val()); return !p.index8 || op > op+y.low;
+        case Stage::SIG_PC_CROSS_PAGE_IN_EMUL: op = bus->privateRead(pc.val()); return p.emulationMode && op > op+adr.low;
+        case Stage::SIG_NATIVE_MODE: return !p.emulationMode;
     }
 }
 

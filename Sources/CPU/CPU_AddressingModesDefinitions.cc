@@ -386,4 +386,12 @@ void W65816::initializeAddressingModes()
                             {Stage(Stage::SIG_ALWAYS,push,&idb.low)},
                             {Stage(Stage::SIG_DUMMY_STAGE,dummyStage)}});
     StackPush16.setPredecodeSignals({bind(invalidPrefetch,this)});
+
+
+    RelativeBranch.setStages({  {Stage(Stage::SIG_INST,dummyStage)}, //Special Case for branch instruction: the first stage is executed within the decode operation (in T1)
+                                {Stage(Stage::SIG_ALWAYS,halfAdd,&pc.low,&adr.low),Stage(Stage::SIG_NATIVE_MODE,fixCarry,&pc.high,&ZERO)}, //The following stages are those to be executed if the branch is taken
+                                {Stage(Stage::SIG_PC_CROSS_PAGE_IN_EMUL,fixCarry,&pc.high,&ZERO)},
+                                {Stage(Stage::SIG_DUMMY_STAGE, dummyStage)}});
+    RelativeBranch.setSignals({bind(incPC,this,1)});
+    RelativeBranch.setPredecodeSignals({bind(branchInstruction,this)});
 }

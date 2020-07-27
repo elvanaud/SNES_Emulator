@@ -798,7 +798,7 @@ TEST_CASE("Test X,Y Reg lose their high part when going native mode", "[!mayfail
     REQUIRE(false);
 }
 
-TEST_CASE("Edge case for carry with ADC: 0x80+0x7F+C=1 Overflow or not ?") //See ken shiriff's blog on 6502 v flag
+TEST_CASE("Edge case for carry with ADC: 0x80+0x7F+C=1 Overflow or not ?", "[!mayfail]") //See ken shiriff's blog on 6502 v flag
 {
     REQUIRE(false);
 }

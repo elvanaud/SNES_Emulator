@@ -16,12 +16,6 @@ void W65816::opPrefetchInIDB()
     //cout << "opPrefetchInIDB" << endl;
 }
 
-void W65816::invalidPrefetch()
-{
-    if(tcycle == 1)forceInternalOperation = true;
-    //cout << "invalidPrefetch" << endl;
-}
-
 void W65816::accPrefetchInIDB()
 {
     if(tcycle == 1) idb.set(acc.val());
@@ -30,4 +24,16 @@ void W65816::accPrefetchInIDB()
 void W65816::dhPrefetchInAdr()
 {
     if(tcycle == 1) adr.high = d.high;
+}
+
+void W65816::invalidPrefetch()
+{
+    if(tcycle == 1) //This if is optional...
+        forceInternalOperation = true;
+    //cout << "invalidPrefetch" << endl;
+}
+
+void W65816::branchInstruction()
+{
+    thisIsABranch = true;
 }

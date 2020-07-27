@@ -58,6 +58,11 @@ private:
     uint8_t ZERO = 0;
 
     //Private helper methods
+    bool forceInternalOperation = false;
+    bool forceTmpBank = false;
+    bool thisIsABranch = false;
+    bool branchTaken = false;
+
     void reloadPipeline();
     void processSignals();
     bool isStageEnabled(Stage const & st);
@@ -65,8 +70,6 @@ private:
     void initializeAddressingModes();
     enum ValidAddressState {OpcodeFetch, InternalOperation, DataFetch, OperandFetch};
     void handleValidAddressPINS(ValidAddressState state);
-    bool forceInternalOperation = false;
-    bool forceTmpBank = false;
     void preDecode();
 
     void generateAddress(uint8_t bank, uint16_t adr);
@@ -204,6 +207,7 @@ private:
 
     //Predecode Signals
     void invalidPrefetch();
+    void branchInstruction();
 
     //Addressing Modes
     enum AdrModeName {
@@ -218,7 +222,8 @@ private:
             DIRECT_X, DIRECT_X_WRITE, DIRECT_X_RMW, DIRECT_Y, DIRECT_Y_WRITE,
         IMMEDIATE, IMMEDIATE_SPECIAL,
         IMPLIED, IMPLIED_SPECIAL,
-        STACK_POP, STACK_POP_8, STACK_POP_16, STACK_PUSH, STACK_PUSH_8, STACK_PUSH_16};
+        STACK_POP, STACK_POP_8, STACK_POP_16, STACK_PUSH, STACK_PUSH_8, STACK_PUSH_16,
+        RELATIVE_BRANCH};
 
     AddressingMode Absolute                 = AddressingMode(AdrModeName::ABSOLUTE);
     AddressingMode AbsoluteWrite            = AddressingMode(AdrModeName::ABSOLUTE_WRITE);
@@ -269,13 +274,23 @@ private:
     AddressingMode StackPush                = AddressingMode(AdrModeName::STACK_PUSH);
     AddressingMode StackPush8               = AddressingMode(AdrModeName::STACK_PUSH_8);
     AddressingMode StackPush16              = AddressingMode(AdrModeName::STACK_PUSH_16);
+    AddressingMode RelativeBranch           = AddressingMode(AdrModeName::RELATIVE_BRANCH);
 
 
     //Instructions
     void ADC();
     void AND();
     void ASL();
+    void BCC();
+    void BCS();
+    void BEQ();
     void BIT();
+    void BMI();
+    void BNE();
+    void BPL();
+    void BRA();
+    void BVC();
+    void BVS();
     void CLC();
     void CLD();
     void CLI();

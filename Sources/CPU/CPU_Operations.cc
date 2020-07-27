@@ -23,9 +23,26 @@ void W65816::preDecode()
 
 void W65816::decode()
 {
+    int STARTING_STAGE = 0;
     preDecode();
     const auto & instructionStages = decodingTable[ir].Stages();
-    for(unsigned int i = 0; i < instructionStages.size(); ++i)
+
+    if(thisIsABranch)
+    {
+        thisIsABranch = false;
+        instructionStages[0][0].get()(this); //no check whatoever, ignoring any other substage in the T1 (T2) stage
+        if(branchTaken)
+        {
+            branchTaken = false;
+            STARTING_STAGE = 1;
+        }
+        else
+        {
+            lastPipelineStage = {};
+            return;
+        }
+    }
+    for(unsigned int i = STARTING_STAGE; i < instructionStages.size(); ++i)
     {
         const auto & stagesCycleN = instructionStages[i];
         vector<StageType> pipelineCycleN;

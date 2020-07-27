@@ -69,6 +69,21 @@ void W65816::ASL()
     setReg(idb,val);
 }
 
+void W65816::BCC()
+{
+    branchTaken = !p.C();
+}
+
+void W65816::BCS()
+{
+    branchTaken = p.C();
+}
+
+void W65816::BEQ()
+{
+    branchTaken = p.Z();
+}
+
 void W65816::BIT()
 {
     uint16_t v = getReg(idb);
@@ -80,6 +95,36 @@ void W65816::BIT()
 
     uint16_t r = getReg(acc) & v;
     p.setZ(r==0);
+}
+
+void W65816::BMI()
+{
+    branchTaken = p.N();
+}
+
+void W65816::BNE()
+{
+    branchTaken = !p.Z();
+}
+
+void W65816::BPL()
+{
+    branchTaken = !p.N();
+}
+
+void W65816::BRA()
+{
+    branchTaken = true;
+}
+
+void W65816::BVC()
+{
+    branchTaken = !p.V();
+}
+
+void W65816::BVS()
+{
+    branchTaken = p.V();
 }
 
 void W65816::CLC()
