@@ -87,7 +87,7 @@ void W65816::BEQ()
 void W65816::BIT()
 {
     uint16_t v = getReg(idb);
-    if(decodingTable[ir].AdrMode().Name() != Immediate.Name())
+    if(decodingTable[ir].AdrMode().Name() != Immediate.Name()) //TODO: wtf... Consider removing this mechanism and all the Name stuff
     {
         p.setN((v>>7)&1);
         p.setV((v>>6)&1);

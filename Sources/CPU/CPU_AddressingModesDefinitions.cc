@@ -351,6 +351,20 @@ void W65816::initializeAddressingModes()
     ImpliedSpecial.setPredecodeSignals({bind(invalidPrefetch,this)});
 
 
+    RelativeBranch.setStages({  {Stage(Stage::SIG_INST,dummyStage)}, //Special Case for branch instruction: the first stage is executed within the decode operation (in T1)
+                                {Stage(Stage::SIG_ALWAYS,dummyFetchLast),Stage(Stage::SIG_ALWAYS,halfAdd,&pc.low,&adr.low),Stage(Stage::SIG_NATIVE_MODE,fixCarry,&pc.high,&ZERO)}, //The following stages are those to be executed if the branch is taken
+                                {Stage(Stage::SIG_ALWAYS,dummyFetchLast),Stage(Stage::SIG_PC_CROSS_PAGE_IN_EMUL,fixCarry,&pc.high,&ZERO)},
+                                {Stage(Stage::SIG_DUMMY_STAGE, dummyStage)}});
+    RelativeBranch.setSignals({bind(incPC,this,1)});
+    RelativeBranch.setPredecodeSignals({bind(branchInstruction,this)});
+
+
+    RelativeBranchLong.setStages({  {Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&adr.high)},
+                                    {Stage(Stage::SIG_ALWAYS,fullAdd,&pc,&adr)},
+                                    {Stage(Stage::SIG_INST, dummyStage)}});
+    RelativeBranchLong.setSignals({bind(incPC,this,1)});
+
+
     StackPop.setStages({{Stage(Stage::SIG_DUMMY_STAGE,dummyStage)}, //The inc is supposed to happen here but I do it all in the "pop" operation
                         {Stage(Stage::SIG_ALWAYS,pop,&idb.low)},
                         {Stage(Stage::SIG_MODE16_ONLY,pop,&idb.high)},
@@ -388,16 +402,27 @@ void W65816::initializeAddressingModes()
     StackPush16.setPredecodeSignals({bind(invalidPrefetch,this)});
 
 
-    RelativeBranch.setStages({  {Stage(Stage::SIG_INST,dummyStage)}, //Special Case for branch instruction: the first stage is executed within the decode operation (in T1)
-                                {Stage(Stage::SIG_ALWAYS,dummyFetchLast),Stage(Stage::SIG_ALWAYS,halfAdd,&pc.low,&adr.low),Stage(Stage::SIG_NATIVE_MODE,fixCarry,&pc.high,&ZERO)}, //The following stages are those to be executed if the branch is taken
-                                {Stage(Stage::SIG_ALWAYS,dummyFetchLast),Stage(Stage::SIG_PC_CROSS_PAGE_IN_EMUL,fixCarry,&pc.high,&ZERO)},
-                                {Stage(Stage::SIG_DUMMY_STAGE, dummyStage)}});
-    RelativeBranch.setSignals({bind(incPC,this,1)});
-    RelativeBranch.setPredecodeSignals({bind(branchInstruction,this)});
+    StackPEA.setStages({{Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&adr.high)},
+                        {Stage(Stage::SIG_ALWAYS,push,&adr.high)},
+                        {Stage(Stage::SIG_ALWAYS,push,&adr.low)},
+                        {Stage(Stage::SIG_INST,dummyStage)}});
+    StackPEA.setSignals({bind(incPC,this,1)});
 
 
-    RelativeBranchLong.setStages({  {Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&adr.high)},
-                                    {Stage(Stage::SIG_ALWAYS,fullAdd,&pc,&adr)},
-                                    {Stage(Stage::SIG_INST, dummyStage)}});
-    RelativeBranchLong.setSignals({bind(incPC,this,1)});
+    StackPEI.setStages({{Stage(Stage::SIG_DL_NOT_ZERO,dummyFetchLast),Stage(Stage::SIG_DL_NOT_ZERO,halfAdd,&adr.low,&d.low),Stage(Stage::SIG_DL_NOT_ZERO,fixCarry,&adr.high,&ZERO)},
+                        {Stage(Stage::SIG_ALWAYS,fetchInc,&adr,&idb.low)},
+                        {Stage(Stage::SIG_ALWAYS,fetch,&adr,&idb.high)},
+                        {Stage(Stage::SIG_ALWAYS,push,&idb.high)},
+                        {Stage(Stage::SIG_ALWAYS,push,&idb.low)},
+                        {Stage(Stage::SIG_INST,dummyStage)}});
+    StackPEI.setSignals({bind(incPC,this,1),bind(dhPrefetchInAdr,this)});
+
+
+    StackPER.setStages({{Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&adr.high)},
+                        {Stage(Stage::SIG_ALWAYS,dummyFetchLast),Stage(Stage::SIG_ALWAYS,fullAdd,&adr,&pc)},
+                        {Stage(Stage::SIG_ALWAYS,push,&adr.high)},
+                        {Stage(Stage::SIG_ALWAYS,push,&adr.low)},
+                        {Stage(Stage::SIG_INST,dummyStage)}});
+    StackPER.setSignals({bind(incPC,this,1)});
+
 }

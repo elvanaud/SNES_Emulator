@@ -87,6 +87,7 @@ void W65816::initializeOpcodes()
     decodingTable[0x5E] = Instruction("LSR", AbsoluteXRMW, LSR);
     decodingTable[0x5F] = Instruction("EOR", AbsoluteXLong, EOR);
     decodingTable[0x61] = Instruction("ADC", DirectXIndirect, ADC);
+    decodingTable[0x62] = Instruction("PER", StackPER, dummyStage);
     decodingTable[0x64] = Instruction("STZ", DirectWrite, STZ);
     decodingTable[0x65] = Instruction("ADC", Direct, ADC);
     decodingTable[0x66] = Instruction("ROR", DirectRMW, ROR);
@@ -190,6 +191,7 @@ void W65816::initializeOpcodes()
     decodingTable[0xD0] = Instruction("BNE", RelativeBranch, BNE);
     decodingTable[0xD1] = Instruction("CMP", DirectIndirectY, CMP);
     decodingTable[0xD2] = Instruction("CMP", DirectIndirect, CMP);
+    decodingTable[0xD4] = Instruction("PEI", StackPEI, dummyStage);
     decodingTable[0xD5] = Instruction("CMP", DirectX, CMP);
     decodingTable[0xD6] = Instruction("DEC", DirectXRMW, DEC);
     decodingTable[0xD7] = Instruction("CMP", DirectIndirectYLong, CMP);
@@ -218,6 +220,7 @@ void W65816::initializeOpcodes()
     decodingTable[0xF0] = Instruction("BEQ", RelativeBranch, BEQ);
     decodingTable[0xF1] = Instruction("SBC", DirectIndirectY, SBC);
     decodingTable[0xF2] = Instruction("SBC", DirectIndirect, SBC);
+    decodingTable[0xF4] = Instruction("PEA", StackPEA, dummyStage);
     decodingTable[0xF5] = Instruction("SBC", DirectX, SBC);
     decodingTable[0xF6] = Instruction("INC", DirectXRMW, INC);
     decodingTable[0xF7] = Instruction("SBC", DirectIndirectYLong, SBC);

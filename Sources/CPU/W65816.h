@@ -222,8 +222,10 @@ private:
             DIRECT_X, DIRECT_X_WRITE, DIRECT_X_RMW, DIRECT_Y, DIRECT_Y_WRITE,
         IMMEDIATE, IMMEDIATE_SPECIAL,
         IMPLIED, IMPLIED_SPECIAL,
-        STACK_POP, STACK_POP_8, STACK_POP_16, STACK_PUSH, STACK_PUSH_8, STACK_PUSH_16,
-        RELATIVE_BRANCH, RELATIVE_BRANCH_LONG};
+        RELATIVE_BRANCH, RELATIVE_BRANCH_LONG,
+        STACK_POP, STACK_POP_8, STACK_POP_16, STACK_PUSH, STACK_PUSH_8, STACK_PUSH_16, STACK_PEA,
+            STACK_PEI, STACK_PER
+        };
 
     AddressingMode Absolute                 = AddressingMode(AdrModeName::ABSOLUTE);
     AddressingMode AbsoluteWrite            = AddressingMode(AdrModeName::ABSOLUTE_WRITE);
@@ -268,14 +270,17 @@ private:
     AddressingMode ImmediateSpecial         = AddressingMode(AdrModeName::IMMEDIATE_SPECIAL);
     AddressingMode Implied                  = AddressingMode(AdrModeName::IMPLIED);
     AddressingMode ImpliedSpecial           = AddressingMode(AdrModeName::IMPLIED_SPECIAL);
+    AddressingMode RelativeBranch           = AddressingMode(AdrModeName::RELATIVE_BRANCH);
+    AddressingMode RelativeBranchLong       = AddressingMode(AdrModeName::RELATIVE_BRANCH_LONG);
     AddressingMode StackPop                 = AddressingMode(AdrModeName::STACK_POP);
     AddressingMode StackPop8                = AddressingMode(AdrModeName::STACK_POP_8);
     AddressingMode StackPop16               = AddressingMode(AdrModeName::STACK_POP_16);
     AddressingMode StackPush                = AddressingMode(AdrModeName::STACK_PUSH);
     AddressingMode StackPush8               = AddressingMode(AdrModeName::STACK_PUSH_8);
     AddressingMode StackPush16              = AddressingMode(AdrModeName::STACK_PUSH_16);
-    AddressingMode RelativeBranch           = AddressingMode(AdrModeName::RELATIVE_BRANCH);
-    AddressingMode RelativeBranchLong       = AddressingMode(AdrModeName::RELATIVE_BRANCH_LONG);
+    AddressingMode StackPEA                 = AddressingMode(AdrModeName::STACK_PEA);
+    AddressingMode StackPEI                 = AddressingMode(AdrModeName::STACK_PEI);
+    AddressingMode StackPER                 = AddressingMode(AdrModeName::STACK_PER);
 
 
     //Instructions
