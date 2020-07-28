@@ -463,4 +463,24 @@ void W65816::initializeAddressingModes()
                                     {Stage(Stage::SIG_MODE16_ONLY,writeLong,&ZERO,&adr,&idb.high)},
                                     {Stage(Stage::SIG_DUMMY_STAGE,dummyStage)}});
     StackRelativeWrite.setSignals({bind(incPC,this,1)});
+
+
+    StackRelativeIndirectY.setStages({  {Stage(Stage::SIG_ALWAYS,dummyFetchLast),Stage(Stage::SIG_ALWAYS,moveReg8,&ZERO,&adr.high),Stage(Stage::SIG_ALWAYS,fullAdd,&adr,&s)},
+                                        {Stage(Stage::SIG_ALWAYS,fetchIncLong,&ZERO,&adr,&idb.low)},
+                                        {Stage(Stage::SIG_ALWAYS,fetchLong,&ZERO,&adr,&idb.high)},
+                                        {Stage(Stage::SIG_ALWAYS,dummyFetchLast),Stage(Stage::SIG_ALWAYS,fullAdd,&idb,&y)},
+                                        {Stage(Stage::SIG_ALWAYS,moveReg16,&idb,&adr),Stage(Stage::SIG_ALWAYS,fetchInc,&adr,&idb.low)},
+                                        {Stage(Stage::SIG_MODE16_ONLY,fetch,&adr,&idb.high)},
+                                        {Stage(Stage::SIG_INST,dummyStage)}});
+    StackRelativeIndirectY.setSignals({bind(incPC,this,1)});
+
+
+    StackRelativeIndirectYWrite.setStages({  {Stage(Stage::SIG_ALWAYS,dummyFetchLast),Stage(Stage::SIG_ALWAYS,moveReg8,&ZERO,&adr.high),Stage(Stage::SIG_ALWAYS,fullAdd,&adr,&s)},
+                                        {Stage(Stage::SIG_ALWAYS,fetchIncLong,&ZERO,&adr,&idb.low)},
+                                        {Stage(Stage::SIG_ALWAYS,fetchLong,&ZERO,&adr,&idb.high)},
+                                        {Stage(Stage::SIG_ALWAYS,dummyFetchLast),Stage(Stage::SIG_ALWAYS,fullAdd,&idb,&y)},
+                                        {Stage(Stage::SIG_ALWAYS,moveReg16,&idb,&adr),Stage(Stage::SIG_INST,dummyStage),Stage(Stage::SIG_ALWAYS,writeInc,&adr,&idb.low)},
+                                        {Stage(Stage::SIG_MODE16_ONLY,write,&adr,&idb.high)},
+                                        {Stage(Stage::SIG_DUMMY_STAGE,dummyStage)}});
+    StackRelativeIndirectYWrite.setSignals({bind(incPC,this,1)});
 }
