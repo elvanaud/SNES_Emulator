@@ -190,6 +190,8 @@ private:
 
     void push(uint8_t * src);
     void pop(uint8_t * dst);
+    void pushP();
+    void popP();
 
     void halfAdd(uint8_t * dst, uint8_t * op); uint8_t internalCarryBuffer = 0;
     void fixCarry(uint8_t * dst, uint8_t * op);
@@ -198,6 +200,9 @@ private:
     void dummyStage(); //Dummy operation
 
     void decReg(Register16 * reg);
+    void incReg(Register16 * reg);
+
+    void enableInterupts(bool enable); //TODO: Signal or stage ?
 
     //Signals
     void incPC(unsigned int whatCycle = 1);
@@ -224,7 +229,7 @@ private:
         IMPLIED, IMPLIED_SPECIAL,
         RELATIVE_BRANCH, RELATIVE_BRANCH_LONG,
         STACK_POP, STACK_POP_8, STACK_POP_16, STACK_PUSH, STACK_PUSH_8, STACK_PUSH_16, STACK_PEA,
-            STACK_PEI, STACK_PER
+            STACK_PEI, STACK_PER, STACK_RTI, STACK_RTS, STACK_RTL
         };
 
     AddressingMode Absolute                 = AddressingMode(AdrModeName::ABSOLUTE);
@@ -281,6 +286,9 @@ private:
     AddressingMode StackPEA                 = AddressingMode(AdrModeName::STACK_PEA);
     AddressingMode StackPEI                 = AddressingMode(AdrModeName::STACK_PEI);
     AddressingMode StackPER                 = AddressingMode(AdrModeName::STACK_PER);
+    AddressingMode StackRTI                 = AddressingMode(AdrModeName::STACK_RTI);
+    AddressingMode StackRTS                 = AddressingMode(AdrModeName::STACK_RTS);
+    AddressingMode StackRTL                 = AddressingMode(AdrModeName::STACK_RTL);
 
 
     //Instructions

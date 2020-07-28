@@ -200,6 +200,19 @@ void W65816::pop(uint8_t * dst)
     fetchLong(&tmpBank,&s,dst);
 }
 
+void W65816::pushP()
+{
+    uint8_t v = p.getVal();
+    push(&v);
+}
+
+void W65816::popP()
+{
+    uint8_t v;
+    pop(&v);
+    p.setVal(v);
+}
+
 void W65816::halfAdd(uint8_t * dst, uint8_t * op)
 {
     uint16_t r = uint16_t(*dst) + *op;
@@ -221,4 +234,14 @@ void W65816::fullAdd(Register16 * dst, Register16 * op)
 void W65816::decReg(Register16 * reg)
 {
     --(*reg);
+}
+
+void W65816::incReg(Register16 * reg)
+{
+    ++(*reg);
+}
+
+void W65816::enableInterupts(bool enable)
+{
+    p.setI(enable);
 }

@@ -60,6 +60,7 @@ void W65816::initializeOpcodes()
     decodingTable[0x3D] = Instruction("AND", AbsoluteX, AND);
     decodingTable[0x3E] = Instruction("ROL", AbsoluteXRMW, ROL);
     decodingTable[0x3F] = Instruction("AND", AbsoluteXLong, AND);
+    decodingTable[0x40] = Instruction("RTI", StackRTI, dummyStage);
     decodingTable[0x41] = Instruction("EOR", DirectXIndirect, EOR);
     decodingTable[0x45] = Instruction("EOR", Direct, EOR);
     decodingTable[0x46] = Instruction("LSR", DirectRMW, LSR);
@@ -86,6 +87,7 @@ void W65816::initializeOpcodes()
     decodingTable[0x5D] = Instruction("EOR", AbsoluteX, EOR);
     decodingTable[0x5E] = Instruction("LSR", AbsoluteXRMW, LSR);
     decodingTable[0x5F] = Instruction("EOR", AbsoluteXLong, EOR);
+    decodingTable[0x60] = Instruction("RTS", StackRTS, dummyStage);
     decodingTable[0x61] = Instruction("ADC", DirectXIndirect, ADC);
     decodingTable[0x62] = Instruction("PER", StackPER, dummyStage);
     decodingTable[0x64] = Instruction("STZ", DirectWrite, STZ);
@@ -95,6 +97,7 @@ void W65816::initializeOpcodes()
     decodingTable[0x68] = Instruction("PLA", StackPop, PLA);
     decodingTable[0x69] = Instruction("ADC", Immediate, ADC);
     decodingTable[0x6A] = Instruction("ROR", Accumulator, ROR);
+    decodingTable[0x6B] = Instruction("RTL", StackRTL, dummyStage);
     decodingTable[0x6C] = Instruction("JMP", AbsoluteIndirectJMP, dummyStage);
     decodingTable[0x6D] = Instruction("ADC", Absolute, ADC);
     decodingTable[0x6E] = Instruction("ROR", AbsoluteRMW, ROR);

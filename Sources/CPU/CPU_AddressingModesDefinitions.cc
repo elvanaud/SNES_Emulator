@@ -425,4 +425,28 @@ void W65816::initializeAddressingModes()
                         {Stage(Stage::SIG_INST,dummyStage)}});
     StackPER.setSignals({bind(incPC,this,1)});
 
+
+    StackRTI.setStages({{Stage(Stage::SIG_ALWAYS,dummyFetchLast), Stage(Stage::SIG_ALWAYS,enableInterupts,true)}, //TODO: Re enable interupts where ?
+                        {Stage(Stage::SIG_ALWAYS,popP)},
+                        {Stage(Stage::SIG_ALWAYS,pop,&pc.low)},
+                        {Stage(Stage::SIG_ALWAYS,pop,&pc.high)},
+                        {Stage(Stage::SIG_NATIVE_MODE,pop,&pbr)},
+                        {Stage(Stage::SIG_INST,dummyStage)}});
+    StackRTI.setPredecodeSignals({bind(invalidPrefetch,this)});
+
+
+    StackRTS.setStages({{Stage(Stage::SIG_ALWAYS,dummyFetchLast)},
+                        {Stage(Stage::SIG_ALWAYS,pop,&pc.low)},
+                        {Stage(Stage::SIG_ALWAYS,pop,&pc.high)},
+                        {Stage(Stage::SIG_ALWAYS,dummyFetchLast),Stage(Stage::SIG_ALWAYS,incReg,&pc)},
+                        {Stage(Stage::SIG_INST,dummyStage)}});
+    StackRTS.setPredecodeSignals({bind(invalidPrefetch,this)});
+
+
+    StackRTL.setStages({{Stage(Stage::SIG_ALWAYS,dummyFetchLast)},
+                        {Stage(Stage::SIG_ALWAYS,pop,&pc.low)},
+                        {Stage(Stage::SIG_ALWAYS,pop,&pc.high)},
+                        {Stage(Stage::SIG_ALWAYS,pop,&pbr),Stage(Stage::SIG_ALWAYS,incReg,&pc)},
+                        {Stage(Stage::SIG_INST,dummyStage)}});
+    StackRTL.setPredecodeSignals({bind(invalidPrefetch,this)});
 }
