@@ -449,4 +449,18 @@ void W65816::initializeAddressingModes()
                         {Stage(Stage::SIG_ALWAYS,pop,&pbr),Stage(Stage::SIG_ALWAYS,incReg,&pc)},
                         {Stage(Stage::SIG_INST,dummyStage)}});
     StackRTL.setPredecodeSignals({bind(invalidPrefetch,this)});
+
+
+    StackRelative.setStages({   {Stage(Stage::SIG_ALWAYS,dummyFetchLast),Stage(Stage::SIG_ALWAYS,moveReg8,&ZERO,&adr.high),Stage(Stage::SIG_ALWAYS,fullAdd,&adr,&s)},
+                                {Stage(Stage::SIG_ALWAYS,fetchIncLong,&ZERO,&adr,&idb.low)},
+                                {Stage(Stage::SIG_MODE16_ONLY,fetchLong,&ZERO,&adr,&idb.high)},
+                                {Stage(Stage::SIG_INST,dummyStage)}});
+    StackRelative.setSignals({bind(incPC,this,1)});
+
+
+    StackRelativeWrite.setStages({  {Stage(Stage::SIG_ALWAYS,dummyFetchLast),Stage(Stage::SIG_ALWAYS,moveReg8,&ZERO,&adr.high),Stage(Stage::SIG_ALWAYS,fullAdd,&adr,&s)},
+                                    {Stage(Stage::SIG_INST,dummyStage),Stage(Stage::SIG_ALWAYS,writeIncLong,&ZERO,&adr,&idb.low)},
+                                    {Stage(Stage::SIG_MODE16_ONLY,writeLong,&ZERO,&adr,&idb.high)},
+                                    {Stage(Stage::SIG_DUMMY_STAGE,dummyStage)}});
+    StackRelativeWrite.setSignals({bind(incPC,this,1)});
 }

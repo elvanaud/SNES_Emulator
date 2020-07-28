@@ -229,7 +229,7 @@ private:
         IMPLIED, IMPLIED_SPECIAL,
         RELATIVE_BRANCH, RELATIVE_BRANCH_LONG,
         STACK_POP, STACK_POP_8, STACK_POP_16, STACK_PUSH, STACK_PUSH_8, STACK_PUSH_16, STACK_PEA,
-            STACK_PEI, STACK_PER, STACK_RTI, STACK_RTS, STACK_RTL
+            STACK_PEI, STACK_PER, STACK_RTI, STACK_RTS, STACK_RTL, STACK_RELATIVE, STACK_RELATIVE_WRITE
         };
 
     AddressingMode Absolute                 = AddressingMode(AdrModeName::ABSOLUTE);
@@ -289,6 +289,8 @@ private:
     AddressingMode StackRTI                 = AddressingMode(AdrModeName::STACK_RTI);
     AddressingMode StackRTS                 = AddressingMode(AdrModeName::STACK_RTS);
     AddressingMode StackRTL                 = AddressingMode(AdrModeName::STACK_RTL);
+    AddressingMode StackRelative            = AddressingMode(AdrModeName::STACK_RELATIVE);
+    AddressingMode StackRelativeWrite       = AddressingMode(AdrModeName::STACK_RELATIVE_WRITE);
 
 
     //Instructions
