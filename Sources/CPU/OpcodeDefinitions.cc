@@ -66,7 +66,9 @@ void W65816::initializeOpcodes()
     decodingTable[0x3F] = Instruction("AND", AbsoluteXLong, AND);
     decodingTable[0x40] = Instruction("RTI", StackRTI, dummyStage);
     decodingTable[0x41] = Instruction("EOR", DirectXIndirect, EOR);
+    decodingTable[0x42] = Instruction("WDM", Immediate, dummyStage);
     decodingTable[0x43] = Instruction("EOR", StackRelative, EOR);
+    decodingTable[0x44] = Instruction("MVP", BlockMoveP, dummyStage);
     decodingTable[0x45] = Instruction("EOR", Direct, EOR);
     decodingTable[0x46] = Instruction("LSR", DirectRMW, LSR);
     decodingTable[0x47] = Instruction("EOR", DirectIndirectLong, EOR);
@@ -82,6 +84,7 @@ void W65816::initializeOpcodes()
     decodingTable[0x51] = Instruction("EOR", DirectIndirectY, EOR);
     decodingTable[0x52] = Instruction("EOR", DirectIndirect, EOR);
     decodingTable[0x53] = Instruction("EOR", StackRelativeIndirectY, EOR);
+    decodingTable[0x54] = Instruction("MVN", BlockMoveN, dummyStage);
     decodingTable[0x55] = Instruction("EOR", DirectX, EOR);
     decodingTable[0x56] = Instruction("LSR", DirectXRMW, LSR);
     decodingTable[0x57] = Instruction("EOR", DirectIndirectYLong, EOR);
