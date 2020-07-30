@@ -129,6 +129,12 @@ void W65816::fetchIncLong(uint8_t * bank, Register16 *src, uint8_t * dst)
     ++(*src);
 }
 
+void W65816::fetchDecLong(uint8_t * bank, Register16 *src, uint8_t * dst)
+{
+    fetchLong(bank,src,dst);
+    --(*src);
+}
+
 void W65816::moveReg8(uint8_t * src, uint8_t * dst)
 {
     *dst = *src;
@@ -243,5 +249,5 @@ void W65816::incReg(Register16 * reg)
 
 void W65816::enableInterupts(bool enable)
 {
-    p.setI(enable);
+    p.setI(!enable);
 }

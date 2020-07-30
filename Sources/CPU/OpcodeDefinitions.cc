@@ -2,7 +2,9 @@
 
 void W65816::initializeOpcodes()
 {
+    decodingTable[0x00] = Instruction("BRK", StackInterupt, BRK);
     decodingTable[0x01] = Instruction("ORA", DirectXIndirect, ORA);
+    decodingTable[0x02] = Instruction("COP", StackInterupt, COP);
     decodingTable[0x03] = Instruction("ORA", StackRelative, ORA);
     decodingTable[0x04] = Instruction("TSB", DirectRMW, TSB);
     decodingTable[0x05] = Instruction("ORA", Direct, ORA);

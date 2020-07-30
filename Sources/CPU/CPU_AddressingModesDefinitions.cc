@@ -485,6 +485,16 @@ void W65816::initializeAddressingModes()
     StackRelativeIndirectYWrite.setSignals({bind(incPC,this,1)});
 
 
+    StackInterupt.setStages({   {Stage(Stage::SIG_NATIVE_MODE,push,&pbr),Stage(Stage::SIG_INST,dummyStage)},//Maybe exec the inst before push pc so I can save the correct value for both inst and int
+                                {Stage(Stage::SIG_ALWAYS,push,&pc.high),Stage(Stage::SIG_ALWAYS,enableInterupts,false)},
+                                {Stage(Stage::SIG_ALWAYS,push,&pc.low)},
+                                {Stage(Stage::SIG_ALWAYS,pushP)},
+                                {Stage(Stage::SIG_ALWAYS,fetchIncLong,&ZERO,&adr,&pc.low),Stage(Stage::SIG_ALWAYS,moveReg8,&ZERO,&pbr)},
+                                {Stage(Stage::SIG_ALWAYS,fetchLong,&ZERO,&adr,&pc.high)},
+                                {Stage(Stage::SIG_DUMMY_STAGE,dummyStage)}});
+    StackInterupt.setSignals({bind(incPC,this,1)});
+
+
     BlockMoveN.setStages({  {Stage(Stage::SIG_ALWAYS,fetchDec,&pc,&adr.high),Stage(Stage::SIG_ALWAYS,moveReg8,&adr.low,&dbr)},
                             {Stage(Stage::SIG_ALWAYS,fetchIncLong,&adr.high,&x,&idb.low)},
                             {Stage(Stage::SIG_ALWAYS,writeIncLong,&adr.low,&y,&idb.low)},

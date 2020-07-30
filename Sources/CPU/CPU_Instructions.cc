@@ -117,6 +117,20 @@ void W65816::BRA()
     branchTaken = true;
 }
 
+void W65816::BRK()
+{
+    uint16_t vecAdr = 0xFFE6;
+    if(p.emulationMode)
+    {
+        vecAdr = 0xFFFE;
+        p.setB(true);
+    }
+    //p.setI(true);
+    p.setD(false);
+    adr.set(vecAdr);
+    //++pc; //TODO
+}
+
 void W65816::BVC()
 {
     branchTaken = !p.V();
@@ -154,6 +168,15 @@ void W65816::CMP()
     uint16_t r = a - b;
     updateNZFlags(r);
     p.setC(a >= b);
+}
+
+void W65816::COP()
+{
+    //uint16_t vecAdr = 0xFFE4;
+    //p.setI(true);
+    p.setD(false);
+    adr.set(0xFFE4);
+    //++pc; //TODO
 }
 
 void W65816::CPX()
