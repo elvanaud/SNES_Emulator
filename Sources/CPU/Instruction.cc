@@ -38,3 +38,8 @@ void Instruction::setIsIndexRelated(bool idxR)
 {
     indexRelated = idxR;
 }
+
+string Instruction::getASM() const
+{
+    return opcodeASM; //TODO: add adrmode specific asm
+}

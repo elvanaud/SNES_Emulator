@@ -28,6 +28,8 @@ public:
 
     bool isIndexRelated();
     void setIsIndexRelated(bool idxR);
+
+    string getASM() const;
 private:
     vector<vector<Stage>> stages;
     AddressingMode adrMode;

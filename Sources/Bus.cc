@@ -3,6 +3,7 @@
 
 #include <cstdio>
 #include <iostream>
+#include <fstream>
 using std::cout;
 using std::endl;
 
@@ -59,8 +60,20 @@ void Bus::copyInMemory(uint32_t adr, vector<uint8_t> const & buffer)
     }
 }
 
+void Bus::loadCartridge(std::string const & path)
+{
+    std::ifstream input(path, std::ios::binary);
+    if(!input){
+         std::cout << "ERREUR: Fichier ROM introuvable\n";
+         exit(-1);
+     }
+
+    input.read((char*)ram,0x10000);
+}
+
 void Bus::run()
 {
+    uint16_t oldPC = cpu.getPC();
     while(true)
     {
         if(debugger.isExecutionBlocked())
@@ -69,23 +82,32 @@ void Bus::run()
             getchar();
             debugger.continueExec();
         }
-        cout << "TCycle = " << cpu.getTCycle() << endl;
+        //cout << "TCycle = " << cpu.getTCycle() << endl;
         cpu.tick();
 
-        cout << "PC = " <<std::hex << cpu.getPC() << "  ;  IR = " << (int)cpu.getIR() << "  ;  Acc = " << cpu.getAcc() << "  ;  Adr = " << cpu.getAdr();
-        cout << "  ;  IDB = " << cpu.getIDB() <<endl;
+        //cout << "PC = " <<std::hex << cpu.getPC() << "  ;  IR = " << (int)cpu.getIR() << "("<<cpu.getInst().getASM() << ")  ;  Acc = " << cpu.getAcc() << "  ;  Adr = " << cpu.getAdr();
+        //cout << "  ;  IDB = " << cpu.getIDB() <<endl;
         uint8_t p = cpu.getP();
         string status;
         if((p>>7)&1) status+="N"; else status += "-";
         if((p>>6)&1) status+="V"; else status += "-";
         if((p>>1)&1) status+="Z"; else status += "-";
         if((p>>0)&1) status+="C"; else status += "-";
-        cout << "Flags = " << status << endl;
-        cout << "VDA = " << cpu.VDA() << "  ;  VPA = " << cpu.VPA() << endl;
+        //cout << "Flags = " << status << endl;
+        //cout << "VDA = " << cpu.VDA() << "  ;  VPA = " << cpu.VPA() << endl;
 
         if(cpu.VDA() && cpu.VPA()) //Sync = Opcode Fetch
         {
-            std::getchar();
+            if(cpu.getPC() == oldPC)
+            {
+                cout << "big pb or test passed (lol)";
+            }
+            oldPC = cpu.getPC();
+            //cout << std::hex << cpu.getPC() << endl;
+            //cout << std::hex << cpu.getPC() << "("<<cpu.getInst().getASM() << ")"<<endl;
+            if(oldPC == 0x0449)
+                cout << "Y="<<std::hex <<cpu.getY()<<endl;
+            //std::getchar();
         }
     }
 }

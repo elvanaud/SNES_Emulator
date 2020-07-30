@@ -41,11 +41,14 @@ public:
     uint8_t getIR();
     uint8_t getP();
     uint32_t getAddressBus();
+    uint16_t getX();
+    uint16_t getY();
 
     //Getters - Internal
     unsigned int getTCycle();
     uint16_t getAdr();
     uint16_t getIDB();
+    Instruction const & getInst();
 
 private:
     //Private Internal State

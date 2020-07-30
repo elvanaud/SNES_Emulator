@@ -24,6 +24,7 @@ public:
     uint8_t DMR();
 
     void copyInMemory(uint32_t adr, vector<uint8_t> const & buffer);
+    void loadCartridge(std::string const & path);
 private:
     W65816 &cpu;
     ConsoleDebugger debugger;

@@ -70,6 +70,21 @@ uint32_t W65816::getAddressBus()
     return addressBusBuffer;
 }
 
+uint16_t W65816::getX()
+{
+    return x.val();
+}
+
+uint16_t W65816::getY()
+{
+    return y.val();
+}
+
+Instruction const & W65816::getInst()
+{
+    return decodingTable[ir];
+}
+
 // ---------- PINS ------------------
 bool W65816::VDA()
 {
