@@ -221,6 +221,7 @@ void W65816::initializeOpcodes()
     decodingTable[0xD8] = Instruction("CLD", Implied, CLD);
     decodingTable[0xD9] = Instruction("CMP", AbsoluteY, CMP);
     decodingTable[0xDA] = Instruction("PHX", StackPush, PHX); decodingTable[0xDA].setIsIndexRelated(true);
+    decodingTable[0xDB] = Instruction("STP", ImpliedSpecial, STP);
     decodingTable[0xDC] = Instruction("JML", AbsoluteIndirectJML, dummyStage);
     decodingTable[0xDD] = Instruction("CMP", AbsoluteX, CMP);
     decodingTable[0xDE] = Instruction("DEC", AbsoluteXRMW, DEC);

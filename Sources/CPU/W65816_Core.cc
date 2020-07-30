@@ -272,10 +272,11 @@ void W65816::checkInterupts()
 void W65816::tick()
 {
     handleValidAddressPINS(ValidAddressState::InternalOperation);
-    if(!rdy)
+    if(!rdy || clockStopped)
     {
         checkInterupts();
         if(executeInterupt) rdy = true; //TODO: if rdy is manually low maybe shouldn't resume exec on interupt ? (need to differentiate between user rdy and internal rdy
+        if(clockStopped && internalRST) clockStopped = false;
         return;
     }
 

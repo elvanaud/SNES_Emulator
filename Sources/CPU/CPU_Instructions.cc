@@ -448,6 +448,11 @@ void W65816::STA()
     setReg(idb, acc.val());
 }
 
+void W65816::STP()
+{
+    clockStopped = true;
+}
+
 void W65816::STX()
 {
     setReg(idb, x.val());

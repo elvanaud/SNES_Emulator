@@ -84,6 +84,7 @@ private:
     bool forceTmpBank = false;
     bool thisIsABranch = false;
     bool branchTaken = false;
+    bool clockStopped = false;
 
     void reloadPipeline();
     void processSignals();
@@ -380,6 +381,7 @@ private:
     void SEI();
     void SEP();
     void STA();
+    void STP();
     void STX();
     void STY();
     void STZ();
