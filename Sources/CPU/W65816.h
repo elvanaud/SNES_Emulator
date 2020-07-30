@@ -28,7 +28,9 @@ public:
     bool M();
     bool X();
 
-    void RESET();
+    void triggerRESET();
+    void triggerIRQ();
+    void triggerNMI();
 
     //Getters - Registers
     uint16_t getPC();
@@ -54,6 +56,22 @@ private:
     bool vpa = true;
 
     Instruction decodingTable[0x100];
+
+    Instruction interuptIRQ;
+    Instruction interuptNMI;
+    Instruction interuptRESET;
+
+    void IRQ();
+    void NMI();
+    void RESET();
+
+    bool internalNMI = false;
+    bool internalIRQ = false;
+    bool internalRST = false;
+
+    bool executeInterupt = false;
+
+    void checkInterupts();
 
     uint8_t ZERO = 0;
 
@@ -203,7 +221,7 @@ private:
     void decReg(Register16 * reg);
     void incReg(Register16 * reg);
 
-    void enableInterupts(bool enable); //TODO: Signal or stage ?
+    void enableInterupts(bool enable); //TODO: Signal or stage ? Note: It also disable the D flag when disabling interupts
 
     //Signals
     void incPC(unsigned int whatCycle = 1);

@@ -18,6 +18,12 @@ TEST_CASE("CPU works", "[cpu]")
     REQUIRE(cpu.M());
     REQUIRE(cpu.X());
 
+    //The cpu executes the RESET interupt at startup
+    cpu.tick(); //Dummy PC fetch
+    cpu.tick(); //Dummy decode
+    cpu.tick(); cpu.tick(); cpu.tick(); //Push CPU state
+    cpu.tick(); cpu.tick(); //Fetch the Adress Vector //TODO: test vector Pull PIN
+
     SECTION("SEC and CLC (Implied)")
     {
         uint16_t oldPC = cpu.getPC();

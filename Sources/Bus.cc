@@ -72,7 +72,7 @@ void Bus::run()
         cout << "TCycle = " << cpu.getTCycle() << endl;
         cpu.tick();
 
-        cout << "PC = " << cpu.getPC() << "  ;  IR = " << (int)cpu.getIR() << "  ;  Acc = " << cpu.getAcc() << "  ;  Adr = " << cpu.getAdr();
+        cout << "PC = " <<std::hex << cpu.getPC() << "  ;  IR = " << (int)cpu.getIR() << "  ;  Acc = " << cpu.getAcc() << "  ;  Adr = " << cpu.getAdr();
         cout << "  ;  IDB = " << cpu.getIDB() <<endl;
         uint8_t p = cpu.getP();
         string status;

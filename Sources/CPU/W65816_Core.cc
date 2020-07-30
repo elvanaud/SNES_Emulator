@@ -15,7 +15,13 @@ W65816::W65816()
     initializeAddressingModes();
     initializeOpcodes();
     reloadPipeline();
-    pc.set(0xFF);
+    pc.set(0xFF); //Becomes useless
+
+    interuptIRQ     = Instruction("<interupt IRQ>", StackInterupt, IRQ);
+    interuptNMI     = Instruction("<interupt NMI>", StackInterupt, NMI);
+    interuptRESET   = Instruction("<interupt RST>", StackInterupt, RESET);
+
+    triggerRESET();
 }
 
 void W65816::attachBus(Bus * b)
@@ -90,10 +96,54 @@ bool W65816::X()
     return p.X();
 }
 
-void RESET()
+void W65816::triggerRESET()
 {
-    //TODO: reset some flags
-    //TODO: reload pipeline with interupt content
+    internalRST = true;
+    executeInterupt = true; //Triggers RST directly (useful for booting the cpu (else it would execute an instruction which I guess isn't the appropriate behavior))
+}
+
+void W65816::triggerNMI()
+{
+    internalNMI = true;
+}
+
+void W65816::triggerIRQ()
+{
+    internalIRQ = true;
+}
+
+void W65816::IRQ()
+{
+    uint16_t vecAdr = 0xFFEE;
+    if(p.emulationMode) vecAdr = 0xFFFE;
+    internalIRQ = false; //TODO: maybe will have to reset that on each cycle as described in the docs
+    adr.set(vecAdr);
+    --pc;
+}
+
+void W65816::NMI()
+{
+    uint16_t vecAdr = 0xFFEA;
+    if(p.emulationMode) vecAdr = 0xFFFA;
+    internalNMI = false;
+    adr.set(vecAdr);
+    --pc;
+}
+
+void W65816::RESET()
+{
+    internalRST = false;
+    adr.set(0xFFFC);
+    --pc; //TODO: Remove that ??
+
+    s.high = 0x01;
+    d.set(0);
+    x.set(0);
+    y.set(0);
+    pbr = 0;
+    dbr = 0;
+
+    p.setE(true); //Also sets the mem and index to 8 bit
 }
 
 void W65816::setReg(Register16 & r, uint16_t v)
@@ -203,6 +253,12 @@ void W65816::generateAddress(uint16_t adr)
     addressBusBuffer |= adr;
 }
 
+void W65816::checkInterupts()
+{
+    if(tcycle != pipeline.size()) return;
+    if(internalIRQ || internalNMI || internalRST) executeInterupt = true;
+}
+
 void W65816::tick()
 {
     handleValidAddressPINS(ValidAddressState::InternalOperation);
@@ -211,8 +267,8 @@ void W65816::tick()
         stage(this);
     }
     processSignals();
-    //checkInterupts();
     ++tcycle;
+    checkInterupts();
 
     if(tcycle >= pipeline.size())
     {

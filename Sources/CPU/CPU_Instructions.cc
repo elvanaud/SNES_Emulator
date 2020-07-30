@@ -125,10 +125,10 @@ void W65816::BRK()
         vecAdr = 0xFFFE;
         p.setB(true);
     }
-    //p.setI(true);
-    p.setD(false);
     adr.set(vecAdr);
+
     //++pc; //TODO
+    //p.setD(false);
 }
 
 void W65816::BVC()
@@ -172,10 +172,11 @@ void W65816::CMP()
 
 void W65816::COP()
 {
-    //uint16_t vecAdr = 0xFFE4;
-    //p.setI(true);
-    p.setD(false);
-    adr.set(0xFFE4);
+    uint16_t vecAdr = 0xFFE4;
+    if(p.emulationMode) vecAdr = 0xFFF4;
+    adr.set(vecAdr);
+
+    //p.setD(false);
     //++pc; //TODO
 }
 

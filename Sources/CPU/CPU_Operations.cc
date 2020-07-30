@@ -23,9 +23,20 @@ void W65816::preDecode()
 
 void W65816::decode()
 {
+    Instruction instToDecode = decodingTable[ir];
+    if(executeInterupt)
+    {
+        if(internalIRQ && !p.I()) {instToDecode = interuptIRQ;}
+        if(internalNMI) {instToDecode = interuptNMI;}
+        if(internalRST) {instToDecode = interuptRESET;}
+
+        --pc;invalidPrefetch();
+        executeInterupt = false;
+    }
+
     int STARTING_STAGE = 0;
     preDecode();
-    const auto & instructionStages = decodingTable[ir].Stages();
+    const auto & instructionStages = instToDecode.Stages();
 
     if(thisIsABranch)
     {
@@ -250,4 +261,5 @@ void W65816::incReg(Register16 * reg)
 void W65816::enableInterupts(bool enable)
 {
     p.setI(!enable);
+    if(!enable) p.setD(false);
 }

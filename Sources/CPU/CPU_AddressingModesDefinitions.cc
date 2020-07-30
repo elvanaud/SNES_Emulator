@@ -373,8 +373,8 @@ void W65816::initializeAddressingModes()
 
 
     StackPop8.setStages({{Stage(Stage::SIG_DUMMY_STAGE,dummyStage)},
-                        {Stage(Stage::SIG_ALWAYS,pop,&idb.low)},
-                        {Stage(Stage::SIG_INST,dummyStage)}});
+                         {Stage(Stage::SIG_ALWAYS,pop,&idb.low)},
+                         {Stage(Stage::SIG_INST,dummyStage)}});
     StackPop8.setPredecodeSignals({bind(invalidPrefetch,this)});
 
 
@@ -426,7 +426,7 @@ void W65816::initializeAddressingModes()
     StackPER.setSignals({bind(incPC,this,1)});
 
 
-    StackRTI.setStages({{Stage(Stage::SIG_ALWAYS,dummyFetchLast), Stage(Stage::SIG_ALWAYS,enableInterupts,true)}, //TODO: Re enable interupts where ?
+    StackRTI.setStages({{Stage(Stage::SIG_ALWAYS,dummyFetchLast)},// Stage(Stage::SIG_ALWAYS,enableInterupts,true)}, //TODO: Re enable interupts where ? maybe no need to do it as it is saved in P
                         {Stage(Stage::SIG_ALWAYS,popP)},
                         {Stage(Stage::SIG_ALWAYS,pop,&pc.low)},
                         {Stage(Stage::SIG_ALWAYS,pop,&pc.high)},
@@ -485,11 +485,11 @@ void W65816::initializeAddressingModes()
     StackRelativeIndirectYWrite.setSignals({bind(incPC,this,1)});
 
 
-    StackInterupt.setStages({   {Stage(Stage::SIG_NATIVE_MODE,push,&pbr),Stage(Stage::SIG_INST,dummyStage)},//Maybe exec the inst before push pc so I can save the correct value for both inst and int
-                                {Stage(Stage::SIG_ALWAYS,push,&pc.high),Stage(Stage::SIG_ALWAYS,enableInterupts,false)},
+    StackInterupt.setStages({   {Stage(Stage::SIG_NATIVE_MODE,push,&pbr)},
+                                {Stage(Stage::SIG_INST,dummyStage),Stage(Stage::SIG_ALWAYS,push,&pc.high)},
                                 {Stage(Stage::SIG_ALWAYS,push,&pc.low)},
-                                {Stage(Stage::SIG_ALWAYS,pushP)},
-                                {Stage(Stage::SIG_ALWAYS,fetchIncLong,&ZERO,&adr,&pc.low),Stage(Stage::SIG_ALWAYS,moveReg8,&ZERO,&pbr)},
+                                {Stage(Stage::SIG_ALWAYS,pushP),Stage(Stage::SIG_ALWAYS,enableInterupts,false)},
+                                {Stage(Stage::SIG_ALWAYS,fetchIncLong,&ZERO,&adr,&pc.low),Stage(Stage::SIG_ALWAYS,moveReg8,&ZERO,&pbr)}, //TODO: Vector Pull signal here(and next line)
                                 {Stage(Stage::SIG_ALWAYS,fetchLong,&ZERO,&adr,&pc.high)},
                                 {Stage(Stage::SIG_DUMMY_STAGE,dummyStage)}});
     StackInterupt.setSignals({bind(incPC,this,1)});
