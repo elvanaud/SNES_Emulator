@@ -26,11 +26,14 @@ void W65816::decode()
     Instruction instToDecode = decodingTable[ir];
     if(executeInterupt)
     {
+        bool effectiveInterupt = true;
+        if(internalIRQ && p.I()) effectiveInterupt = false;
+
         if(internalIRQ && !p.I()) {instToDecode = interuptIRQ;}
         if(internalNMI) {instToDecode = interuptNMI;}
         if(internalRST) {instToDecode = interuptRESET;}
 
-        --pc;invalidPrefetch();
+        if(effectiveInterupt) {--pc; invalidPrefetch();}
         executeInterupt = false;
     }
 

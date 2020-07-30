@@ -96,6 +96,16 @@ bool W65816::X()
     return p.X();
 }
 
+bool W65816::RDY()
+{
+    return rdy;
+}
+
+void W65816::triggerRDY(bool status)
+{
+    rdy = status;
+}
+
 void W65816::triggerRESET()
 {
     internalRST = true;
@@ -255,20 +265,27 @@ void W65816::generateAddress(uint16_t adr)
 
 void W65816::checkInterupts()
 {
-    if(tcycle != pipeline.size()) return;
+    //if(tcycle != pipeline.size()) return;
     if(internalIRQ || internalNMI || internalRST) executeInterupt = true;
 }
 
 void W65816::tick()
 {
     handleValidAddressPINS(ValidAddressState::InternalOperation);
+    if(!rdy)
+    {
+        checkInterupts();
+        if(executeInterupt) rdy = true; //TODO: if rdy is manually low maybe shouldn't resume exec on interupt ? (need to differentiate between user rdy and internal rdy
+        return;
+    }
+
     for(auto &stage : pipeline[tcycle])
     {
         stage(this);
     }
     processSignals();
     ++tcycle;
-    checkInterupts();
+    if(tcycle == pipeline.size()) checkInterupts();
 
     if(tcycle >= pipeline.size())
     {

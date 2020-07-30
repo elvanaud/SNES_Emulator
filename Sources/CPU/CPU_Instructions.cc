@@ -549,6 +549,11 @@ void W65816::TYX()
     updateNZFlags(x.val(),true);
 }
 
+void W65816::WAI()
+{
+    rdy = false;
+}
+
 void W65816::XBA()
 {
     uint8_t tmp = acc.high;

@@ -27,6 +27,9 @@ public:
     bool E();
     bool M();
     bool X();
+    bool RDY();
+
+    void triggerRDY(bool status);
 
     void triggerRESET();
     void triggerIRQ();
@@ -54,6 +57,7 @@ private:
 
     bool vda = true;
     bool vpa = true;
+    bool rdy = true;
 
     Instruction decodingTable[0x100];
 
@@ -393,6 +397,7 @@ private:
     void TXY();
     void TYA();
     void TYX();
+    void WAI();
     void XBA();
     void XCE();
 };

@@ -205,6 +205,7 @@ void W65816::initializeOpcodes()
     decodingTable[0xC8] = Instruction("INY", Implied, INY);
     decodingTable[0xC9] = Instruction("CMP", Immediate, CMP);
     decodingTable[0xCA] = Instruction("DEX", Implied, DEX);
+    decodingTable[0xCB] = Instruction("WAI", ImpliedSpecial, WAI);
     decodingTable[0xCC] = Instruction("CPY", Absolute, CPY); decodingTable[0xCC].setIsIndexRelated(true);
     decodingTable[0xCD] = Instruction("CMP", Absolute, CMP);
     decodingTable[0xCE] = Instruction("DEC", AbsoluteRMW, DEC);
