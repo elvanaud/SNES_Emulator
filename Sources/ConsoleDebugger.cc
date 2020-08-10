@@ -14,3 +14,8 @@ void ConsoleDebugger::continueExec()
 {
 
 }
+
+bool ConsoleDebugger::tick()
+{
+    return false;
+}

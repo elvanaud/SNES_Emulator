@@ -1,6 +1,9 @@
 #ifndef ADDRESSINGMODE_H
 #define ADDRESSINGMODE_H
 
+#include <sstream>
+#include <string>
+using std::string;
 #include <vector>
 using std::vector;
 
@@ -21,6 +24,10 @@ public:
     void setSignals(vector<std::function<void()>> s);
     void setPredecodeSignals(vector<std::function<void()>> s);
     int Name();
+
+    void setASMDecoder(std::function<void(std::stringstream&)> decoder);
+    string decodeASM();
+
 private:
     vector<vector<Stage>> stages;
     vector<std::function<void()>> signals;
@@ -29,6 +36,7 @@ private:
     unsigned int pipelineStage;
     unsigned int stageNum;
     int name = -1;
+    std::function<void(std::stringstream&)> asmDecoder;
 };
 
 #endif // ADDRESSINGMODE_H

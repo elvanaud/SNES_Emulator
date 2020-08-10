@@ -1,6 +1,8 @@
 #include "Bus.h"
 #include "CPU/W65816.h"
 
+#include <SFML/Graphics.hpp>
+
 #include <cstdio>
 #include <iostream>
 #include <fstream>
@@ -73,41 +75,123 @@ void Bus::loadCartridge(std::string const & path)
 
 void Bus::run()
 {
+    sf::RenderWindow app(sf::VideoMode(300,300,32),"SNES Emulator");
+    unsigned int clock = 6;
+    unsigned int global_clock = 0;
+
+    bool debugPrint = false;
+    bool stepMode = false;
+    bool step = false;
+
     uint16_t oldPC = cpu.getPC();
-    while(true)
+    while(app.isOpen())
     {
-        if(debugger.isExecutionBlocked())
+        if(!stepMode || (stepMode && step))
         {
-            cout << "CPU Blocked" << endl;
-            getchar();
-            debugger.continueExec();
-        }
-        //cout << "TCycle = " << cpu.getTCycle() << endl;
-        cpu.tick();
-
-        //cout << "PC = " <<std::hex << cpu.getPC() << "  ;  IR = " << (int)cpu.getIR() << "("<<cpu.getInst().getASM() << ")  ;  Acc = " << cpu.getAcc() << "  ;  Adr = " << cpu.getAdr();
-        //cout << "  ;  IDB = " << cpu.getIDB() <<endl;
-        uint8_t p = cpu.getP();
-        string status;
-        if((p>>7)&1) status+="N"; else status += "-";
-        if((p>>6)&1) status+="V"; else status += "-";
-        if((p>>1)&1) status+="Z"; else status += "-";
-        if((p>>0)&1) status+="C"; else status += "-";
-        //cout << "Flags = " << status << endl;
-        //cout << "VDA = " << cpu.VDA() << "  ;  VPA = " << cpu.VPA() << endl;
-
-        if(cpu.VDA() && cpu.VPA()) //Sync = Opcode Fetch
-        {
-            if(cpu.getPC() == oldPC)
+            --clock;
+            ++global_clock;
+            /*if(debugger.isExecutionBlocked())
             {
-                cout << "big pb or test passed (lol)";
+                cout << "CPU Blocked" << endl;
+                getchar();
+                debugger.continueExec();
+            }*/
+            //cout << "TCycle = " << cpu.getTCycle() << endl;
+            if(clock == 0)
+            {
+                cpu.tick();
+                clock = 6;
+
+                //debugger.tick();
+
+                //cout << "PC = " <<std::hex << cpu.getPC() << "  ;  IR = " << (int)cpu.getIR() << "("<<cpu.getInst().getASM() << ")  ;  Acc = " << cpu.getAcc() << "  ;  Adr = " << cpu.getAdr();
+                //cout << "  ;  IDB = " << cpu.getIDB() <<endl;
+                /*uint8_t p = cpu.getP();
+                string status;
+                if((p>>7)&1) status+="N"; else status += "-";
+                if((p>>6)&1) status+="V"; else status += "-";
+                if((p>>1)&1) status+="Z"; else status += "-";
+                if((p>>0)&1) status+="C"; else status += "-";*/
+                //cout << "Flags = " << status << endl;
+                //cout << "VDA = " << cpu.VDA() << "  ;  VPA = " << cpu.VPA() << endl;
+                if(cpu.VDA() && cpu.VPA()) //Sync = Opcode Fetch
+                {
+
+                    //if(!stepMode || (stepMode && step))
+                    {
+                        step = false;
+                        if(debugPrint)
+                        {
+                            cout << "PC = " <<std::hex << cpu.getPC() << "  ;  IR = " << (int)cpu.getIR() << "("<<cpu.getInst().getASM() << ")  ;  Acc = " << cpu.getAcc() << "  ;  Adr = " << cpu.getAdr();
+                            cout << "  ;  IDB = " << cpu.getIDB() << " ; X = "<< cpu.getX() << " ; Y = " << cpu.getY() << endl;
+
+                            uint8_t p = cpu.getP();
+                            string status;
+                            if((p>>7)&1) status+="N"; else status += "-";
+                            if((p>>6)&1) status+="V"; else status += "-";
+                            if((p>>1)&1) status+="Z"; else status += "-";
+                            if((p>>0)&1) status+="C"; else status += "-";
+                            cout << "Flags = " << status << endl;
+
+                            if(cpu.getPC() == oldPC)
+                            {
+                                cout << "big pb or test passed (lol)";
+                            }
+                            oldPC = cpu.getPC();
+                            //cout << std::hex << cpu.getPC() << endl;
+                            //cout << std::hex << cpu.getPC() << "("<<cpu.getInst().getASM() << ")"<<endl;
+                            if(oldPC == 0x0449)
+                            {
+                                cout << "Y="<<std::hex <<cpu.getY()//<<//endl;
+                                     << " " << cpu.getInst().getASM() << endl;
+                            }
+                            //std::getchar();
+                        }
+
+                    }
+                }
             }
-            oldPC = cpu.getPC();
-            //cout << std::hex << cpu.getPC() << endl;
-            //cout << std::hex << cpu.getPC() << "("<<cpu.getInst().getASM() << ")"<<endl;
-            if(oldPC == 0x0449)
-                cout << "Y="<<std::hex <<cpu.getY()<<endl;
-            //std::getchar();
+
+
+            /*if(global_clock >= 1364*262) //Roughly one frame
+            {
+                global_clock = 0;
+                sf::Event event;
+                while(app.pollEvent(event))
+                {
+                    if(event.type == sf::Event::Closed) app.close();
+                }
+
+                app.clear(sf::Color::Red);
+                app.display();
+            }*/
+
+        }
+        //else
+        {
+            sf::Event event;
+            while(app.pollEvent(event))
+            {
+                if(event.type == sf::Event::Closed)
+                    app.close();
+                else if(event.type == sf::Event::KeyPressed)
+                {
+                    switch(event.key.code)
+                    {
+                    case sf::Keyboard::B:
+                        cout<<"cnskdcnsckj";
+                        break;
+                    case sf::Keyboard::D:
+                        debugPrint = !debugPrint;
+                        break;
+                    case sf::Keyboard::S:
+                        stepMode = true;
+                        step = !step;
+                    default:
+                        ;
+                    }
+                }
+            }
         }
     }
 }

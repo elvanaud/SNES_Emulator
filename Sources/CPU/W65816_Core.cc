@@ -13,6 +13,7 @@ using std::endl;
 W65816::W65816()
 {
     initializeAddressingModes();
+    initializeAdrModeASMDecode();
     initializeOpcodes();
     reloadPipeline();
     pc.set(0xFF); //Becomes useless
@@ -80,7 +81,7 @@ uint16_t W65816::getY()
     return y.val();
 }
 
-Instruction const & W65816::getInst()
+Instruction & W65816::getInst()
 {
     return decodingTable[ir];
 }

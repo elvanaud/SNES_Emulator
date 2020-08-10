@@ -14,7 +14,7 @@ int main()
     Bus bus(cpu);
     cpu.attachBus(&bus);
 
-    bus.loadCartridge("6502_functional_test.bin");
+    bus.loadCartridge("Games/6502_functional_test.bin");
     bus.copyInMemory(0xFFFC,{0x00,04});
 
     bus.run();

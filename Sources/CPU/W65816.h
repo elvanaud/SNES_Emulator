@@ -48,7 +48,7 @@ public:
     unsigned int getTCycle();
     uint16_t getAdr();
     uint16_t getIDB();
-    Instruction const & getInst();
+    Instruction & getInst();
 
 private:
     //Private Internal State
@@ -94,6 +94,9 @@ private:
     bool isStageEnabled(Stage const & st);
     void initializeOpcodes();
     void initializeAddressingModes();
+    void initializeAdrModeASMDecode();
+    uint32_t getParam(int index, int length = 1);
+
     enum ValidAddressState {OpcodeFetch, InternalOperation, DataFetch, OperandFetch};
     void handleValidAddressPINS(ValidAddressState state);
     void preDecode();
