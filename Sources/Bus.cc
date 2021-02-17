@@ -1,11 +1,13 @@
 #include "Bus.h"
 #include "CPU/W65816.h"
+#include "CartridgeHeader.h"
 
 #include <SFML/Graphics.hpp>
 
 #include <cstdio>
 #include <iostream>
 #include <fstream>
+#include <limits>
 using std::cout;
 using std::endl;
 
@@ -65,12 +67,61 @@ void Bus::copyInMemory(uint32_t adr, vector<uint8_t> const & buffer)
 void Bus::loadCartridge(std::string const & path)
 {
     std::ifstream input(path, std::ios::binary);
-    if(!input){
-         std::cout << "ERREUR: Fichier ROM introuvable\n";
-         exit(-1);
-     }
+    if(!input)
+    {
+        std::cout << "ERREUR: Fichier ROM introuvable\n";
+        exit(-1);
+    }
 
-    input.read((char*)ram,0x10000);
+    //Compute size of ROM file:
+    input.ignore( std::numeric_limits<std::streamsize>::max() );
+    std::streamsize cartridgeSize = input.gcount();
+    input.clear();   //  Since ignore will have set eof.
+
+    int extraHeaderSize = cartridgeSize & 0x3FF;
+    if(extraHeaderSize != 0)
+    {
+        cout << "Extra header present\n";
+        if(extraHeaderSize != 0x200)
+            cout << "Ill formed header; size="<<extraHeaderSize<<endl;
+        cout << "Skipping header..."<<endl;
+        cartridgeSize -= extraHeaderSize;
+    }
+    input.seekg(extraHeaderSize, std::ios_base::beg);
+
+    uint8_t firstBank[BANK_SIZE];
+
+    input.read((char*)firstBank,BANK_SIZE);
+
+    CartridgeHeader header(firstBank,0x007F00);
+    cout << "Header loaded\n";
+    if(header.valid) //Maybe remove that condition to run homebrew games
+    {
+        cout << "Coherent checksum\n";
+        if(header.romSize == cartridgeSize)
+        {
+            cout << "Expected rom size and Actual Rom Size match." <<endl;
+            if(header.mapMode == CartridgeHeader::LoROM)
+            {
+                cout << "Valid LoROM Header" << endl;
+
+            }
+            else
+            {
+                cout << "Invalid LoROM Header - Expected LoRom but found: ";
+                cout << header.mapMode << " from SpeedMapMode: "<<int(header.speedMapMode)<<endl;
+            }
+        }
+        else
+        {
+            cout << "Rom size don't match.\nActual: "<< cartridgeSize <<" (Extra header removed)"<< endl;
+            cout << "Expected: " << header.romSize << endl << "Difference: " << int(header.romSize-cartridgeSize)<<endl;
+        }
+    }
+    cout << header.title<<endl;
+    cout << "This game uses " << header.ramSize << " bytes of RAM ";
+    if(header.battery) cout << "(with battery)";
+    cout << endl;
 }
 
 void Bus::run()

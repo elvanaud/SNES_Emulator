@@ -44,7 +44,7 @@ void W65816::decode()
     if(thisIsABranch)
     {
         thisIsABranch = false;
-        instructionStages[0][0].get()(this); //no check whatoever, ignoring any other substage in the T1 (T2) stage
+        instructionStages[0][0].get()(this); //no check whatsoever, ignoring any other substage in the T1 (T2) stage
         if(branchTaken)
         {
             branchTaken = false;

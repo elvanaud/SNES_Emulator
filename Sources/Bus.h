@@ -9,7 +9,7 @@ using std::vector;
 
 class W65816;
 
-const unsigned int RAM_QUANTITY = 0x1'00'00; //TODO
+const unsigned int BANK_SIZE = 0x1'00'00; //TODO
 
 class Bus
 {
@@ -30,7 +30,7 @@ private:
     ConsoleDebugger debugger;
 
     uint8_t dmr = 0;
-    uint8_t ram[RAM_QUANTITY];
+    uint8_t ram[BANK_SIZE];
 };
 
 #endif //Bus_H
