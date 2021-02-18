@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="SNES_Emulator" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/SNES_Emulator" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="Sources" />
+				</Compiler>
+				<Linker>
+					<Add library="../../SFML/SFML-2.5.1-windows-gcc-7.3.0-mingw-64-bit/lib/libsfml-graphics-d.a" />
+					<Add library="../../SFML/SFML-2.5.1-windows-gcc-7.3.0-mingw-64-bit/lib/libsfml-window-d.a" />
+					<Add library="../../SFML/SFML-2.5.1-windows-gcc-7.3.0-mingw-64-bit/lib/libsfml-system-d.a" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/SNES_Emulator" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add directory="Sources" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="../../SFML/SFML - Build/lib/libsfml-graphics.a" />
+					<Add library="../../SFML/SFML - Build/lib/libsfml-window.a" />
+					<Add library="../../SFML/SFML - Build/lib/libsfml-system.a" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-std=c++14" />
+			<Add directory="../../SFML/SFML-2.5.1-windows-gcc-7.3.0-mingw-64-bit/include" />
+			<Add directory="Sources" />
+		</Compiler>
+		<Linker>
+			<Add directory="../../SFML/SFML-2.5.1-windows-gcc-7.3.0-mingw-64-bit/lib" />
+		</Linker>
+		<Unit filename="Sources/Bus.cc" />
+		<Unit filename="Sources/Bus.h" />
+		<Unit filename="Sources/CPU/ASMDecode.cc" />
+		<Unit filename="Sources/CPU/AddressingMode.cc" />
+		<Unit filename="Sources/CPU/AddressingMode.h" />
+		<Unit filename="Sources/CPU/CPU_AddressingModesDefinitions.cc" />
+		<Unit filename="Sources/CPU/CPU_Debugger.cc" />
+		<Unit filename="Sources/CPU/CPU_Debugger.h" />
+		<Unit filename="Sources/CPU/CPU_Instructions.cc" />
+		<Unit filename="Sources/CPU/CPU_Operations.cc" />
+		<Unit filename="Sources/CPU/CPU_Signals.cc" />
+		<Unit filename="Sources/CPU/Instruction.cc" />
+		<Unit filename="Sources/CPU/Instruction.h" />
+		<Unit filename="Sources/CPU/OpcodeDefinitions.cc" />
+		<Unit filename="Sources/CPU/Stage.cc" />
+		<Unit filename="Sources/CPU/Stage.h" />
+		<Unit filename="Sources/CPU/Types.h" />
+		<Unit filename="Sources/CPU/W65816.h" />
+		<Unit filename="Sources/CPU/W65816_Core.cc" />
+		<Unit filename="Sources/CartridgeHeader.cc" />
+		<Unit filename="Sources/CartridgeHeader.h" />
+		<Unit filename="Sources/ConsoleDebugger.cc" />
+		<Unit filename="Sources/ConsoleDebugger.h" />
+		<Unit filename="Sources/main.cc" />
+		<Extensions>
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

@@ -13,6 +13,7 @@ using std::endl;
 
 Bus::Bus(W65816 & c) : cpu(c), debugger(cpu)
 {
+    /*
     ram[0xFF]  = 0x38; //SEC
     ram[0x100] = 0x69; //ADC
     ram[0x101] = 19;
@@ -27,27 +28,61 @@ Bus::Bus(W65816 & c) : cpu(c), debugger(cpu)
     ram[0x10A] = 0xC9; //CMP
     ram[0x10B] = 0x0A;
     ram[0x10C] = 0xA9; //LDA #42
-    ram[0x10D] = 42;
+    ram[0x10D] = 42;*/
 }
 
 void Bus::read(uint32_t adr)
 {
     if (!cpu.VDA() && !cpu.VPA()) return;
 
-    dmr = ram[adr]; //TODO: Might use privateRead in the future
+    dmr = privateRead(adr);
 }
 
-uint8_t Bus::privateRead(uint32_t adr)
+void Bus::memoryMap(MemoryOperation op, uint32_t full_adr, uint8_t *data)
 {
-    return ram[adr];
+    uint8_t bank = (full_adr>>16)&0xFF;
+    uint16_t adr = full_adr & 0xFFFF;
+
+    if(bank == 0x7E || bank == 0x7F) //RAM Access
+    {
+        doMemoryOperation(op, &ram[bank-0x7E][adr], data);
+        return; //Useless...
+    }
+    else if((bank >= 0x40 && bank <= 0x7D)||(bank >= 0xC0 && bank <= 0xFF)) //HiROM banks
+    {
+        cartridge.memoryMap(op,full_adr,data);
+    }
+    else if((bank >= 0x00 && bank <= 0x3F)||(bank >= 0x80 && bank <= 0xBF))
+    {
+        if(adr >= 0x6000) //LoROM bank and expansion region
+        {
+            cartridge.memoryMap(op,full_adr,data);
+        }
+        else //System area
+        {
+            if(adr < 0x2000) //First 8kB of RAM Mirror
+            {
+                doMemoryOperation(op, &ram[0][adr], data);
+            }
+        }
+    }
 }
 
-void Bus::write(uint32_t adr, uint8_t data)
+uint8_t Bus::privateRead(uint32_t full_adr)
+{
+    uint8_t data = 0;
+    memoryMap(Read, full_adr, &data);
+
+    return data;
+}
+
+void Bus::write(uint32_t full_adr, uint8_t data)
 {
     if (!cpu.VDA() && !cpu.VPA()) return;
 
-    dmr = data;
-    ram[adr] = dmr;
+    //dmr = data;
+    memoryMap(Write, full_adr, &dmr);
+    //Writes in unmapped regions might indicate the presence of an unknown SRAM mapping on the cartridge
 }
 
 uint8_t Bus::DMR()
@@ -59,7 +94,7 @@ void Bus::copyInMemory(uint32_t adr, vector<uint8_t> const & buffer)
 {
     for(auto value : buffer)
     {
-        ram[adr] = value;
+        ram[0][adr] = value; //TODO: adapt that in the future
         ++adr;
     }
 }
@@ -84,7 +119,7 @@ void Bus::loadCartridge(std::string const & path)
         cout << "Extra header present\n";
         if(extraHeaderSize != 0x200)
             cout << "Ill formed header; size="<<extraHeaderSize<<endl;
-        cout << "Skipping header..."<<endl;
+        cout << "Skipping extra header..."<<endl;
         cartridgeSize -= extraHeaderSize;
     }
     input.seekg(extraHeaderSize, std::ios_base::beg);
@@ -93,8 +128,14 @@ void Bus::loadCartridge(std::string const & path)
 
     input.read((char*)firstBank,BANK_SIZE);
 
+    input.seekg(extraHeaderSize, std::ios_base::beg); //Reset to beginning of file
+
     CartridgeHeader header(firstBank,0x007F00);
     cout << "Header loaded\n";
+    //TODO: maybe flatten those ifs and add a counter of how many good conditions were obtained
+    //We compute that score for each supported mappings/chipset
+    //We select the highest score
+    //This would probably be complicated for nothing...
     if(header.valid) //Maybe remove that condition to run homebrew games
     {
         cout << "Coherent checksum\n";
@@ -114,7 +155,7 @@ void Bus::loadCartridge(std::string const & path)
         }
         else
         {
-            cout << "Rom size don't match.\nActual: "<< cartridgeSize <<" (Extra header removed)"<< endl;
+            cout << "Rom size doesn't match.\nActual: "<< cartridgeSize <<" (Extra header removed)"<< endl;
             cout << "Expected: " << header.romSize << endl << "Difference: " << int(header.romSize-cartridgeSize)<<endl;
         }
     }
@@ -122,6 +163,8 @@ void Bus::loadCartridge(std::string const & path)
     cout << "This game uses " << header.ramSize << " bytes of RAM ";
     if(header.battery) cout << "(with battery)";
     cout << endl;
+
+    cartridge.load(input, header);
 }
 
 void Bus::run()
@@ -130,7 +173,7 @@ void Bus::run()
     unsigned int clock = 6;
     unsigned int global_clock = 0;
 
-    bool debugPrint = false;
+    bool debugPrint = true;
     bool stepMode = false;
     bool step = false;
 
@@ -184,10 +227,10 @@ void Bus::run()
                             if((p>>0)&1) status+="C"; else status += "-";
                             cout << "Flags = " << status << endl;
 
-                            if(cpu.getPC() == oldPC)
+                            /*if(cpu.getPC() == oldPC)
                             {
                                 cout << "big pb or test passed (lol)";
-                            }
+                            }*/
                             oldPC = cpu.getPC();
                             //cout << std::hex << cpu.getPC() << endl;
                             //cout << std::hex << cpu.getPC() << "("<<cpu.getInst().getASM() << ")"<<endl;

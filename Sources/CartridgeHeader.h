@@ -1,13 +1,11 @@
 #ifndef CARTRIDGEHEADER_H
 #define CARTRIDGEHEADER_H
 
-#include "Bus.h"
-
-#include <string>
-using std::string;
+#include "Common.h"
 
 struct CartridgeHeader
 {
+    CartridgeHeader();
     CartridgeHeader(uint8_t bank[BANK_SIZE], uint32_t headerOffset);
 
     bool valid = false; //Only tells if checksum and complement match
@@ -32,8 +30,8 @@ struct CartridgeHeader
     CoprocessorType coprocessorType = unsupportedCoprocessor;
 
     //ROM/RAM Size
-    int romSize = 0; //Value rounded up for 10,12,20,24Mbits chips
-    int ramSize = 0;
+    unsigned int romSize = 0; //Value rounded up for 10,12,20,24Mbits chips
+    unsigned int ramSize = 0;
 
     //Country and PAL/NTSC
     enum Country{   International = 0, Japan, USA_Canada, Europe_Oceania_Asia, Scandinavia,
@@ -52,8 +50,8 @@ struct CartridgeHeader
     string makerCode;
     string gameCode;
 
-    int expFlashSize = 0;
-    int expRAMSize = 0;
+    unsigned int expFlashSize = 0;
+    unsigned int expRAMSize = 0;
 
     uint8_t specialVersion = 0;
 };

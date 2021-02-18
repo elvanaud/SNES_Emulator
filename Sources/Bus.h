@@ -1,17 +1,17 @@
 #ifndef Bus_H
 #define Bus_H
 
-#include <cstdint>
 #include <vector>
 using std::vector;
 
+#include "Common.h"
+
 #include "ConsoleDebugger.h"
+#include "Cartridge.h"
 
 class W65816;
 
-const unsigned int BANK_SIZE = 0x1'00'00; //TODO
-
-class Bus
+class Bus : MemoryInterface
 {
 public:
     Bus(W65816 &c);
@@ -25,12 +25,15 @@ public:
 
     void copyInMemory(uint32_t adr, vector<uint8_t> const & buffer);
     void loadCartridge(std::string const & path);
+
+    virtual void memoryMap(MemoryOperation op, uint32_t full_adr, uint8_t *data);
 private:
     W65816 &cpu;
     ConsoleDebugger debugger;
+    Cartridge cartridge;
 
     uint8_t dmr = 0;
-    uint8_t ram[BANK_SIZE];
+    uint8_t ram[2][BANK_SIZE];
 };
 
 #endif //Bus_H

@@ -1,6 +1,8 @@
 #include "CartridgeHeader.h"
 #include <iostream>
 
+CartridgeHeader::CartridgeHeader(){}
+
 CartridgeHeader::CartridgeHeader(uint8_t bank[BANK_SIZE], uint32_t headerOffset)
 {
     //Offset definitions
