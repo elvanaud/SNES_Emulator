@@ -1,7 +1,7 @@
 #ifndef W65816_H
 #define W65816_H
 
-#include <cstdint>
+#include "Common.h"
 #include <functional>
 #include <vector>
 using std::vector;
@@ -43,6 +43,7 @@ public:
     uint32_t getAddressBus();
     uint16_t getX();
     uint16_t getY();
+    uint16_t getD();
 
     //Getters - Internal
     unsigned int getTCycle();
@@ -81,6 +82,7 @@ private:
     void checkInterupts();
 
     uint8_t ZERO = 0;
+    uint8_t SIGN_EXTENDED_OP_HALF_ADD = 0;
 
     //Private helper methods
     bool forceInternalOperation = false;

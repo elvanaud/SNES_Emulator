@@ -10,11 +10,12 @@ using std::vector;
 #include "Cartridge.h"
 
 class W65816;
+class SNES_APU;
 
 class Bus : MemoryInterface
 {
 public:
-    Bus(W65816 &c);
+    Bus(W65816 &c, SNES_APU &p_apu);
 
     void run();
 
@@ -29,6 +30,7 @@ public:
     virtual void memoryMap(MemoryOperation op, uint32_t full_adr, uint8_t *data);
 private:
     W65816 &cpu;
+    SNES_APU &apu;
     ConsoleDebugger debugger;
     Cartridge cartridge;
 

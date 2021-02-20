@@ -57,6 +57,11 @@ uint16_t W65816::getIDB()
     return idb.val();
 }
 
+uint16_t W65816::getD()
+{
+    return d.val();
+}
+
 uint8_t W65816::getIR()
 {
     return ir;

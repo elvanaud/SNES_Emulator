@@ -25,7 +25,7 @@ public:
     void setPredecodeSignals(vector<std::function<void()>> s);
     int Name();
 
-    void setASMDecoder(std::function<void(std::stringstream&)> decoder);
+    void setASMDecoder(std::function<void(std::stringstream&,string)> decoder);
     string decodeASM();
 
 private:
@@ -36,7 +36,7 @@ private:
     unsigned int pipelineStage;
     unsigned int stageNum;
     int name = -1;
-    std::function<void(std::stringstream&)> asmDecoder;
+    std::function<void(std::stringstream&,string)> asmDecoder;
 };
 
 #endif // ADDRESSINGMODE_H

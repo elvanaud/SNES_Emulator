@@ -66,10 +66,15 @@
 		<Unit filename="Sources/CPU/Types.h" />
 		<Unit filename="Sources/CPU/W65816.h" />
 		<Unit filename="Sources/CPU/W65816_Core.cc" />
+		<Unit filename="Sources/Cartridge.cc" />
+		<Unit filename="Sources/Cartridge.h" />
 		<Unit filename="Sources/CartridgeHeader.cc" />
 		<Unit filename="Sources/CartridgeHeader.h" />
+		<Unit filename="Sources/Common.h" />
 		<Unit filename="Sources/ConsoleDebugger.cc" />
 		<Unit filename="Sources/ConsoleDebugger.h" />
+		<Unit filename="Sources/MemoryInterface.cc" />
+		<Unit filename="Sources/MemoryInterface.h" />
 		<Unit filename="Sources/main.cc" />
 		<Extensions>
 			<lib_finder disable_auto="1" />

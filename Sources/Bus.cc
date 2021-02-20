@@ -1,17 +1,15 @@
 #include "Bus.h"
 #include "CPU/W65816.h"
+#include "SNES_APU.h"
 #include "CartridgeHeader.h"
 
 #include <SFML/Graphics.hpp>
 
 #include <cstdio>
-#include <iostream>
 #include <fstream>
 #include <limits>
-using std::cout;
-using std::endl;
 
-Bus::Bus(W65816 & c) : cpu(c), debugger(cpu)
+Bus::Bus(W65816 & c, SNES_APU &p_apu) : cpu(c), apu(p_apu), debugger(cpu)
 {
     /*
     ram[0xFF]  = 0x38; //SEC
@@ -64,6 +62,10 @@ void Bus::memoryMap(MemoryOperation op, uint32_t full_adr, uint8_t *data)
             {
                 doMemoryOperation(op, &ram[0][adr], data);
             }
+            else if(adr >= 0x2140 && adr <= 0x2143)
+            {
+                apu.memoryMap(op,full_adr,data);
+            }
         }
     }
 }
@@ -80,7 +82,7 @@ void Bus::write(uint32_t full_adr, uint8_t data)
 {
     if (!cpu.VDA() && !cpu.VPA()) return;
 
-    //dmr = data;
+    dmr = data;
     memoryMap(Write, full_adr, &dmr);
     //Writes in unmapped regions might indicate the presence of an unknown SRAM mapping on the cartridge
 }
@@ -174,10 +176,11 @@ void Bus::run()
     unsigned int global_clock = 0;
 
     bool debugPrint = true;
-    bool stepMode = false;
-    bool step = false;
+    bool stepMode = true;
+    bool step = true;
 
     uint16_t oldPC = cpu.getPC();
+    std::vector<uint32_t> watches;
     while(app.isOpen())
     {
         if(!stepMode || (stepMode && step))
@@ -216,16 +219,17 @@ void Bus::run()
                         step = false;
                         if(debugPrint)
                         {
-                            cout << "PC = " <<std::hex << cpu.getPC() << "  ;  IR = " << (int)cpu.getIR() << "("<<cpu.getInst().getASM() << ")  ;  Acc = " << cpu.getAcc() << "  ;  Adr = " << cpu.getAdr();
-                            cout << "  ;  IDB = " << cpu.getIDB() << " ; X = "<< cpu.getX() << " ; Y = " << cpu.getY() << endl;
+                            cout << "PC = " <<std::hex << cpu.getPC()-1 << "  ;  IR = " << (int)cpu.getIR() << "("<<cpu.getInst().getASM() << ")  ;  A = " << cpu.getAcc();
+                            cout << "  ;  Adr = " << cpu.getAdr() << "  ;  IDB = " << cpu.getIDB();
+                            cout << " ; X = "<< cpu.getX() << " ; Y = " << cpu.getY() << " ; D = " << cpu.getD() << endl;
 
                             uint8_t p = cpu.getP();
                             string status;
-                            if((p>>7)&1) status+="N"; else status += "-";
+                            if((p>>7)&1) status+="N"; else status += "-"; //TODO: print flags in lower/upper case if set/unset
                             if((p>>6)&1) status+="V"; else status += "-";
                             if((p>>1)&1) status+="Z"; else status += "-";
                             if((p>>0)&1) status+="C"; else status += "-";
-                            cout << "Flags = " << status << endl;
+                            cout << "Flags = " << status << " " << std::hex << int(p) << endl;
 
                             /*if(cpu.getPC() == oldPC)
                             {
@@ -240,11 +244,14 @@ void Bus::run()
                                      << " " << cpu.getInst().getASM() << endl;
                             }
                             //std::getchar();
+                            for(uint32_t watch : watches)
+                                cout << "Content of "<<std::hex<<watch<<" :"<<(int)privateRead(watch)<<endl;
                         }
 
                     }
                 }
             }
+            apu.tick();
 
 
             /*if(global_clock >= 1364*262) //Roughly one frame
@@ -264,6 +271,7 @@ void Bus::run()
         //else
         {
             sf::Event event;
+            uint32_t user_entry;
             while(app.pollEvent(event))
             {
                 if(event.type == sf::Event::Closed)
@@ -281,6 +289,17 @@ void Bus::run()
                     case sf::Keyboard::S:
                         stepMode = true;
                         step = !step;
+                        break;
+                    case sf::Keyboard::C:
+                        stepMode = false;
+                        break;
+                    case sf::Keyboard::W:
+                        cout << "Enter watch adress:";
+                        cin >> std::hex >>user_entry;
+                        watches.push_back(user_entry);
+                        stepMode = true;
+                        step = !step;
+                        break;
                     default:
                         ;
                     }

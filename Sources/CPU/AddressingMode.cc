@@ -5,7 +5,7 @@ AddressingMode::AddressingMode(){}
 AddressingMode::AddressingMode(int id)
 {
     name = id;
-    asmDecoder = std::function<void(std::stringstream&)>([](std::stringstream&st){});//dummy decoder
+    asmDecoder = std::function<void(std::stringstream&,string)>([](std::stringstream&st,string s){});//dummy decoder
 }
 
 void AddressingMode::setStages(vector<vector<Stage>> st)
@@ -56,7 +56,7 @@ int AddressingMode::Name()
     return name;
 }
 
-void AddressingMode::setASMDecoder(std::function<void(std::stringstream&)> decoder)
+void AddressingMode::setASMDecoder(std::function<void(std::stringstream&,string)> decoder)
 {
     asmDecoder = decoder;
 }
@@ -64,6 +64,7 @@ void AddressingMode::setASMDecoder(std::function<void(std::stringstream&)> decod
 string AddressingMode::decodeASM()
 {
     std::stringstream st;
-    asmDecoder(st);
+    //st<<" ";
+    asmDecoder(st,"$");
     return st.str();
 }

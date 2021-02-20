@@ -14,17 +14,17 @@
 	<functional>
 	"Types.h"
 
-1613667855 source:c:\users\arthur\documents\projects\snes_emulator\sources\bus.cc
+1613769167 source:c:\users\arthur\documents\projects\snes_emulator\sources\bus.cc
 	"Bus.h"
 	"CPU/W65816.h"
+	"SNES_APU.h"
 	"CartridgeHeader.h"
 	<SFML/Graphics.hpp>
 	<cstdio>
-	<iostream>
 	<fstream>
 	<limits>
 
-1613665866 c:\users\arthur\documents\projects\snes_emulator\sources\bus.h
+1613756578 c:\users\arthur\documents\projects\snes_emulator\sources\bus.h
 	<vector>
 	"Common.h"
 	"ConsoleDebugger.h"
@@ -48,10 +48,11 @@
 1594479247 source:c:\users\arthur\documents\projects\snes_emulator\sources\instruction.cc
 	"Instruction.h"
 
-1613642137 source:c:\users\arthur\documents\projects\snes_emulator\sources\main.cc
+1613756465 source:c:\users\arthur\documents\projects\snes_emulator\sources\main.cc
 	<iostream>
 	"CPU/W65816.h"
 	"Bus.h"
+	"SNES_APU.h"
 
 1594478544 source:c:\users\arthur\documents\projects\snes_emulator\sources\stage.cc
 	"Stage.h"
@@ -78,8 +79,8 @@
 	"W65816.h"
 	<iostream>
 
-1613316213 c:\users\arthur\documents\projects\snes_emulator\sources\cpu\w65816.h
-	<cstdint>
+1613766763 c:\users\arthur\documents\projects\snes_emulator\sources\cpu\w65816.h
+	"Common.h"
 	<functional>
 	<vector>
 	"Stage.h"
@@ -100,20 +101,20 @@
 	"Stage.h"
 	"AddressingMode.h"
 
-1613316213 c:\users\arthur\documents\projects\snes_emulator\sources\cpu\addressingmode.h
+1613758991 c:\users\arthur\documents\projects\snes_emulator\sources\cpu\addressingmode.h
 	<sstream>
 	<string>
 	<vector>
 	"Types.h"
 	"Stage.h"
 
-1613316213 source:c:\users\arthur\documents\projects\snes_emulator\sources\cpu\addressingmode.cc
+1613759055 source:c:\users\arthur\documents\projects\snes_emulator\sources\cpu\addressingmode.cc
 	"AddressingMode.h"
 
-1613316213 source:c:\users\arthur\documents\projects\snes_emulator\sources\cpu\cpu_addressingmodesdefinitions.cc
+1613674174 source:c:\users\arthur\documents\projects\snes_emulator\sources\cpu\cpu_addressingmodesdefinitions.cc
 	"W65816.h"
 
-1613316213 source:c:\users\arthur\documents\projects\snes_emulator\sources\cpu\cpu_instructions.cc
+1613769144 source:c:\users\arthur\documents\projects\snes_emulator\sources\cpu\cpu_instructions.cc
 	"W65816.h"
 	<iostream>
 
@@ -121,7 +122,7 @@
 	"W65816.h"
 	<iostream>
 
-1613331791 source:c:\users\arthur\documents\projects\snes_emulator\sources\cpu\cpu_operations.cc
+1613769137 source:c:\users\arthur\documents\projects\snes_emulator\sources\cpu\cpu_operations.cc
 	"W65816.h"
 	"../Bus.h"
 	<iostream>
@@ -136,7 +137,7 @@
 	"Stage.h"
 	"W65816.h"
 
-1613643230 source:c:\users\arthur\documents\projects\snes_emulator\sources\cpu\w65816_core.cc
+1613766790 source:c:\users\arthur\documents\projects\snes_emulator\sources\cpu\w65816_core.cc
 	"W65816.h"
 	"../Bus.h"
 	"Stage.h"
@@ -992,7 +993,7 @@
 	<SFML/Graphics/Drawable.hpp>
 	<SFML/Window/GlResource.hpp>
 
-1613316213 source:c:\users\arthur\documents\projects\snes_emulator\sources\cpu\asmdecode.cc
+1613764711 source:c:\users\arthur\documents\projects\snes_emulator\sources\cpu\asmdecode.cc
 	"W65816.h"
 	"Bus.h"
 	<sstream>
@@ -1009,7 +1010,7 @@
 	<cstdint>
 	<cassert>
 
-1613667388 source:c:\users\arthur\documents\projects\snes_emulator\sources\cartridge.cc
+1613668269 source:c:\users\arthur\documents\projects\snes_emulator\sources\cartridge.cc
 	"Cartridge.h"
 
 1613666732 c:\users\arthur\documents\projects\snes_emulator\sources\cartridge.h
@@ -1023,4 +1024,12 @@
 
 1613644204 source:c:\users\arthur\documents\projects\snes_emulator\sources\memoryinterface.cc
 	"MemoryInterface.h"
+
+1613765430 c:\users\arthur\documents\projects\snes_emulator\sources\snes_apu.h
+	"Common.h"
+	"MemoryInterface.h"
+
+1613765690 source:c:\users\arthur\documents\projects\snes_emulator\sources\snes_apu.cc
+	"SNES_APU.h"
+	"Bus.h"
 
