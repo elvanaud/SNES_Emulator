@@ -2,14 +2,84 @@
 <CodeBlocks_layout_file>
 	<FileVersion major="1" minor="0" />
 	<ActiveTarget name="Debug" />
-	<File name="Sources\CPU\W65816.h" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Sources\Bus.cc" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1538" topLine="67" />
+			<Cursor1 position="2224" topLine="68" />
+		</Cursor>
+	</File>
+	<File name="Sources\CPU\Types.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="144" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="Sources\CPU\OpcodeDefinitions.cc" open="1" top="0" tabpos="20" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="9066" topLine="128" />
+		</Cursor>
+	</File>
+	<File name="Sources\CPU\CPU_Signals.cc" open="1" top="0" tabpos="25" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="478" topLine="10" />
+		</Cursor>
+	</File>
+	<File name="Sources\CPU\CPU_Instructions.cc" open="1" top="0" tabpos="16" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="7281" topLine="440" />
+		</Cursor>
+	</File>
+	<File name="Sources\SNES_APU.cc" open="1" top="1" tabpos="23" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="257" topLine="8" />
+		</Cursor>
+	</File>
+	<File name="Sources\CPU\CPU_Debugger.cc" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="770" topLine="7" />
 		</Cursor>
 	</File>
 	<File name="Sources\CPU\CPU_Debugger.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="268" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="Sources\Bus.h" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="256" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="Sources\Common.h" open="1" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="170" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="Sources\ConsoleDebugger.h" open="1" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="114" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="Sources\CPU\CPU_Operations.cc" open="1" top="0" tabpos="15" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3810" topLine="160" />
+		</Cursor>
+	</File>
+	<File name="Sources\CartridgeHeader.cc" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1210" topLine="32" />
+		</Cursor>
+	</File>
+	<File name="Sources\CPU\W65816_Core.cc" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2980" topLine="168" />
+		</Cursor>
+	</File>
+	<File name="Sources\CPU\CPU_AddressingModesDefinitions.cc" open="1" top="0" tabpos="21" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="12147" topLine="174" />
+		</Cursor>
+	</File>
+	<File name="Sources\CPU\W65816.h" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="792" topLine="32" />
 		</Cursor>
 	</File>
 	<File name="Sources\CPU\Stage.cc" open="0" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -24,87 +94,17 @@
 	</File>
 	<File name="Sources\CPU\AddressingMode.cc" open="1" top="0" tabpos="18" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1463" topLine="48" />
-		</Cursor>
-	</File>
-	<File name="Sources\Bus.cc" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="6761" topLine="208" />
-		</Cursor>
-	</File>
-	<File name="Sources\MemoryInterface.cc" open="1" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="283" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="Sources\main.cc" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="402" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="Sources\CPU\OpcodeDefinitions.cc" open="1" top="0" tabpos="20" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="14790" topLine="200" />
-		</Cursor>
-	</File>
-	<File name="Sources\CPU\CPU_Debugger.cc" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="770" topLine="7" />
-		</Cursor>
-	</File>
-	<File name="Sources\Cartridge.h" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="543" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="Sources\CPU\CPU_Operations.cc" open="1" top="1" tabpos="15" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="5522" topLine="232" />
-		</Cursor>
-	</File>
-	<File name="Sources\ConsoleDebugger.cc" open="1" top="0" tabpos="14" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="209" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="Sources\CartridgeHeader.cc" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1210" topLine="32" />
-		</Cursor>
-	</File>
-	<File name="Sources\MemoryInterface.h" open="1" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="136" topLine="0" />
+			<Cursor1 position="1427" topLine="49" />
 		</Cursor>
 	</File>
 	<File name="Sources\CPU\ASMDecode.cc" open="1" top="0" tabpos="19" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="777" topLine="16" />
+			<Cursor1 position="5720" topLine="117" />
 		</Cursor>
 	</File>
-	<File name="Sources\CPU\Types.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Sources\SNES_APU.h" open="1" top="0" tabpos="22" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="144" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="Sources\Common.h" open="1" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="170" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="Sources\CPU\CPU_AddressingModesDefinitions.cc" open="1" top="0" tabpos="21" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="27747" topLine="341" />
-		</Cursor>
-	</File>
-	<File name="Sources\Cartridge.cc" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="994" topLine="28" />
-		</Cursor>
-	</File>
-	<File name="Sources\ConsoleDebugger.h" open="1" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="114" topLine="0" />
+			<Cursor1 position="365" topLine="7" />
 		</Cursor>
 	</File>
 	<File name="Sources\CPU\Instruction.cc" open="1" top="0" tabpos="17" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -112,24 +112,14 @@
 			<Cursor1 position="817" topLine="24" />
 		</Cursor>
 	</File>
-	<File name="Sources\Bus.h" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Sources\MemoryInterface.h" open="1" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="231" topLine="5" />
+			<Cursor1 position="489" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="Sources\CPU\AddressingMode.h" open="0" top="0" tabpos="18" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Sources\Cartridge.h" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="735" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="Sources\CPU\CPU_Signals.cc" open="0" top="0" tabpos="15" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="715" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="Sources\CPU\CPU_Instructions.cc" open="1" top="0" tabpos="16" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="225" topLine="0" />
+			<Cursor1 position="543" topLine="0" />
 		</Cursor>
 	</File>
 	<File name="Sources\CartridgeHeader.h" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -137,9 +127,29 @@
 			<Cursor1 position="1613" topLine="25" />
 		</Cursor>
 	</File>
-	<File name="Sources\CPU\W65816_Core.cc" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Sources\main.cc" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="5403" topLine="232" />
+			<Cursor1 position="201" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="Sources\CPU\AddressingMode.h" open="1" top="0" tabpos="24" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="789" topLine="21" />
+		</Cursor>
+	</File>
+	<File name="Sources\MemoryInterface.cc" open="1" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="278" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="Sources\Cartridge.cc" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="994" topLine="28" />
+		</Cursor>
+	</File>
+	<File name="Sources\ConsoleDebugger.cc" open="1" top="0" tabpos="14" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="209" topLine="0" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>

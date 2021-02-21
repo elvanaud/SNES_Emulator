@@ -1,6 +1,6 @@
 #include "Bus.h"
 #include "CPU/W65816.h"
-#include "SNES_APU.h"
+#include "APU/SNES_APU.h"
 #include "CartridgeHeader.h"
 
 #include <SFML/Graphics.hpp>
@@ -64,7 +64,7 @@ void Bus::memoryMap(MemoryOperation op, uint32_t full_adr, uint8_t *data)
             }
             else if(adr >= 0x2140 && adr <= 0x2143)
             {
-                apu.memoryMap(op,full_adr,data);
+                //apu.memoryMap(op,full_adr,data); //TODO: replace that with a different access
             }
         }
     }

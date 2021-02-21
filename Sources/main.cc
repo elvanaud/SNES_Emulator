@@ -1,18 +1,23 @@
 #include <iostream>
 
+#include "Common.h"
+
 #include "CPU/W65816.h"
 #include "Bus.h"
-#include "SNES_APU.h"
-
-using std::cout;
-using std::endl;
+#include "APU/SNES_APU.h"
+#include "APU/SPC700.h"
 
 int main()
 {
     cout << "SNES Emulator" << endl;
 
     W65816 cpu;
-    SNES_APU apu;
+
+    SPC700 spc;
+    SNES_APU apu(spc);
+    spc.attachBus(&apu);
+    spc.reset();
+
     Bus bus(cpu, apu);
     cpu.attachBus(&bus);
     apu.attachBus(&bus);

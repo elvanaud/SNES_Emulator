@@ -75,6 +75,8 @@
 		<Unit filename="Sources/ConsoleDebugger.h" />
 		<Unit filename="Sources/MemoryInterface.cc" />
 		<Unit filename="Sources/MemoryInterface.h" />
+		<Unit filename="Sources/SNES_APU.cc" />
+		<Unit filename="Sources/SNES_APU.h" />
 		<Unit filename="Sources/main.cc" />
 		<Extensions>
 			<lib_finder disable_auto="1" />

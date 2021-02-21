@@ -14,10 +14,10 @@
 	<functional>
 	"Types.h"
 
-1613769167 source:c:\users\arthur\documents\projects\snes_emulator\sources\bus.cc
+1613838417 source:c:\users\arthur\documents\projects\snes_emulator\sources\bus.cc
 	"Bus.h"
 	"CPU/W65816.h"
-	"SNES_APU.h"
+	"APU/SNES_APU.h"
 	"CartridgeHeader.h"
 	<SFML/Graphics.hpp>
 	<cstdio>
@@ -48,11 +48,13 @@
 1594479247 source:c:\users\arthur\documents\projects\snes_emulator\sources\instruction.cc
 	"Instruction.h"
 
-1613756465 source:c:\users\arthur\documents\projects\snes_emulator\sources\main.cc
+1613853704 source:c:\users\arthur\documents\projects\snes_emulator\sources\main.cc
 	<iostream>
+	"Common.h"
 	"CPU/W65816.h"
 	"Bus.h"
-	"SNES_APU.h"
+	"APU/SNES_APU.h"
+	"APU/SPC700.h"
 
 1594478544 source:c:\users\arthur\documents\projects\snes_emulator\sources\stage.cc
 	"Stage.h"
@@ -1032,4 +1034,24 @@
 1613765690 source:c:\users\arthur\documents\projects\snes_emulator\sources\snes_apu.cc
 	"SNES_APU.h"
 	"Bus.h"
+
+1613855087 c:\users\arthur\documents\projects\snes_emulator\sources\apu\snes_apu.h
+	"Common.h"
+	"MemoryInterface.h"
+
+1613855153 source:c:\users\arthur\documents\projects\snes_emulator\sources\apu\snes_apu.cc
+	"SNES_APU.h"
+	"Bus.h"
+	"SPC700.h"
+
+1613866747 c:\users\arthur\documents\projects\snes_emulator\sources\apu\spc700.h
+	"Common.h"
+	<functional>
+
+1613856951 source:c:\users\arthur\documents\projects\snes_emulator\sources\apu\spc700.cc
+	"SPC700.h"
+	"SNES_APU.h"
+
+1613856085 source:c:\users\arthur\documents\projects\snes_emulator\sources\apu\spc_instructions.cc
+	"SPC700.h"
 
