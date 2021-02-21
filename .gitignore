@@ -2,3 +2,6 @@ bin/
 obj/
 Games/
 6502_functional_test.bin
+*.cbp
+*.depend
+*.layout
