@@ -33,16 +33,68 @@ void SPC700::reset()
     inst_cycles = inst_length = currentCycle = 0;
 }
 
-void SPC700::updateNZflags(uint8_t a)
+void SPC700::updateNZflags(uint8_t data)
 {
-    psw.setN((a>>7)&1);
-    psw.setZ(a == 0);
+    psw.setN((data>>7)&1);
+    psw.setZ(data == 0);
 }
 
-void SPC700::updateNZflags(uint8_t high, uint8_t a)
+void SPC700::updateNZflags(uint8_t high, uint8_t data)
 {
     psw.setN((high>>7)&1);
-    psw.setZ(a == 0 && high == 0);
+    psw.setZ(data == 0 && high == 0);
+}
+
+uint16_t SPC700::directAddress(uint8_t adr)
+{
+    return (uint16_t(psw.P())<<8)|adr;
+}
+
+void SPC700::doMemOperation(MemoryDirection dir, uint8_t* left, uint8_t* right)
+{
+    if(dir == ReadMemory)
+        *left = *right;
+    else
+        *right = *left;
+}
+
+void SPC700::DummyInst()
+{
+    ; //Empty
+}
+
+uint8_t SPC700::CarryFromBit(uint16_t a,uint16_t b,uint16_t res,uint8_t bit)
+{
+    uint16_t mask = 1 << bit;
+    a &= mask;
+    b &= mask;
+    res &= mask;
+    if(a & b)
+        return 1;
+    if(a^b)
+        return ((~res)>>bit)&1;
+    return 0;
+}
+
+uint8_t SPC700::BorrowFromBit(uint16_t a, uint16_t b, uint16_t res, uint8_t bit)
+{
+    //a-b=res
+    uint16_t mask = 1 << bit;
+    a &= mask;
+    b &= mask;
+    res &= mask;
+    if(a==0 && b == 0)
+        return res>>bit; //set it back to bit 0 pos
+    if(a & b)
+        return res>>bit;
+    if(a==0 && b!=0)
+        return 1;
+    return 0;
+}
+
+void SPC700::checkSignedOverflow(int a, int b, int c)
+{
+    psw.setV((a == 0 && b == 0 && c == 1) || (a == 1 && b == 1 && c == 0));
 }
 
 void SPC700::tick()
@@ -56,12 +108,94 @@ void SPC700::tick()
     //Decoding
     inst_cycles = 0;
     inst_length = 0;
+    memoryDirection = ReadMemory;
 
     uint8_t opcode = read(pc);
 
-    if(false) //Manual decode
+    uint8_t right = opcode&0x0F;
+    uint8_t left = opcode >> 4;
+    if(left <= 0xB && right >= 0x04 && right <= 0x09) //Manual decode
     {
+        bool leftOdd = left&1;
+        if(leftOdd) --left;
 
+        auto operation = OR; //Dummy init
+        switch(left)
+        {
+        case 0x00: operation = OR;  break;
+        case 0x02: operation = AND; break;
+        case 0x04: operation = EOR; break;
+        case 0x06: operation = CMP; break;
+        case 0x08: operation = ADC; break;
+        case 0x0A: operation = SBC; break;
+        default: cout << "[APU][SPC700] error manual decode !"<<endl;
+        }
+
+        if(leftOdd)
+        {
+            switch(right)
+            {
+                case 0x04: DirectIndexedX(operation);           break;
+                case 0x05: AbsoluteIndexedX(operation);         break;
+                case 0x06: AbsoluteIndexedY(operation);         break;
+                case 0x07: DirectIndirectIndexed(operation);    break;
+                case 0x08: Direct_Immediate(operation);         break;
+                case 0x09: DirectX_DirectY(operation);          break;
+            }
+        }
+        else
+        {
+            switch(right)
+            {
+                case 0x04: Direct(operation);                   break;
+                case 0x05: Absolute(operation);                 break;
+                case 0x06: DirectX(operation);                  break;
+                case 0x07: DirectIndexedIndirect(operation);    break;
+                case 0x08: Immediate(operation);                break;
+                case 0x09: Direct_Direct(operation);            break;
+            }
+        }
+    }
+    else if(left <= 0xB && right >= 0x0B && right <= 0x0C)
+    {
+        bool leftOdd = left&1;
+        if(leftOdd) --left;
+
+        auto operation = OR; //Dummy init
+        switch(left)
+        {
+        case 0x00: operation = ASL;  break;
+        case 0x02: operation = ROL; break;
+        case 0x04: operation = LSR; break;
+        case 0x06: operation = ROR; break;
+        case 0x08: operation = DEC; break;
+        case 0x0A: operation = INC; break;
+        default: cout << "[APU][SPC700] error manual decode 2!"<<endl;
+        }
+
+        if(leftOdd)
+        {
+            switch(right)
+            {
+                case 0x0B: DirectIndexedXRMW(operation);    break;
+                case 0x0C: AccRMW(operation);               break;
+            }
+        }
+        else
+        {
+            switch(right)
+            {
+                case 0x0B: DirectRMW(operation);            break;
+                case 0x0C: AbsoluteRMW(operation);          break;
+            }
+        }
+    }
+    else if(right == 0x03)
+    {
+        if(left&1)//odd
+            BranchTestMem(BBC);
+        else
+            BranchTestMem(BBS);
     }
     else
     {
@@ -92,12 +226,60 @@ void SPC700::tick()
         case 0xFB: DirectIndexedX(MOVY);                break;
         case 0xEC: Absolute(MOVY);                      break;
         case 0xBA: Direct16(MOVW_YA);                   break;
+        case 0x8F: DirectWriteImmediate(DummyInst);     break;//Different kind
+        case 0xFA: DirectTransfer(DummyInst);           break;//Different kind
+        case 0xC4: DirectWrite(MOVA);                   break;
+        case 0xD8: DirectWrite(MOVX);                   break;
+        case 0xCB: DirectWrite(MOVY);                   break;
+        case 0xD4: DirectIndexedXWrite(MOVA);           break;
+        case 0xDB: DirectIndexedXWrite(MOVY);           break;
+        case 0xD9: DirectIndexedYWrite(MOVX);           break;
+        case 0xC5: AbsoluteWrite(MOVA);                 break;
+        case 0xC9: AbsoluteWrite(MOVX);                 break;
+        case 0xCC: AbsoluteWrite(MOVY);                 break;
+        case 0xD5: AbsoluteIndexedXWrite(MOVA);         break;
+        case 0xD6: AbsoluteIndexedYWrite(MOVA);         break;
+        case 0xAF: DirectXIncWrite(MOVA);               break;
+        case 0xC6: DirectXWrite(MOVA);                  break;
+        case 0xD7: DirectIndirectIndexedWrite(MOVA);    break;
+        case 0xC7: DirectIndexedIndirectWrite(MOVA);    break;
+        case 0xDA: Direct16Write(MOVW_YA);              break;
+        case 0x2D: Push(MOVA);                          break;
+        case 0x4D: Push(MOVX);                          break;
+        case 0x6D: Push(MOVY);                          break;
+        case 0x0D: Push(MOV_PSW);                       break;
+        case 0xAE: Pop(MOVA);                           break;
+        case 0xCE: Pop(MOVX);                           break;
+        case 0xEE: Pop(MOVY);                           break;
+        case 0x8E: Pop(MOV_PSW);                        break;
+        case 0xC8: Immediate(CMPX);                     break;
+        case 0x3E: Direct(CMPX);                        break;
+        case 0x1E: Absolute(CMPX);                      break;
+        case 0xAD: Immediate(CMPY);                     break;
+        case 0x7E: Direct(CMPY);                        break;
+        case 0x5E: Absolute(CMPY);                      break;
+        case 0x3D: XRMW(INC);                           break;
+        case 0xFC: YRMW(INC);                           break;
+        case 0x1D: XRMW(DEC);                           break;
+        case 0xDC: YRMW(DEC);                           break;
+        case 0x10: Branch(BPL);                         break;
+        case 0x30: Branch(BMI);                         break;
+        case 0x50: Branch(BVC);                         break;
+        case 0x70: Branch(BVS);                         break;
+        case 0x90: Branch(BCC);                         break;
+        case 0xB0: Branch(BCS);                         break;
+        case 0xD0: Branch(BNE);                         break;
+        case 0xF0: Branch(BEQ);                         break;
+        case 0x2E: BranchTestMem(CBNE);                 break;
+        case 0xDE: BranchTestMemIndexedX(CBNE);         break;
+        case 0xFE: Branch(DBNZ);                        break;
         default:
             cout<<"[APU][SPC700] error: unknown opcode:"<<std::hex<<(int)opcode<<endl;
         }
     }
 
-
     pc += inst_length;
     currentCycle = inst_cycles;
+
+    //cout<<"[APU][SPC700] inst:"<<asm_inst<<" pc="<<std::hex<<int(pc)<<endl;
 }

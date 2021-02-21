@@ -50,7 +50,9 @@ private:
     } psw; //status reg
 
     uint8_t  idb8;
-    uint16_t idb8_ext; //High part of idb8 when manipulating 16bit instructions
+    uint8_t  idb8_ext; //High part of idb8 when manipulating 16bit instructions
+
+    bool branchTaken = false;
 
     unsigned int inst_length = 0;
     unsigned int inst_cycles = 0;
@@ -63,6 +65,18 @@ private:
 
     void updateNZflags(uint8_t a);
     void updateNZflags(uint8_t high, uint8_t a);
+
+    void checkSignedOverflow(int a, int b, int c);
+    uint8_t CarryFromBit(uint16_t a,uint16_t b,uint16_t res,uint8_t bit);
+    uint8_t BorrowFromBit(uint16_t a,uint16_t b,uint16_t res,uint8_t bit);
+
+    uint16_t directAddress(uint8_t adr);
+    enum MemoryDirection{ReadMemory,WriteMemory};
+    MemoryDirection memoryDirection = ReadMemory;
+    void doMemOperation(MemoryDirection dir, uint8_t* left, uint8_t* right);
+
+    void DummyInst();
+
     //Addressing modes
     void Immediate(Inst);
     void Implied(Inst);
@@ -77,6 +91,33 @@ private:
     void DirectIndexedIndirect(Inst);
     void DirectIndexedY(Inst);
     void Direct16(Inst);
+    void DirectWrite(Inst);
+    void DirectWriteImmediate(Inst);
+    void DirectTransfer(Inst);
+    void DirectIndexedXWrite(Inst);
+    void DirectIndexedYWrite(Inst);
+    void AbsoluteWrite(Inst);
+    void AbsoluteIndexedXWrite(Inst);
+    void AbsoluteIndexedYWrite(Inst);
+    void DirectXIncWrite(Inst);
+    void DirectXWrite(Inst);
+    void DirectIndirectIndexedWrite(Inst);
+    void DirectIndexedIndirectWrite(Inst);
+    void Direct16Write(Inst);
+    void Push(Inst);
+    void Pop(Inst);
+    void Direct_Direct(Inst);
+    void Direct_Immediate(Inst);
+    void DirectX_DirectY(Inst);
+    void DirectRMW(Inst);
+    void DirectIndexedXRMW(Inst);
+    void AbsoluteRMW(Inst);
+    void AccRMW(Inst);
+    void XRMW(Inst);
+    void YRMW(Inst);
+    void Branch(Inst);
+    void BranchTestMem(Inst);
+    void BranchTestMemIndexedX(Inst);
 
     //Instructions
     void MOVA();
@@ -89,6 +130,33 @@ private:
     void MOVXSP();
     void MOVSPX();
     void MOVW_YA();
+    void MOV_PSW();
+    void OR();
+    void AND();
+    void EOR();
+    void CMP();
+    void ADC();
+    void SBC();
+    void CMPX();
+    void CMPY();
+    void ASL();
+    void ROL();
+    void LSR();
+    void ROR();
+    void DEC();
+    void INC();
+    void BPL();
+    void BMI();
+    void BVC();
+    void BVS();
+    void BCC();
+    void BCS();
+    void BNE();
+    void BEQ();
+    void BBS();
+    void BBC();
+    void CBNE();
+    void DBNZ();
 };
 
 #endif // SPC700_H
