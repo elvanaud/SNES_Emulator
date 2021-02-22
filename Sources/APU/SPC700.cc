@@ -28,6 +28,7 @@ void SPC700::reset()
     pc |= (uint16_t(read(0xFFFF))<<8);
 
     a = x = y = sp = psw.val = 0;
+    halt_cpu = false;
     idb8_ext = 0;
     idb8 = 0;
     inst_cycles = inst_length = currentCycle = 0;
@@ -97,8 +98,28 @@ void SPC700::checkSignedOverflow(int a, int b, int c)
     psw.setV((a == 0 && b == 0 && c == 1) || (a == 1 && b == 1 && c == 0));
 }
 
+void SPC700::push(uint8_t data)
+{
+    write(make16(0x01,sp),data);
+    --sp;
+}
+
+uint8_t SPC700::pop()
+{
+    ++sp;
+    return read(make16(0x01,sp));
+}
+
+uint16_t SPC700::make16(uint8_t high, uint8_t low)
+{
+    uint16_t word = low;
+    word |= (uint16_t(high)<<8);
+    return word;
+}
+
 void SPC700::tick()
 {
+    if(halt_cpu) return;
     if(currentCycle != 0) //Waiting for end of current instruction
     {
         --currentCycle;
@@ -197,6 +218,10 @@ void SPC700::tick()
         else
             BranchTestMem(BBS);
     }
+    else if(right == 0x01)
+    {
+        Implied(TCALL);
+    }
     else
     {
         switch(opcode)
@@ -273,6 +298,23 @@ void SPC700::tick()
         case 0x2E: BranchTestMem(CBNE);                 break;
         case 0xDE: BranchTestMemIndexedX(CBNE);         break;
         case 0xFE: Branch(DBNZ);                        break;
+        case 0x6E: BranchTestMem(DBNZ_MEM);             break;
+        case 0x2F: Branch(BRA);                         break;
+        case 0x5F: Immediate16(JMP);                    break;
+        case 0x1F: JumpAbsoluteIndexedX(DummyInst);     break;
+        case 0x3F: Immediate16(CALL);                   break;
+        case 0x4F: Implied(PCALL);                      break; //Actually it's Immediate but it doesn't change the psw reg, so the operand will be handled in the inst
+        case 0x6F: Implied(RET);                        break;
+        case 0x7F: Implied(RETI);                       break;
+        case 0x0F: Implied(BRK);                        break;
+        case 0x00: Implied(NOP);                        break;
+        case 0x20: Implied(CLRP);                       break;
+        case 0x40: Implied(SETP);                       break;
+        case 0xA0: Implied(EI);                         break;
+        case 0xC0: Implied(DI);                         break;
+        case 0xEF: Implied(SLEEP);                      break;
+        case 0xFF: Implied(HALT);                       break;
+        //TODO: add 16bit and 1bit instructions and special alu inst
         default:
             cout<<"[APU][SPC700] error: unknown opcode:"<<std::hex<<(int)opcode<<endl;
         }

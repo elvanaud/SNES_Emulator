@@ -64,7 +64,7 @@ void Bus::memoryMap(MemoryOperation op, uint32_t full_adr, uint8_t *data)
             }
             else if(adr >= 0x2140 && adr <= 0x2143)
             {
-                //apu.memoryMap(op,full_adr,data); //TODO: replace that with a different access
+                apu.mainBusIO(op,full_adr,data);
             }
         }
     }

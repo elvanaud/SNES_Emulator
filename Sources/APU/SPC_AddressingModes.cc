@@ -48,8 +48,7 @@ void SPC700::Absolute(Inst inst)
     inst_cycles = 4;
     inst_length = 3;
 
-    uint16_t adr = read(pc+1);
-    adr |= (uint16_t(read(pc+2))<<8);
+    uint16_t adr = make16(read(pc+2),read(pc+1));
 
     idb8 = read(adr);
     updateNZflags(idb8);
@@ -61,8 +60,7 @@ void SPC700::AbsoluteIndexedX(Inst inst)
     inst_cycles = 5;
     inst_length = 3;
 
-    uint16_t adr = read(pc+1);
-    adr |= (uint16_t(read(pc+2))<<8);
+    uint16_t adr = make16(read(pc+2),read(pc+1));
 
     idb8 = read(adr+x);
     updateNZflags(idb8);
@@ -74,8 +72,7 @@ void SPC700::AbsoluteIndexedY(Inst inst)
     inst_cycles = 5;
     inst_length = 3;
 
-    uint16_t adr = read(pc+1);
-    adr |= (uint16_t(read(pc+2))<<8);
+    uint16_t adr = make16(read(pc+2),read(pc+1));
 
     idb8 = read(adr+y);
     updateNZflags(idb8);
@@ -182,6 +179,8 @@ void SPC700::DirectWriteImmediate(Inst inst)
     inst_cycles = 5;
     inst_length = 3;
 
+    asm_inst = "MOV";
+
     uint8_t offset = read(pc+2);
     uint16_t adr = directAddress(offset);
     read(adr); //Dummy read
@@ -193,6 +192,7 @@ void SPC700::DirectWriteImmediate(Inst inst)
     inst(this); //Not supposed to anything(for now?)
 
     write(adr,idb8);
+    //cout <<"[APU]adr="<<std::hex<<int(adr)<<" val="<<int(idb8)<<endl;
 }
 
 void SPC700::DirectTransfer(Inst inst)
@@ -251,8 +251,7 @@ void SPC700::AbsoluteWrite(Inst inst)
     inst_cycles = 5;
     inst_length = 3;
 
-    uint16_t adr = read(pc+1);
-    adr |= (uint16_t(read(pc+2))<<8);
+    uint16_t adr = make16(read(pc+2),read(pc+1));
     read(adr); //Dummy read
 
     memoryDirection = WriteMemory;
@@ -266,8 +265,7 @@ void SPC700::AbsoluteIndexedXWrite(Inst inst)
     inst_cycles = 6;
     inst_length = 3;
 
-    uint16_t adr = read(pc+1);
-    adr |= (uint16_t(read(pc+2))<<8);
+    uint16_t adr = make16(read(pc+2),read(pc+1));
     adr+=x;
     read(adr); //Dummy read
 
@@ -282,8 +280,7 @@ void SPC700::AbsoluteIndexedYWrite(Inst inst)
     inst_cycles = 6;
     inst_length = 3;
 
-    uint16_t adr = read(pc+1);
-    adr |= (uint16_t(read(pc+2))<<8);
+    uint16_t adr = make16(read(pc+2),read(pc+1));
     adr+=y;
     read(adr); //Dummy read
 
@@ -381,8 +378,7 @@ void SPC700::Push(Inst inst)
     memoryDirection = WriteMemory;
     inst(this); //Puts the value to push in idb8
 
-    write(0x0100|sp,idb8);
-    --sp;
+    push(idb8);
 }
 
 void SPC700::Pop(Inst inst)
@@ -390,8 +386,7 @@ void SPC700::Pop(Inst inst)
     inst_cycles = 4;
     inst_length = 1;
 
-    ++sp;
-    idb8 = read(0x0100|sp);
+    idb8 = pop();
 
     inst(this); //Puts idb8 in correct reg
 }
@@ -434,7 +429,11 @@ void SPC700::Direct_Immediate(Inst inst)
 
     inst(this);
 
-    write(aAdr,a); //We save the result and restore the accumulator
+    if(!cmpNoWrite)
+    {
+        cmpNoWrite = false;
+        write(aAdr,a); //We save the result and restore the accumulator
+    }
     a = save_acc;
 }
 
@@ -491,8 +490,7 @@ void SPC700::AbsoluteRMW(Inst inst)
     inst_cycles = 5;
     inst_length = 3;
 
-    uint16_t adr = read(pc+1);
-    adr |= (uint16_t(read(pc+2))<<8);
+    uint16_t adr = make16(read(pc+2),read(pc+1));
     idb8 = read(adr);
 
     inst(this);
@@ -530,7 +528,7 @@ void SPC700::YRMW(Inst inst)
     y = idb8;
 }
 
-void SPC700::Branch(Inst inst)
+void SPC700::Branch(Inst inst) //TODO: refactor: maybe i should have use immediate instead and have the individual inst set branchTaken or call relativeBranch(true) (helper function) instead
 {
     inst_cycles = 2;//Turns 4 if branch is taken
     inst_length = 2;
@@ -585,4 +583,34 @@ void SPC700::BranchTestMemIndexedX(Inst inst)
         pcRight += offset;
         pc = (pc&0xFF00)|pcRight;
     }
+}
+
+void SPC700::Immediate16(Inst inst)
+{
+    inst_cycles = 3;
+    inst_length = 3;
+
+    //asm_inst = "JMP"; //Exceptionally this adr mode is used (almost?) exclusively for a single jmp inst
+
+    idb8 = read(pc+1);
+    idb8_ext = read(pc+2);
+
+    inst(this);
+    //adr |= (uint16_t(read(pc+2))<<8);
+
+    //pc = adr;
+}
+
+void SPC700::JumpAbsoluteIndexedX(Inst inst)
+{
+    inst_cycles = 6;
+    inst_length = 3;
+
+    asm_inst = "JMP";
+
+    uint16_t adr = make16(read(pc+2),read(pc+1));
+    adr+=x;
+
+    pc = make16(read(adr+1),read(adr));
+    pc-=inst_length;//Correct pc autoincrement
 }

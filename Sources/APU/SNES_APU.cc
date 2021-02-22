@@ -4,7 +4,10 @@
 
 SNES_APU::SNES_APU(SPC700 &p_spc):spc(p_spc)
 {
-    //spc.reset();
+    for(int i = 0; i < 4; ++i)
+    {
+        ia[i] = oa[i] = 0;
+    }
 }
 
 void SNES_APU::attachBus(Bus* p_bus)
@@ -41,6 +44,17 @@ void SNES_APU::tick()
     }*/
 }
 
+void SNES_APU::mainBusIO(MemoryOperation op, uint32_t full_adr, uint8_t *data)
+{
+    int adr = full_adr-0x2140;
+    //From the main bus POV
+    if(op==Read)
+        *data = oa[adr];
+    else
+        ia[adr] = *data;
+    //cout <<"[APU]oa read:"<<std::hex<<int(adr)<<" val="<<int(*data)<<endl;
+}
+
 void SNES_APU::memoryMap(MemoryOperation op, uint32_t full_adr, uint8_t *data)
 {
     uint16_t adr = full_adr; //Theoretically useless bit it's shorter to write
@@ -54,34 +68,24 @@ void SNES_APU::memoryMap(MemoryOperation op, uint32_t full_adr, uint8_t *data)
     {
         switch(adr & 0xFF)
         {
-        case 0xF0:
+        case 0xF0: //Test reg, TODO
             break;
         case 0xF1:
-            doMemoryOperation(op,&control.val,data);
+            doMemoryOperation(op,&control.val,data); //TODO: write triggers timers and resets io ports
+            break;
+        case 0xF4: case 0xF5:
+        case 0xF6: case 0xF7:
+            if(op==Read)
+            {
+                *data = ia[adr-0x00F4];
+            }
+            else
+            {
+                oa[adr-0x00F4] = *data;
+                //cout <<"[APU]oa set:"<<std::hex<<int(adr)<<" val="<<int(*data)<<endl;
+            }
             break;
         }
         return;
     }
-
-    /*uint8_t adr = full_adr & 0xFF;
-    if(op == Read)//Read from the point of view of the main cpu, so this maps to out registers
-    {
-        switch(adr)
-        {
-            case 0x40:*data = oa0; break;
-            case 0x41:*data = oa1; break;
-            case 0x42:*data = oa2; break;
-            case 0x43:*data = oa3; break;
-        }
-    }
-    else
-    {
-        switch(adr)
-        {
-            case 0x40:ia0 = *data; dataToProcess = true; break;
-            case 0x41:ia1 = *data; break;
-            case 0x42:ia2 = *data; break;
-            case 0x43:ia3 = *data; break;
-        }
-    }*/
 }

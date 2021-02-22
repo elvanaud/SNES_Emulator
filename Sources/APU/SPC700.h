@@ -59,6 +59,8 @@ private:
 
     unsigned int currentCycle = 0;
 
+    bool halt_cpu = false;
+
     string asm_inst;
     string asm_adrMode;
     string asm_final;
@@ -74,6 +76,13 @@ private:
     enum MemoryDirection{ReadMemory,WriteMemory};
     MemoryDirection memoryDirection = ReadMemory;
     void doMemOperation(MemoryDirection dir, uint8_t* left, uint8_t* right);
+
+    void push(uint8_t data);
+    uint8_t pop();
+
+    uint16_t make16(uint8_t high, uint8_t low);
+
+    bool cmpNoWrite = false;
 
     void DummyInst();
 
@@ -118,6 +127,9 @@ private:
     void Branch(Inst);
     void BranchTestMem(Inst);
     void BranchTestMemIndexedX(Inst);
+    void Immediate16(Inst);
+    void JumpAbsoluteIndexedX(Inst);
+
 
     //Instructions
     void MOVA();
@@ -157,6 +169,22 @@ private:
     void BBC();
     void CBNE();
     void DBNZ();
+    void DBNZ_MEM();
+    void BRA();
+    void JMP();
+    void CALL();
+    void TCALL();
+    void PCALL();
+    void RET();
+    void RETI();
+    void BRK();
+    void NOP();
+    void CLRP();
+    void SETP();
+    void EI();
+    void DI();
+    void SLEEP();
+    void HALT();
 };
 
 #endif // SPC700_H

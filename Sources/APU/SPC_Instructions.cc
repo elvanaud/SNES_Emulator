@@ -109,6 +109,7 @@ void SPC700::CMP()
     uint8_t res = a - idb8;
     updateNZflags(res);
     psw.setC(a >= idb8);
+    cmpNoWrite = true;
 }
 
 void SPC700::ADC()
@@ -318,4 +319,183 @@ void SPC700::DBNZ()
 
     --y;
     branchTaken = (y!=0);
+}
+
+void SPC700::DBNZ_MEM()
+{
+    asm_inst = "DBNZ";
+
+    --idb8;
+    write(directAddress(read(pc+1)),idb8);
+
+    branchTaken = (idb8!=0);
+}
+
+void SPC700::BRA()
+{
+    asm_inst = "BRA";
+
+    branchTaken = true;
+}
+
+void SPC700::JMP()
+{
+    asm_inst = "JMP";
+
+    pc = make16(idb8_ext,idb8);
+    pc-=inst_length;
+}
+
+void SPC700::CALL()
+{
+    asm_inst = "CALL";
+    inst_cycles = 8;
+
+    pc+=inst_length; //Compute the return address
+
+    uint8_t lowPC = pc;
+    uint8_t highPC = (pc>>8);
+
+    push(highPC);
+    push(lowPC);
+
+    pc = make16(idb8_ext,idb8);
+    pc-=inst_length;
+}
+
+void SPC700::TCALL()
+{
+    asm_inst = "TCALL";
+    inst_cycles = 8;
+
+    uint8_t n = (read(pc)>>4);
+    pc+=inst_length; //Compute the return address
+
+    uint8_t lowPC = pc;
+    uint8_t highPC = (pc>>8);
+
+    push(highPC);
+    push(lowPC);
+
+    uint16_t adr = 0xFFDE - 2*n;
+    pc = make16(read(adr+1), read(adr));
+    pc-=inst_length;
+}
+
+void SPC700::PCALL()
+{
+    asm_inst = "PCALL";
+    inst_cycles = 6;
+    inst_length = 2;
+
+    uint8_t adr = read(pc+1); //This instruction handles its own operand (see comment in tick:decode function)
+    pc+=inst_length; //Compute the return address
+
+    uint8_t lowPC = pc;
+    uint8_t highPC = (pc>>8);
+
+    push(highPC);
+    push(lowPC);
+
+    pc = make16(0xFF,adr);
+    pc-=inst_length;
+}
+
+void SPC700::RET()
+{
+    asm_inst = "RET";
+    inst_cycles = 5;
+
+    uint8_t lowPC = pop();
+    uint8_t highPC = pop();
+
+    pc = make16(highPC, lowPC);
+    pc-=inst_length;
+}
+
+void SPC700::RETI()
+{
+    asm_inst = "RETI";
+    inst_cycles = 6;
+
+    psw.val = pop();
+
+    uint8_t lowPC = pop();
+    uint8_t highPC = pop();
+
+    pc = make16(highPC, lowPC);
+    pc-=inst_length;
+}
+
+void SPC700::BRK()
+{
+    asm_inst = "BRK";
+    inst_cycles = 8;
+
+    pc+=inst_length; //Compute the return address
+
+    uint8_t lowPC = pc;
+    uint8_t highPC = (pc>>8);
+
+    push(highPC);
+    push(lowPC);
+    push(psw.val);
+
+    psw.setB(true);
+    psw.setI(false);
+
+    pc = make16(read(0xFFDF),read(0xFFDE));
+    pc-=inst_length;
+}
+
+void SPC700::NOP()
+{
+    asm_inst = "NOP";
+    inst_cycles = 2;
+
+    ;//That's it
+}
+
+void SPC700::CLRP()
+{
+    asm_inst = "CLRP";
+    inst_cycles = 2;
+    psw.setP(false);
+}
+
+void SPC700::SETP()
+{
+    asm_inst = "SETP";
+    inst_cycles = 2;
+    psw.setP(true);
+}
+
+void SPC700::EI()
+{
+    asm_inst = "EI";
+    inst_cycles = 3;
+    psw.setI(true);
+}
+
+void SPC700::DI()
+{
+    asm_inst = "DI";
+    inst_cycles = 3;
+    psw.setI(false);
+}
+
+void SPC700::HALT()
+{
+    asm_inst = "HALT";
+    inst_cycles = 2;
+
+    halt_cpu = true;
+}
+
+void SPC700::SLEEP()
+{
+    asm_inst = "SLEEP";
+    inst_cycles = 2;
+
+    halt_cpu = true;
 }
