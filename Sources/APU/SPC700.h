@@ -131,6 +131,7 @@ private:
     void JumpAbsoluteIndexedX(Inst);
     void MemBit(Inst);
     void MemBitRMW(Inst);
+    void DirectRMW16(Inst);
 
 
     //Instructions
@@ -207,6 +208,13 @@ private:
     void TSET1();
     void DAA();
     void DAS();
+    void ADDW();
+    void SUBW();
+    void CMPW();
+    void INCW();
+    void DECW();
+    void MUL();
+    void DIV();
 };
 
 #endif // SPC700_H

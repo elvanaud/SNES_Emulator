@@ -338,7 +338,13 @@ void SPC700::tick()
         case 0x0E: AbsoluteRMW(TSET1);                  break;
         case 0xDF: Implied(DAA);                        break;
         case 0xBE: Implied(DAS);                        break;
-        //TODO: add 16bit instructions and special alu inst
+        case 0x7A: Direct16(ADDW);                      break;
+        case 0x9A: Direct16(SUBW);                      break;
+        case 0x5A: Direct16(CMPW);                      break;
+        case 0x3A: DirectRMW16(INCW);                   break;
+        case 0x1A: DirectRMW16(DECW);                   break;
+        case 0xCF: Implied(MUL);                        break;
+        case 0x9E: Implied(DIV);                        break;
         default:
             cout<<"[APU][SPC700] error: unknown opcode:"<<std::hex<<(int)opcode<<endl;
         }

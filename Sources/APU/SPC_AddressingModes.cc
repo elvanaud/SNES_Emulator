@@ -657,3 +657,23 @@ void SPC700::MemBitRMW(Inst inst)
 
     write(adr,data);
 }
+
+void SPC700::DirectRMW16(Inst inst)
+{
+    inst_cycles = 6;
+    inst_length = 2;
+
+    uint8_t offset = read(pc+1);
+    uint16_t adrLow = directAddress(offset);
+    ++offset;
+    uint16_t adrHigh = directAddress(offset);
+
+    idb8 = read(adrLow);
+    idb8_ext = read(adrHigh);
+
+    memoryDirection = WriteMemory;
+    inst(this);
+
+    write(adrLow,idb8);
+    write(adrHigh,idb8_ext);
+}

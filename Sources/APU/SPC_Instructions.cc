@@ -694,3 +694,129 @@ void SPC700::DAS() //TODO: test those two
     a+=offset;
     updateNZflags(a);
 }
+
+void SPC700::ADDW()
+{
+    asm_inst = "ADDW";
+
+    uint16_t ya = make16(y,a);
+    uint16_t data = make16(idb8_ext,idb8);
+
+    uint16_t res = ya + data;
+
+    psw.setC(CarryFromBit(ya,data,res,15));
+    psw.setH(CarryFromBit(ya,data,res,11));
+    checkSignedOverflow((ya>>15)&1,(data>>15)&1,(res>>15)&1);
+
+    a = res;
+    y = (res>>8);
+
+    updateNZflags(y,a);
+}
+
+void SPC700::SUBW()
+{
+    asm_inst = "SUBW";
+
+    uint16_t ya = make16(y,a);
+    uint16_t data = make16(idb8_ext,idb8);
+
+    uint16_t res = ya - data;
+
+    psw.setC(BorrowFromBit(ya,data,res,15));
+    psw.setH(BorrowFromBit(ya,data,res,11));
+    checkSignedOverflow((ya>>15)&1,((-data)>>15)&1,(res>>15)&1);
+
+    a = res;
+    y = (res>>8);
+
+    updateNZflags(y,a);
+}
+
+void SPC700::CMPW()
+{
+    asm_inst = "CMPW";
+    --inst_cycles;
+
+    uint16_t ya = make16(y,a);
+    uint16_t data = make16(idb8_ext,idb8);
+
+    uint16_t res = ya - data;
+
+    psw.setZ(res==0);
+    psw.setN(res>>15);
+    psw.setC(ya >= data);
+}
+
+void SPC700::INCW()
+{
+    asm_inst = "INCW";
+
+    uint16_t data = make16(idb8_ext,idb8);
+
+    ++data;
+
+    psw.setZ(data==0);
+    psw.setN(data>>15);
+
+    idb8 = data;
+    idb8_ext = (data>>8);
+}
+
+void SPC700::DECW()
+{
+    asm_inst = "DECW";
+
+    uint16_t data = make16(idb8_ext,idb8);
+
+    --data;
+
+    psw.setZ(data==0);
+    psw.setN(data>>15);
+
+    idb8 = data;
+    idb8_ext = (data>>8);
+}
+
+void SPC700::MUL()
+{
+    asm_inst = "MUL";
+    inst_cycles = 9;
+
+    uint16_t res = int(y)*int(a);
+    a = res;
+    y = (res>>8);
+
+    updateNZflags(y);
+}
+
+void SPC700::DIV()
+{
+    asm_inst = "DIV";
+    inst_cycles = 12;
+
+    //Algorithm found on: https://github.com/gilligan/snesdev/blob/master/docs/spc700.txt
+    uint32_t yva = make16(y,a);
+    uint32_t tmpX = (x<<9);
+    for(int i = 0; i < 9; ++i)
+    {
+      //ROL yva:
+      uint32_t tmpBit = (yva>>16);
+      yva<<=1;
+      yva &= 0x1FF; //clip to 17bits
+      yva |= tmpBit;
+
+      if(yva > tmpX) yva^= 0x01;
+      if(yva & 1) yva -= tmpX;       // remember, clip to 17 bits:
+      yva &= 0x1FF;
+    }
+    //H seems to be based on X&$F<=Y&$F
+    psw.setH((x&0x0F)<= (y&0x0F)); //unsure
+
+    //yva => Y, A, and V flag as YYYYYYYY V AAAAAAAA
+    a = yva;
+    y = (yva>>9);
+    psw.setV((yva>>8)&1);
+
+    updateNZflags(a);
+}
