@@ -129,6 +129,8 @@ private:
     void BranchTestMemIndexedX(Inst);
     void Immediate16(Inst);
     void JumpAbsoluteIndexedX(Inst);
+    void MemBit(Inst);
+    void MemBitRMW(Inst);
 
 
     //Instructions
@@ -157,6 +159,10 @@ private:
     void ROR();
     void DEC();
     void INC();
+
+    void CLR1();
+    void SET1();
+
     void BPL();
     void BMI();
     void BVC();
@@ -185,6 +191,17 @@ private:
     void DI();
     void SLEEP();
     void HALT();
+    void NOT1();
+    void MOV1();
+    void OR1();
+    void OR1_NOT();
+    void AND1();
+    void AND1_NOT();
+    void EOR1();
+    void CLRC();
+    void SETC();
+    void NOTC();
+    void CLRVH();
 };
 
 #endif // SPC700_H

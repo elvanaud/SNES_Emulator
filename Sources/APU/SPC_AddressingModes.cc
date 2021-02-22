@@ -614,3 +614,46 @@ void SPC700::JumpAbsoluteIndexedX(Inst inst)
     pc = make16(read(adr+1),read(adr));
     pc-=inst_length;//Correct pc autoincrement
 }
+
+void SPC700::MemBit(Inst inst)
+{
+    inst_cycles = 4; //4 or 5 cycles depending on inst
+    inst_length = 3;
+
+    uint8_t lowAdr = read(pc+1);
+    uint8_t bit = read(pc+2);
+    uint8_t highAdr = bit & 0x0F;
+    bit >>= 4;
+
+    uint16_t adr = make16(highAdr,lowAdr);
+    uint8_t data = read(adr);
+
+    idb8 = ((data>>bit)&1);
+
+    inst(this);
+}
+
+void SPC700::MemBitRMW(Inst inst)
+{
+    inst_cycles = 5; //5 or 6 cycles depending on inst
+    inst_length = 3;
+
+    uint8_t lowAdr = read(pc+1);
+    uint8_t bit = read(pc+2);
+    uint8_t highAdr = bit & 0x0F;
+    bit >>= 4;
+
+    uint16_t adr = make16(highAdr,lowAdr);
+    uint8_t data = read(adr);
+
+    idb8 = ((data>>bit)&1);
+
+    memoryDirection = WriteMemory;
+    inst(this);
+
+    idb8 = ((idb8&1)<<bit);
+    data &= ~(1<<bit); //Reset data bit
+    data |= idb8;
+
+    write(adr,data);
+}

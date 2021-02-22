@@ -499,3 +499,117 @@ void SPC700::SLEEP()
 
     halt_cpu = true;
 }
+
+void SPC700::CLR1()
+{
+    asm_inst = "CLR1";
+
+    uint8_t n = (read(pc)>>4);
+    --n;
+    n /= 2;
+
+    idb8 &= ~(1<<n);
+}
+
+void SPC700::SET1()
+{
+    asm_inst = "SET1";
+
+    uint8_t n = (read(pc)>>4);
+    n /= 2;
+
+    idb8 |= (1<<n);
+}
+
+void SPC700::NOT1()
+{
+    asm_inst = "NOT1";
+
+    idb8 = ((~idb8)&1);
+}
+
+void SPC700::MOV1()
+{
+    asm_inst = "MOV1";
+
+
+    if(memoryDirection == ReadMemory)
+    {
+        psw.setC(idb8);
+    }
+    else
+    {
+        inst_cycles+=1;
+        idb8 = psw.C();
+    }
+}
+
+void SPC700::OR1()
+{
+    asm_inst = "OR1 C";
+    inst_cycles+=1;
+
+    psw.setC(psw.C()|idb8);
+}
+
+void SPC700::OR1_NOT()
+{
+    asm_inst = "OR1 C,not";
+    inst_cycles+=1;
+
+    psw.setC(psw.C()|((~idb8)&1));
+}
+
+void SPC700::AND1()
+{
+    asm_inst = "AND1 C";
+
+    psw.setC(psw.C()&idb8);
+}
+
+void SPC700::AND1_NOT()
+{
+    asm_inst = "AND1 C,not";
+
+    psw.setC(psw.C()&((~idb8)&1));
+}
+
+void SPC700::EOR1()
+{
+    asm_inst = "EOR1 C";
+
+    psw.setC(psw.C()^idb8);
+}
+
+void SPC700::CLRC()
+{
+    asm_inst = "CLRC";
+    inst_cycles = 2;
+
+    psw.setC(false);
+}
+
+void SPC700::SETC()
+{
+    asm_inst = "SETC";
+    inst_cycles = 2;
+
+    psw.setC(true);
+}
+
+void SPC700::NOTC()
+{
+    asm_inst = "NOTC";
+    inst_cycles = 3;
+
+    psw.setC((~psw.C())&1);
+}
+
+void SPC700::CLRVH()
+{
+    asm_inst = "CLR V,H";
+    inst_cycles = 2;
+
+    psw.setV(false);
+    psw.setH(false);
+}

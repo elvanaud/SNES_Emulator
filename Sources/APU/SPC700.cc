@@ -222,26 +222,33 @@ void SPC700::tick()
     {
         Implied(TCALL);
     }
+    else if(right == 0x02)
+    {
+        if(left&1)//odd
+            DirectRMW(CLR1);
+        else
+            DirectRMW(SET1);
+    }
     else
     {
         switch(opcode)
         {
-        case 0xE8: Immediate(MOVA);         break;
-        case 0xCD: Immediate(MOVX);         break;
-        case 0x8D: Immediate(MOVY);         break;
-        case 0x7D: Implied(MOVAX);          break;
-        case 0x5D: Implied(MOVXA);          break;
-        case 0xDD: Implied(MOVAY);          break;
-        case 0xFD: Implied(MOVYA);          break;
-        case 0x9D: Implied(MOVXSP);         break;
-        case 0xBD: Implied(MOVSPX);         break;
-        case 0xE4: Direct(MOVA);            break;
-        case 0xF4: DirectIndexedX(MOVA);    break;
-        case 0xE5: Absolute(MOVA);          break;
-        case 0xF5: AbsoluteIndexedX(MOVA);  break;
-        case 0xF6: AbsoluteIndexedY(MOVA);  break;
-        case 0xE6: DirectX(MOVA);           break;
-        case 0xBF: DirectXInc(MOVA);        break;
+        case 0xE8: Immediate(MOVA);                     break;
+        case 0xCD: Immediate(MOVX);                     break;
+        case 0x8D: Immediate(MOVY);                     break;
+        case 0x7D: Implied(MOVAX);                      break;
+        case 0x5D: Implied(MOVXA);                      break;
+        case 0xDD: Implied(MOVAY);                      break;
+        case 0xFD: Implied(MOVYA);                      break;
+        case 0x9D: Implied(MOVXSP);                     break;
+        case 0xBD: Implied(MOVSPX);                     break;
+        case 0xE4: Direct(MOVA);                        break;
+        case 0xF4: DirectIndexedX(MOVA);                break;
+        case 0xE5: Absolute(MOVA);                      break;
+        case 0xF5: AbsoluteIndexedX(MOVA);              break;
+        case 0xF6: AbsoluteIndexedY(MOVA);              break;
+        case 0xE6: DirectX(MOVA);                       break;
+        case 0xBF: DirectXInc(MOVA);                    break;
         case 0xF7: DirectIndirectIndexed(MOVA);         break;
         case 0xE7: DirectIndexedIndirect(MOVA);         break;
         case 0xF8: Direct(MOVX);                        break;
@@ -314,7 +321,19 @@ void SPC700::tick()
         case 0xC0: Implied(DI);                         break;
         case 0xEF: Implied(SLEEP);                      break;
         case 0xFF: Implied(HALT);                       break;
-        //TODO: add 16bit and 1bit instructions and special alu inst
+        case 0xEA: MemBitRMW(NOT1);                     break;
+        case 0xCA: MemBitRMW(MOV1);                     break;
+        case 0xAA: MemBit(MOV1);                        break;
+        case 0x0A: MemBit(OR1);                         break;
+        case 0x2A: MemBit(OR1_NOT);                     break;
+        case 0x4A: MemBit(AND1);                        break;
+        case 0x6A: MemBit(AND1_NOT);                    break;
+        case 0x8A: MemBit(EOR1);                        break;
+        case 0x60: Implied(CLRC);                       break;
+        case 0x80: Implied(SETC);                       break;
+        case 0xED: Implied(NOTC);                       break;
+        case 0xE0: Implied(CLRVH);                      break;
+        //TODO: add 16bit instructions and special alu inst
         default:
             cout<<"[APU][SPC700] error: unknown opcode:"<<std::hex<<(int)opcode<<endl;
         }
