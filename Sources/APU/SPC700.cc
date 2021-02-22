@@ -333,6 +333,11 @@ void SPC700::tick()
         case 0x80: Implied(SETC);                       break;
         case 0xED: Implied(NOTC);                       break;
         case 0xE0: Implied(CLRVH);                      break;
+        case 0x9F: Implied(XCN);                        break;
+        case 0x4E: AbsoluteRMW(TCLR1);                  break; //TODO:This inst is supposed to ignore bit 15 of the address but that would require a new adrMode so I don't do it
+        case 0x0E: AbsoluteRMW(TSET1);                  break;
+        case 0xDF: Implied(DAA);                        break;
+        case 0xBE: Implied(DAS);                        break;
         //TODO: add 16bit instructions and special alu inst
         default:
             cout<<"[APU][SPC700] error: unknown opcode:"<<std::hex<<(int)opcode<<endl;

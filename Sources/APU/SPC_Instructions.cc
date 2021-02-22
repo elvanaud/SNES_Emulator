@@ -613,3 +613,84 @@ void SPC700::CLRVH()
     psw.setV(false);
     psw.setH(false);
 }
+
+void SPC700::XCN()
+{
+    asm_inst = "XCN";
+    inst_cycles = 5;
+
+    uint8_t accLeft = (a>>4);
+    a <<= 4;
+    a |= accLeft;
+
+    updateNZflags(a);
+}
+
+void SPC700::TCLR1()
+{
+    asm_inst = "TCLR1";
+    inst_cycles = 6;
+
+    uint8_t tmpRes = a-idb8;
+    updateNZflags(tmpRes);
+
+    idb8 &= (~a);
+}
+
+void SPC700::TSET1()
+{
+    asm_inst = "TSET1";
+    inst_cycles = 6;
+
+    uint8_t tmpRes = a-idb8;
+    updateNZflags(tmpRes);
+
+    idb8 |= a;
+}
+
+void SPC700::DAA()
+{
+    asm_inst = "DAA";
+    inst_cycles = 3;
+
+    uint8_t offset = 0;
+    uint8_t right = a&0x0F;
+    uint8_t left = (a>>4);
+
+    if(psw.H()==1 || (right>=0xA && right<=0xF))
+    {
+        offset += 0x06;
+    }
+    if(psw.C()==1 || (left>=0xA && left <= 0xF) || ((right>=0xA && right<=0xF)&&left==9))
+    {
+        offset += 0x60;
+        psw.setC(true);
+    }
+
+    a+=offset;
+    updateNZflags(a);
+}
+
+void SPC700::DAS() //TODO: test those two
+{
+    asm_inst = "DAS";
+    inst_cycles = 3;
+
+    uint8_t offset = 0;
+    //uint8_t right = a&0x0F;
+    //uint8_t left = (a>>4);
+
+    if(psw.H()==1)
+    {
+        offset += 0x0A;
+    }
+    uint8_t left_offset[] = {0x00,0xF0,0xA0,0x90};
+    offset += left_offset[(psw.C()<<1)|psw.H()];
+    if(psw.C()==1)
+    {
+        psw.setC(true); //useless ? Why did I write this ??
+    }
+
+    a+=offset;
+    updateNZflags(a);
+}

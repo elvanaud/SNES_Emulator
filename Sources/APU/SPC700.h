@@ -202,6 +202,11 @@ private:
     void SETC();
     void NOTC();
     void CLRVH();
+    void XCN();
+    void TCLR1();
+    void TSET1();
+    void DAA();
+    void DAS();
 };
 
 #endif // SPC700_H
