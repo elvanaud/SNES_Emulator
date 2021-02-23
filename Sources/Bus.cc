@@ -62,9 +62,32 @@ void Bus::memoryMap(MemoryOperation op, uint32_t full_adr, uint8_t *data)
             {
                 doMemoryOperation(op, &ram[0][adr], data);
             }
-            else if(adr >= 0x2140 && adr <= 0x2143)
+            else if(adr >= 0x2140 && adr <= 0x217F)
             {
                 apu.mainBusIO(op,full_adr,data);
+            }
+            else if(adr == 0x2180)
+            {
+                doMemoryOperation(op,&ram[WMADDH][(uint16_t(WMADDM)<<8)|WMADDL],data);
+                //Increment the address:
+                uint32_t address = (uint32_t(WMADDH)<<16)|(uint32_t(WMADDM)<<8)|WMADDL;
+                ++address;
+                WMADDL = address;
+                WMADDM = (address>>8)&0xFF;
+                WMADDH = (address>>16)&0x01; //Clip to one bit
+            }
+            else if(adr == 0x2181)
+            {
+                doMemoryOperation(op,&WMADDL,data); //TODO: limit this operation in writing only (same for the following addresses)
+            }
+            else if(adr == 0x2182)
+            {
+                doMemoryOperation(op,&WMADDM,data);
+            }
+            else if(adr == 0x2183)
+            {
+                (*data) &= 0x01; //TODO: Keep this register one bit (maybe this can cause problems when reading this adr)
+                doMemoryOperation(op,&WMADDH,data);
             }
         }
     }

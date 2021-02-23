@@ -36,6 +36,10 @@ private:
 
     uint8_t dmr = 0;
     uint8_t ram[2][BANK_SIZE];
+
+    uint8_t WMADDH = 0;
+    uint8_t WMADDM = 0;
+    uint8_t WMADDL = 0;
 };
 
 #endif //Bus_H

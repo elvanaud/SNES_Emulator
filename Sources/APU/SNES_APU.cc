@@ -47,6 +47,7 @@ void SNES_APU::tick()
 void SNES_APU::mainBusIO(MemoryOperation op, uint32_t full_adr, uint8_t *data)
 {
     int adr = full_adr-0x2140;
+    adr %= 4; //Mirorring
     //From the main bus POV
     if(op==Read)
         *data = oa[adr];
