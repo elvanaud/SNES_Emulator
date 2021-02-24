@@ -11,22 +11,7 @@
 
 Bus::Bus(W65816 & c, SNES_APU &p_apu) : cpu(c), apu(p_apu), debugger(cpu)
 {
-    /*
-    ram[0xFF]  = 0x38; //SEC
-    ram[0x100] = 0x69; //ADC
-    ram[0x101] = 19;
-    ram[0x102] = 0x69; //ADC
-    ram[0x103] = 55;
-    ram[0x104] = 0x29; //AND
-    ram[0x105] = 0x3F;
-    ram[0x106] = 0x89; //BIT
-    ram[0x107] = 0x00;
-    ram[0x108] = 0x89; //BIT
-    ram[0x109] = 0x02;
-    ram[0x10A] = 0xC9; //CMP
-    ram[0x10B] = 0x0A;
-    ram[0x10C] = 0xA9; //LDA #42
-    ram[0x10D] = 42;*/
+    debugger.attachBus(this);
 }
 
 void Bus::read(uint32_t adr)
@@ -198,98 +183,21 @@ void Bus::run()
     unsigned int clock = 6;
     unsigned int global_clock = 0;
 
-    bool debugPrint = true;
-    bool stepMode = true;
-    bool step = true;
-
-    uint16_t oldPC = cpu.getPC();
-    std::vector<uint32_t> watches;
     while(app.isOpen())
     {
-        if(!stepMode || (stepMode && step))
+        if(debugger.executeSystem())
         {
             --clock;
             ++global_clock;
-            /*if(debugger.isExecutionBlocked())
-            {
-                cout << "CPU Blocked" << endl;
-                getchar();
-                debugger.continueExec();
-            }*/
-            //cout << "TCycle = " << cpu.getTCycle() << endl;
+
             if(clock == 0)
             {
                 cpu.tick();
                 clock = 6;
 
-                //debugger.tick();
-
-                //cout << "PC = " <<std::hex << cpu.getPC() << "  ;  IR = " << (int)cpu.getIR() << "("<<cpu.getInst().getASM() << ")  ;  Acc = " << cpu.getAcc() << "  ;  Adr = " << cpu.getAdr();
-                //cout << "  ;  IDB = " << cpu.getIDB() <<endl;
-                /*uint8_t p = cpu.getP();
-                string status;
-                if((p>>7)&1) status+="N"; else status += "-";
-                if((p>>6)&1) status+="V"; else status += "-";
-                if((p>>1)&1) status+="Z"; else status += "-";
-                if((p>>0)&1) status+="C"; else status += "-";*/
-                //cout << "Flags = " << status << endl;
-                //cout << "VDA = " << cpu.VDA() << "  ;  VPA = " << cpu.VPA() << endl;
-                if(cpu.VDA() && cpu.VPA()) //Sync = Opcode Fetch
-                {
-
-                    //if(!stepMode || (stepMode && step))
-                    {
-                        step = false;
-                        if(debugPrint)
-                        {
-                            cout << "PC = " <<std::hex << cpu.getPC()-1 << "  ;  IR = " << (int)cpu.getIR() << "("<<cpu.getInst().getASM() << ")  ;  A = " << cpu.getAcc();
-                            cout << "  ;  Adr = " << cpu.getAdr() << "  ;  IDB = " << cpu.getIDB();
-                            cout << " ; X = "<< cpu.getX() << " ; Y = " << cpu.getY() << " ; D = " << cpu.getD() << endl;
-
-                            uint8_t p = cpu.getP();
-                            string status;
-                            if((p>>7)&1) status+="N"; else status += "-"; //TODO: print flags in lower/upper case if set/unset
-                            if((p>>6)&1) status+="V"; else status += "-";
-                            if((p>>1)&1) status+="Z"; else status += "-";
-                            if((p>>0)&1) status+="C"; else status += "-";
-                            cout << "Flags = " << status << " " << std::hex << int(p) << endl;
-
-                            /*if(cpu.getPC() == oldPC)
-                            {
-                                cout << "big pb or test passed (lol)";
-                            }*/
-                            oldPC = cpu.getPC();
-                            //cout << std::hex << cpu.getPC() << endl;
-                            //cout << std::hex << cpu.getPC() << "("<<cpu.getInst().getASM() << ")"<<endl;
-                            if(oldPC == 0x0449)
-                            {
-                                cout << "Y="<<std::hex <<cpu.getY()//<<//endl;
-                                     << " " << cpu.getInst().getASM() << endl;
-                            }
-                            //std::getchar();
-                            for(uint32_t watch : watches)
-                                cout << "Content of "<<std::hex<<watch<<" :"<<(int)privateRead(watch)<<endl;
-                        }
-
-                    }
-                }
+                debugger.tick();
             }
             apu.tick();
-
-
-            /*if(global_clock >= 1364*262) //Roughly one frame
-            {
-                global_clock = 0;
-                sf::Event event;
-                while(app.pollEvent(event))
-                {
-                    if(event.type == sf::Event::Closed) app.close();
-                }
-
-                app.clear(sf::Color::Red);
-                app.display();
-            }*/
-
         }
         //else
         {
@@ -304,24 +212,11 @@ void Bus::run()
                     switch(event.key.code)
                     {
                     case sf::Keyboard::B:
-                        cout<<"cnskdcnsckj";
-                        break;
                     case sf::Keyboard::D:
-                        debugPrint = !debugPrint;
-                        break;
                     case sf::Keyboard::S:
-                        stepMode = true;
-                        step = !step;
-                        break;
                     case sf::Keyboard::C:
-                        stepMode = false;
-                        break;
                     case sf::Keyboard::W:
-                        cout << "Enter watch adress:";
-                        cin >> std::hex >>user_entry;
-                        watches.push_back(user_entry);
-                        stepMode = true;
-                        step = !step;
+                        debugger.processEvent(event);
                         break;
                     default:
                         ;
