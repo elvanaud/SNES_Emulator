@@ -11,11 +11,12 @@ using std::vector;
 
 class W65816;
 class SNES_APU;
+class SNES_PPU;
 
 class Bus : MemoryInterface
 {
 public:
-    Bus(W65816 &c, SNES_APU &p_apu);
+    Bus(W65816 &c, SNES_APU &p_apu, SNES_PPU &p_ppu);
 
     void run();
 
@@ -31,6 +32,7 @@ public:
 private:
     W65816 &cpu;
     SNES_APU &apu;
+    SNES_PPU &ppu;
     ConsoleDebugger debugger;
     Cartridge cartridge;
 

@@ -6,6 +6,7 @@
 #include "Bus.h"
 #include "APU/SNES_APU.h"
 #include "APU/SPC700.h"
+#include "PPU/SNES_PPU.h"
 
 int main()
 {
@@ -18,7 +19,9 @@ int main()
     spc.attachBus(&apu);
     spc.reset();
 
-    Bus bus(cpu, apu);
+    SNES_PPU ppu;
+
+    Bus bus(cpu, apu, ppu); //TODO: c'est moche et inutile => Corrige ce code
     cpu.attachBus(&bus);
     apu.attachBus(&bus);
 

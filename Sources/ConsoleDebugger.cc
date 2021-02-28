@@ -49,6 +49,9 @@ void ConsoleDebugger::processEvent(sf::Event & event)
     {
         switch(event.key.code)
         {
+        case sf::Keyboard::B:
+            cout<<"breakpoints"<<endl;
+            break;
         case sf::Keyboard::D:
             debugPrint = !debugPrint;
             break;

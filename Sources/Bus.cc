@@ -1,6 +1,7 @@
 #include "Bus.h"
 #include "CPU/W65816.h"
 #include "APU/SNES_APU.h"
+#include "PPU/SNES_PPU.h"
 #include "CartridgeHeader.h"
 
 #include <SFML/Graphics.hpp>
@@ -9,9 +10,10 @@
 #include <fstream>
 #include <limits>
 
-Bus::Bus(W65816 & c, SNES_APU &p_apu) : cpu(c), apu(p_apu), debugger(cpu)
+Bus::Bus(W65816 & c, SNES_APU &p_apu, SNES_PPU &p_ppu) : cpu(c), apu(p_apu),ppu(p_ppu), debugger(cpu)
 {
     debugger.attachBus(this);
+    ppu.attachBus(this);
 }
 
 void Bus::read(uint32_t adr)
@@ -47,6 +49,10 @@ void Bus::memoryMap(MemoryOperation op, uint32_t full_adr, uint8_t *data)
             {
                 doMemoryOperation(op, &ram[0][adr], data);
             }
+            else if(adr >= 0x2100 && adr <= 0x213F)
+            {
+                ppu.memoryMap(op,full_adr,data);
+            }
             else if(adr >= 0x2140 && adr <= 0x217F)
             {
                 apu.mainBusIO(op,full_adr,data);
@@ -81,7 +87,7 @@ void Bus::memoryMap(MemoryOperation op, uint32_t full_adr, uint8_t *data)
 uint8_t Bus::privateRead(uint32_t full_adr)
 {
     uint8_t data = 0;
-    memoryMap(Read, full_adr, &data);
+    memoryMap(Read, full_adr, &data); //TODO: find a way to differentiate this with regular read so that read trigger IO ports don't react to private reads
 
     return data;
 }
@@ -180,29 +186,36 @@ void Bus::loadCartridge(std::string const & path)
 void Bus::run()
 {
     sf::RenderWindow app(sf::VideoMode(300,300,32),"SNES Emulator");
-    unsigned int clock = 6;
+    unsigned int cpu_clock = 6;
+    unsigned int ppu_clock = 4;
     unsigned int global_clock = 0;
 
     while(app.isOpen())
     {
         if(debugger.executeSystem())
         {
-            --clock;
+            --cpu_clock;
+            --ppu_clock;
             ++global_clock;
 
-            if(clock == 0)
+            if(cpu_clock == 0)
             {
                 cpu.tick();
-                clock = 6;
+                cpu_clock = 6;
 
                 debugger.tick();
+            }
+            if(ppu_clock == 0)
+            {
+                ppu.tick();
+                ppu_clock = 4; //TODO: handle long dots and stuff
             }
             apu.tick();
         }
         //else
         {
             sf::Event event;
-            uint32_t user_entry;
+            //uint32_t user_entry;
             while(app.pollEvent(event))
             {
                 if(event.type == sf::Event::Closed)

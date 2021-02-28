@@ -4,7 +4,6 @@
 #include "Common.h"
 
 #include "CPU/W65816.h"
-#include "CPU/CPU_Debugger.h"
 
 #include <SFML/Graphics.hpp>
 
