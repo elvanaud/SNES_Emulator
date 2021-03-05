@@ -3,6 +3,11 @@
 
 SNES_PPU::SNES_PPU()
 {
+    screenTexture.create(350,250);
+    screenTexture.setSmooth(false);
+
+    for(int i = 0; i < VRAM_WORD_SIZE; i++)
+        vram[i] = 0;
 }
 
 void SNES_PPU::attachBus(Bus* b)
@@ -136,9 +141,32 @@ void SNES_PPU::memoryMap(MemoryOperation op, uint32_t full_adr, uint8_t* data)
 void SNES_PPU::tick()
 {
     //Let's consider it's a dot clock tick for now
-    //handleTimings();
+    handleTimings();
+    screenContent[idx] = vram[idx];
+    screenContent[idx+1] = vram[idx+1];//]50;
+    screenContent[idx+2] = vram[idx+2];//130;
+    screenContent[idx+3] = vram[idx+3];//255;
+    idx+=4;
+    if(idx >= 350*250*4)idx=0;
+    if(idx >= VRAM_WORD_SIZE) idx=0;
     if(forcedBlank) return; //Don't render a thing
 
+}
+
+void SNES_PPU::setRenderWindow(sf::RenderWindow* p_renderWindow)
+{
+    renderWindow = p_renderWindow;
+}
+
+void SNES_PPU::renderScreen()
+{
+    screenTexture.update(screenContent);
+    //cout <<"hello"<<endl;
+    sf::Sprite screenSprite;
+    screenSprite.setTexture(screenTexture);
+
+    renderWindow->draw(screenSprite);
+    renderWindow->display();
 }
 
 void SNES_PPU::handleTimings()
@@ -149,12 +177,13 @@ void SNES_PPU::handleTimings()
     {
 
     }
-    //if(hcounter == 0 && vcounter == nVLines) //Beginning of VBLank
+    if(hcounter == 0 && vcounter == 250) //Beginning of VBLank
     {
-        renderState = VBLANK;
+        //renderState = VBLANK;
+        renderScreen();
     }
     //if(hcounter == 10 && vcounter == nVLines)
-    {
+    /*{
         oamAddress = oamReloadAdr.fullAdr();
     }
     if(hcounter == 1)
@@ -168,10 +197,17 @@ void SNES_PPU::handleTimings()
     if(hcounter == 274)
     {
         renderState = HBLANK;
-    }
+    }*/
     if(hcounter == 339)
     {
         //last dot of line
+        ++vcounter;
+        hcounter = -1;
+    }
+    if(vcounter == 300)
+    {
+        //end of vblank
+        vcounter = 0;
     }
 }
 

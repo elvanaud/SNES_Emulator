@@ -197,7 +197,8 @@ void Bus::loadCartridge(std::string const & path)
 
 void Bus::run()
 {
-    sf::RenderWindow app(sf::VideoMode(300,300,32),"SNES Emulator");
+    sf::RenderWindow app(sf::VideoMode(400,400,32),"SNES Emulator");
+    ppu.setRenderWindow(&app);
     unsigned int cpu_clock = 6;
     unsigned int ppu_clock = 4;
     unsigned int global_clock = 0;

@@ -2,6 +2,7 @@
 #define SNES_PPU_H
 
 #include "Common.h"
+#include <SFML/Graphics.hpp>
 
 #include <array>
 
@@ -21,8 +22,15 @@ public:
     void attachBus(Bus* b);
     virtual void memoryMap(MemoryOperation op, uint32_t full_adr, uint8_t* data);
     void tick();
+    void setRenderWindow(sf::RenderWindow* p_renderWindow);
 private:
     Bus* bus;
+    void renderScreen();
+    sf::RenderWindow * renderWindow;
+    sf::Texture screenTexture;
+    int idx = 0;
+    uint8_t screenContent[350*250*4];
+
     uint16_t vram[VRAM_WORD_SIZE];
     uint8_t oamLow[OAM_LOW_SIZE]; //OAM is supposed to be 16bit words
     uint8_t oamHigh[OAM_HIGH_SIZE];
