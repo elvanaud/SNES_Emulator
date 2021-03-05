@@ -12,16 +12,18 @@ using std::vector;
 class W65816;
 class SNES_APU;
 class SNES_PPU;
+class DmaHandler;
 
 class Bus : MemoryInterface
 {
 public:
-    Bus(W65816 &c, SNES_APU &p_apu, SNES_PPU &p_ppu);
+    Bus(W65816 &c, SNES_APU &p_apu, SNES_PPU &p_ppu, DmaHandler &p_dma);
 
     void run();
 
     void read(uint32_t adr);
     uint8_t privateRead(uint32_t adr);
+    void privateWrite(uint32_t adr, uint8_t data);
     void write(uint32_t adr, uint8_t data);
     uint8_t DMR();
 
@@ -29,12 +31,17 @@ public:
     void loadCartridge(std::string const & path);
 
     virtual void memoryMap(MemoryOperation op, uint32_t full_adr, uint8_t *data);
+
+    void dmaEnable(bool enable);
 private:
     W65816 &cpu;
     SNES_APU &apu;
     SNES_PPU &ppu;
+    DmaHandler &dmaHandler;
     ConsoleDebugger debugger;
     Cartridge cartridge;
+
+    bool dmaEnabled = false;
 
     uint8_t dmr = 0;
     uint8_t ram[2][BANK_SIZE];

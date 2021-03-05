@@ -7,6 +7,7 @@
 #include "APU/SNES_APU.h"
 #include "APU/SPC700.h"
 #include "PPU/SNES_PPU.h"
+#include "PPU/DmaHandler.h"
 
 int main()
 {
@@ -20,8 +21,9 @@ int main()
     spc.reset();
 
     SNES_PPU ppu;
+    DmaHandler dma;
 
-    Bus bus(cpu, apu, ppu); //TODO: c'est moche et inutile => Corrige ce code
+    Bus bus(cpu, apu, ppu, dma); //TODO: c'est moche et inutile => Corrige ce code
     cpu.attachBus(&bus);
     apu.attachBus(&bus);
 

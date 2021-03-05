@@ -2,6 +2,7 @@
 #include "CPU/W65816.h"
 #include "APU/SNES_APU.h"
 #include "PPU/SNES_PPU.h"
+#include "PPU/DmaHandler.h"
 #include "CartridgeHeader.h"
 
 #include <SFML/Graphics.hpp>
@@ -10,10 +11,12 @@
 #include <fstream>
 #include <limits>
 
-Bus::Bus(W65816 & c, SNES_APU &p_apu, SNES_PPU &p_ppu) : cpu(c), apu(p_apu),ppu(p_ppu), debugger(cpu)
+Bus::Bus(W65816 & c, SNES_APU &p_apu, SNES_PPU &p_ppu, DmaHandler &p_dma)
+    : cpu(c), apu(p_apu),ppu(p_ppu),dmaHandler(p_dma), debugger(cpu)
 {
     debugger.attachBus(this);
     ppu.attachBus(this);
+    dmaHandler.attachBus(this);
 }
 
 void Bus::read(uint32_t adr)
@@ -80,6 +83,10 @@ void Bus::memoryMap(MemoryOperation op, uint32_t full_adr, uint8_t *data)
                 (*data) &= 0x01; //TODO: Keep this register one bit (maybe this can cause problems when reading this adr)
                 doMemoryOperation(op,&WMADDH,data);
             }
+            else if((adr >= 0x4300 && adr <= 0x437F)||(adr >= 0x420B && adr <= 0x420C))
+            {
+                dmaHandler.memoryMap(op,full_adr,data);
+            }
         }
     }
 }
@@ -99,6 +106,11 @@ void Bus::write(uint32_t full_adr, uint8_t data)
     dmr = data;
     memoryMap(Write, full_adr, &dmr);
     //Writes in unmapped regions might indicate the presence of an unknown SRAM mapping on the cartridge
+}
+
+void Bus::privateWrite(uint32_t full_adr, uint8_t data)
+{
+    memoryMap(Write, full_adr, &data);
 }
 
 uint8_t Bus::DMR()
@@ -200,10 +212,13 @@ void Bus::run()
 
             if(cpu_clock == 0)
             {
-                cpu.tick();
                 cpu_clock = 6;
 
-                debugger.tick();
+                if(!dmaEnabled)
+                {
+                    cpu.tick();
+                    debugger.tick();
+                }
             }
             if(ppu_clock == 0)
             {
@@ -211,11 +226,11 @@ void Bus::run()
                 ppu_clock = 4; //TODO: handle long dots and stuff
             }
             apu.tick();
+            dmaHandler.tick();
         }
         //else
         {
             sf::Event event;
-            //uint32_t user_entry;
             while(app.pollEvent(event))
             {
                 if(event.type == sf::Event::Closed)
@@ -238,4 +253,9 @@ void Bus::run()
             }
         }
     }
+}
+
+void Bus::dmaEnable(bool enable)
+{
+    dmaEnabled = enable;
 }

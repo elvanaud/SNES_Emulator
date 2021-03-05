@@ -28,6 +28,15 @@ private:
     uint8_t oamHigh[OAM_HIGH_SIZE];
     uint8_t cgram[CGRAM_SIZE];
 
+    uint16_t hcounter = -1; //auto increment when starting
+    uint16_t vcounter = 0;
+
+    bool forcedBlank = false;
+    enum RenderState {HBLANK,VBLANK,RENDERING}; //Technically H-Blank still happens during VBlank
+    RenderState renderState = RENDERING;
+
+    void handleTimings();
+
     uint16_t translateAdr(uint16_t adr);
     void prefetchVRAM(uint16_t adr);
     void writeVHigh(uint16_t adr, uint8_t data);
