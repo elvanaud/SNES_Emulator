@@ -31,6 +31,7 @@ int main()
     //bus.copyInMemory(0xFFFC,{0x00,04});
 
     bus.loadCartridge("Games/The Legend of Zelda - A Link to the Past.smc");
+    //bus.loadCartridge("Games/Super Mario World (Patch FR).smc");
 
     bus.run();
 

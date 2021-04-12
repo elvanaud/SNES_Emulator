@@ -39,18 +39,56 @@ string csvGet(string src,string field)
 
 bool ConsoleDebugger::executeSystem()
 {
+    if(cpu.VDA() && cpu.VPA())
+    {
+        uint32_t pc = cpu.getPC()-1;
+        //cout<<"pc:"<<pc<<endl;
+        for(uint32_t bp : program_breakpoints)
+        {
+            if(pc == bp)
+            {
+                cout<<"Breakpoint hit!"<<endl;
+                stepMode = step = true;
+                debugPrint = true;
+                break;
+            }
+        }
+    }
+
     return !stepMode || (stepMode && step);
 }
 
 void ConsoleDebugger::processEvent(sf::Event & event)
 {
     uint32_t user_entry;
+    bool delete_bp = false;
+    int beforeLastElem = program_breakpoints.size()-1;
+    //if(beforeLastElem<0)beforeLastElem=0;
+
     if(event.type == sf::Event::KeyPressed)
     {
         switch(event.key.code)
         {
         case sf::Keyboard::B:
-            cout<<"breakpoints"<<endl;
+            cout<<"Breakpoint at address:"<<endl;
+            cin>>std::hex>>user_entry;
+
+            //program_breakpoints.push_back(user_entry);
+            //if(beforeLastElem<0)
+            for(int i = 0; i < beforeLastElem;++i)
+            {
+                if(program_breakpoints[i] == user_entry)
+                    delete_bp = true;
+                if(delete_bp)
+                {
+                    program_breakpoints[i] = program_breakpoints[i+1];
+                }
+            }
+            if(program_breakpoints[beforeLastElem]==user_entry || delete_bp)
+                program_breakpoints.pop_back();
+            else
+                program_breakpoints.push_back(user_entry);
+
             break;
         case sf::Keyboard::D:
             debugPrint = !debugPrint;

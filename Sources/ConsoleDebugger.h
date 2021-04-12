@@ -27,6 +27,7 @@ private:
     bool step = true;
 
     std::vector<uint32_t> watches;
+    std::vector<uint32_t> program_breakpoints;
 };
 
 #endif // CONSOLE_DEBUGGER_H
