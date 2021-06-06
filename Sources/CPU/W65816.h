@@ -36,19 +36,27 @@ public:
 
     //Getters - Registers
     uint16_t getPC();
+    uint32_t getFullPC();
     uint16_t getAcc();
-    uint8_t getIR();
-    uint8_t getP();
+    uint8_t  getIR();
+    uint8_t  getP();
     uint32_t getAddressBus();
     uint16_t getX();
     uint16_t getY();
+    uint16_t getS();
     uint16_t getD();
+    uint8_t  getDBR();
+
+    string getPString();
 
     //Getters - Internal
     unsigned int getTCycle();
     uint16_t getAdr();
     uint16_t getIDB();
     Instruction & getInst();
+
+    bool isBranchInstruction = false;   //used for debugging purposes (no effect in cpu emulation)
+    uint32_t branchAddress = 0;         // "
 
 private:
     //Private Internal State
@@ -169,8 +177,8 @@ private:
         uint8_t N() { return (val>>7)&1; }
         void setC(bool status) { val = (val & ~(1<<0)) | (uint8_t(status)<<0); }
         void setZ(bool status) { val = (val & ~(1<<1)) | (uint8_t(status)<<1); }
-        void setD(bool status) { val = (val & ~(1<<3)) | (uint8_t(status)<<3); }
         void setI(bool status) { val = (val & ~(1<<2)) | (uint8_t(status)<<2); }
+        void setD(bool status) { val = (val & ~(1<<3)) | (uint8_t(status)<<3); }
         void setV(bool status) { val = (val & ~(1<<6)) | (uint8_t(status)<<6); }
         void setN(bool status) { val = (val & ~(1<<7)) | (uint8_t(status)<<7); }
         //Depending on Mode
@@ -186,6 +194,24 @@ private:
         void update() {setM(M()); setX(X());}
         void setVal(uint8_t v) {val = v; update();}
         uint8_t getVal() {return val;}
+
+        string toString() 
+        {
+            string status = "nvmxdizc"; //16bit mode by default
+            for(int i = 0; i < 8; i++)
+            {
+                if(emulationMode)
+                {
+                    if(i == 5) status[7-i] = '1';
+                    else if(i == 4) status[7-i] = B() ? 'B' : 'b';
+                }
+                if(((val>>i)&1) && ~(((i==5)||(i==4))&&emulationMode))
+                {
+                    status[7-i] = toupper(status[7-i]);
+                }
+            }
+            return status;
+        }
 
         private: uint8_t val = 0x30;
     } p;
@@ -265,70 +291,70 @@ private:
         BLOCK_MOVE_N, BLOCK_MOVE_P
         };
 
-    AddressingMode Absolute                 = AddressingMode(AdrModeName::ABSOLUTE);
-    AddressingMode AbsoluteWrite            = AddressingMode(AdrModeName::ABSOLUTE_WRITE);
-    AddressingMode AbsoluteRMW              = AddressingMode(AdrModeName::ABSOLUTE_RMW);
-    AddressingMode AbsoluteJMP              = AddressingMode(AdrModeName::ABSOLUTE_JMP);
-    AddressingMode AbsoluteJSR              = AddressingMode(AdrModeName::ABSOLUTE_JSR);
-    AddressingMode AbsoluteLong             = AddressingMode(AdrModeName::ABSOLUTE_LONG);
-    AddressingMode AbsoluteLongWrite        = AddressingMode(AdrModeName::ABSOLUTE_LONG_WRITE);
-    AddressingMode AbsoluteLongJMP          = AddressingMode(AdrModeName::ABSOLUTE_LONG_JMP);
-    AddressingMode AbsoluteLongJSL          = AddressingMode(AdrModeName::ABSOLUTE_LONG_JSL);
-    AddressingMode AbsoluteXLong            = AddressingMode(AdrModeName::ABSOLUTE_LONG_X);
-    AddressingMode AbsoluteX                = AddressingMode(AdrModeName::ABSOLUTE_X);
-    AddressingMode AbsoluteXWrite           = AddressingMode(AdrModeName::ABSOLUTE_X_WRITE);
-    AddressingMode AbsoluteXLongWrite       = AddressingMode(AdrModeName::ABSOLUTE_X_LONG_WRITE);
-    AddressingMode AbsoluteXRMW             = AddressingMode(AdrModeName::ABSOLUTE_X_RMW);
-    AddressingMode AbsoluteY                = AddressingMode(AdrModeName::ABSOLUTE_Y);
-    AddressingMode AbsoluteYWrite           = AddressingMode(AdrModeName::ABSOLUTE_Y_WRITE);
-    AddressingMode AbsoluteXIndirectJMP     = AddressingMode(AdrModeName::ABSOLUTE_X_INDIRECT_JMP);
-    AddressingMode AbsoluteXIndirectJSR     = AddressingMode(AdrModeName::ABSOLUTE_X_INDIRECT_JSR);
-    AddressingMode AbsoluteIndirectJML      = AddressingMode(AdrModeName::ABSOLUTE_INDIRECT_JML);
-    AddressingMode AbsoluteIndirectJMP      = AddressingMode(AdrModeName::ABSOLUTE_INDIRECT_JMP);
-    AddressingMode Accumulator              = AddressingMode(AdrModeName::ACCUMULATOR);
-    AddressingMode Direct                   = AddressingMode(AdrModeName::DIRECT);
-    AddressingMode DirectWrite              = AddressingMode(AdrModeName::DIRECT_WRITE);
-    AddressingMode DirectRMW                = AddressingMode(AdrModeName::DIRECT_RMW);
-    AddressingMode DirectXIndirect          = AddressingMode(AdrModeName::DIRECT_X_INDIRECT);
-    AddressingMode DirectXIndirectWrite     = AddressingMode(AdrModeName::DIRECT_X_INDIRECT_WRITE);
-    AddressingMode DirectIndirect           = AddressingMode(AdrModeName::DIRECT_INDIRECT);
-    AddressingMode DirectIndirectWrite      = AddressingMode(AdrModeName::DIRECT_INDIRECT_WRITE);
-    AddressingMode DirectIndirectY          = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y);
-    AddressingMode DirectIndirectYWrite     = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y_WRITE);
-    AddressingMode DirectIndirectYLong      = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y);
-    AddressingMode DirectIndirectYLongWrite = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y_WRITE);
-    AddressingMode DirectIndirectLong       = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y);
-    AddressingMode DirectIndirectLongWrite  = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y_WRITE);
-    AddressingMode DirectX                  = AddressingMode(AdrModeName::DIRECT_X);
-    AddressingMode DirectXWrite             = AddressingMode(AdrModeName::DIRECT_X_WRITE);
-    AddressingMode DirectXRMW               = AddressingMode(AdrModeName::DIRECT_X_RMW);
-    AddressingMode DirectY                  = AddressingMode(AdrModeName::DIRECT_Y);
-    AddressingMode DirectYWrite             = AddressingMode(AdrModeName::DIRECT_Y_WRITE);
-    AddressingMode Immediate                = AddressingMode(AdrModeName::IMMEDIATE);
-    AddressingMode ImmediateSpecial         = AddressingMode(AdrModeName::IMMEDIATE_SPECIAL);
-    AddressingMode Implied                  = AddressingMode(AdrModeName::IMPLIED);
-    AddressingMode ImpliedSpecial           = AddressingMode(AdrModeName::IMPLIED_SPECIAL);
-    AddressingMode RelativeBranch           = AddressingMode(AdrModeName::RELATIVE_BRANCH);
-    AddressingMode RelativeBranchLong       = AddressingMode(AdrModeName::RELATIVE_BRANCH_LONG);
-    AddressingMode StackPop                 = AddressingMode(AdrModeName::STACK_POP);
-    AddressingMode StackPop8                = AddressingMode(AdrModeName::STACK_POP_8);
-    AddressingMode StackPop16               = AddressingMode(AdrModeName::STACK_POP_16);
-    AddressingMode StackPush                = AddressingMode(AdrModeName::STACK_PUSH);
-    AddressingMode StackPush8               = AddressingMode(AdrModeName::STACK_PUSH_8);
-    AddressingMode StackPush16              = AddressingMode(AdrModeName::STACK_PUSH_16);
-    AddressingMode StackPEA                 = AddressingMode(AdrModeName::STACK_PEA);
-    AddressingMode StackPEI                 = AddressingMode(AdrModeName::STACK_PEI);
-    AddressingMode StackPER                 = AddressingMode(AdrModeName::STACK_PER);
-    AddressingMode StackRTI                 = AddressingMode(AdrModeName::STACK_RTI);
-    AddressingMode StackRTS                 = AddressingMode(AdrModeName::STACK_RTS);
-    AddressingMode StackRTL                 = AddressingMode(AdrModeName::STACK_RTL);
-    AddressingMode StackRelative            = AddressingMode(AdrModeName::STACK_RELATIVE);
-    AddressingMode StackRelativeWrite       = AddressingMode(AdrModeName::STACK_RELATIVE_WRITE);
-    AddressingMode StackRelativeIndirectY   = AddressingMode(AdrModeName::STACK_RELATIVE_INDIRECT_Y);
-    AddressingMode StackRelativeIndirectYWrite=AddressingMode(AdrModeName::STACK_RELATIVE_INDIRECT_Y_WRITE);
-    AddressingMode StackInterupt            = AddressingMode(AdrModeName::STACK_INTERUPT);
-    AddressingMode BlockMoveN               = AddressingMode(AdrModeName::BLOCK_MOVE_N);
-    AddressingMode BlockMoveP               = AddressingMode(AdrModeName::BLOCK_MOVE_P);
+    AddressingMode Absolute                     = AddressingMode(AdrModeName::ABSOLUTE);
+    AddressingMode AbsoluteWrite                = AddressingMode(AdrModeName::ABSOLUTE_WRITE);
+    AddressingMode AbsoluteRMW                  = AddressingMode(AdrModeName::ABSOLUTE_RMW);
+    AddressingMode AbsoluteJMP                  = AddressingMode(AdrModeName::ABSOLUTE_JMP);
+    AddressingMode AbsoluteJSR                  = AddressingMode(AdrModeName::ABSOLUTE_JSR);
+    AddressingMode AbsoluteLong                 = AddressingMode(AdrModeName::ABSOLUTE_LONG);
+    AddressingMode AbsoluteLongWrite            = AddressingMode(AdrModeName::ABSOLUTE_LONG_WRITE);
+    AddressingMode AbsoluteLongJMP              = AddressingMode(AdrModeName::ABSOLUTE_LONG_JMP);
+    AddressingMode AbsoluteLongJSL              = AddressingMode(AdrModeName::ABSOLUTE_LONG_JSL);
+    AddressingMode AbsoluteXLong                = AddressingMode(AdrModeName::ABSOLUTE_LONG_X);
+    AddressingMode AbsoluteX                    = AddressingMode(AdrModeName::ABSOLUTE_X);
+    AddressingMode AbsoluteXWrite               = AddressingMode(AdrModeName::ABSOLUTE_X_WRITE);
+    AddressingMode AbsoluteXLongWrite           = AddressingMode(AdrModeName::ABSOLUTE_X_LONG_WRITE);
+    AddressingMode AbsoluteXRMW                 = AddressingMode(AdrModeName::ABSOLUTE_X_RMW);
+    AddressingMode AbsoluteY                    = AddressingMode(AdrModeName::ABSOLUTE_Y);
+    AddressingMode AbsoluteYWrite               = AddressingMode(AdrModeName::ABSOLUTE_Y_WRITE);
+    AddressingMode AbsoluteXIndirectJMP         = AddressingMode(AdrModeName::ABSOLUTE_X_INDIRECT_JMP);
+    AddressingMode AbsoluteXIndirectJSR         = AddressingMode(AdrModeName::ABSOLUTE_X_INDIRECT_JSR);
+    AddressingMode AbsoluteIndirectJML          = AddressingMode(AdrModeName::ABSOLUTE_INDIRECT_JML);
+    AddressingMode AbsoluteIndirectJMP          = AddressingMode(AdrModeName::ABSOLUTE_INDIRECT_JMP);
+    AddressingMode Accumulator                  = AddressingMode(AdrModeName::ACCUMULATOR);
+    AddressingMode Direct                       = AddressingMode(AdrModeName::DIRECT);
+    AddressingMode DirectWrite                  = AddressingMode(AdrModeName::DIRECT_WRITE);
+    AddressingMode DirectRMW                    = AddressingMode(AdrModeName::DIRECT_RMW);
+    AddressingMode DirectXIndirect              = AddressingMode(AdrModeName::DIRECT_X_INDIRECT);
+    AddressingMode DirectXIndirectWrite         = AddressingMode(AdrModeName::DIRECT_X_INDIRECT_WRITE);
+    AddressingMode DirectIndirect               = AddressingMode(AdrModeName::DIRECT_INDIRECT);
+    AddressingMode DirectIndirectWrite          = AddressingMode(AdrModeName::DIRECT_INDIRECT_WRITE);
+    AddressingMode DirectIndirectY              = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y);
+    AddressingMode DirectIndirectYWrite         = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y_WRITE);
+    AddressingMode DirectIndirectYLong          = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y);
+    AddressingMode DirectIndirectYLongWrite     = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y_WRITE);
+    AddressingMode DirectIndirectLong           = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y);
+    AddressingMode DirectIndirectLongWrite      = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y_WRITE);
+    AddressingMode DirectX                      = AddressingMode(AdrModeName::DIRECT_X);
+    AddressingMode DirectXWrite                 = AddressingMode(AdrModeName::DIRECT_X_WRITE);
+    AddressingMode DirectXRMW                   = AddressingMode(AdrModeName::DIRECT_X_RMW);
+    AddressingMode DirectY                      = AddressingMode(AdrModeName::DIRECT_Y);
+    AddressingMode DirectYWrite                 = AddressingMode(AdrModeName::DIRECT_Y_WRITE);
+    AddressingMode Immediate                    = AddressingMode(AdrModeName::IMMEDIATE);
+    AddressingMode ImmediateSpecial             = AddressingMode(AdrModeName::IMMEDIATE_SPECIAL);
+    AddressingMode Implied                      = AddressingMode(AdrModeName::IMPLIED);
+    AddressingMode ImpliedSpecial               = AddressingMode(AdrModeName::IMPLIED_SPECIAL);
+    AddressingMode RelativeBranch               = AddressingMode(AdrModeName::RELATIVE_BRANCH);
+    AddressingMode RelativeBranchLong           = AddressingMode(AdrModeName::RELATIVE_BRANCH_LONG);
+    AddressingMode StackPop                     = AddressingMode(AdrModeName::STACK_POP);
+    AddressingMode StackPop8                    = AddressingMode(AdrModeName::STACK_POP_8);
+    AddressingMode StackPop16                   = AddressingMode(AdrModeName::STACK_POP_16);
+    AddressingMode StackPush                    = AddressingMode(AdrModeName::STACK_PUSH);
+    AddressingMode StackPush8                   = AddressingMode(AdrModeName::STACK_PUSH_8);
+    AddressingMode StackPush16                  = AddressingMode(AdrModeName::STACK_PUSH_16);
+    AddressingMode StackPEA                     = AddressingMode(AdrModeName::STACK_PEA);
+    AddressingMode StackPEI                     = AddressingMode(AdrModeName::STACK_PEI);
+    AddressingMode StackPER                     = AddressingMode(AdrModeName::STACK_PER);
+    AddressingMode StackRTI                     = AddressingMode(AdrModeName::STACK_RTI);
+    AddressingMode StackRTS                     = AddressingMode(AdrModeName::STACK_RTS);
+    AddressingMode StackRTL                     = AddressingMode(AdrModeName::STACK_RTL);
+    AddressingMode StackRelative                = AddressingMode(AdrModeName::STACK_RELATIVE);
+    AddressingMode StackRelativeWrite           = AddressingMode(AdrModeName::STACK_RELATIVE_WRITE);
+    AddressingMode StackRelativeIndirectY       = AddressingMode(AdrModeName::STACK_RELATIVE_INDIRECT_Y);
+    AddressingMode StackRelativeIndirectYWrite  = AddressingMode(AdrModeName::STACK_RELATIVE_INDIRECT_Y_WRITE);
+    AddressingMode StackInterupt                = AddressingMode(AdrModeName::STACK_INTERUPT);
+    AddressingMode BlockMoveN                   = AddressingMode(AdrModeName::BLOCK_MOVE_N);
+    AddressingMode BlockMoveP                   = AddressingMode(AdrModeName::BLOCK_MOVE_P);
 
 
     //Instructions

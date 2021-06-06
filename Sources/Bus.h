@@ -33,6 +33,9 @@ public:
     virtual void memoryMap(MemoryOperation op, uint32_t full_adr, uint8_t *data);
 
     void dmaEnable(bool enable);
+
+    uint32_t accessedAdr = 0;
+    bool isDataLoaded = false;
 private:
     W65816 &cpu;
     SNES_APU &apu;

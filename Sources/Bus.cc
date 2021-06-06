@@ -28,6 +28,12 @@ void Bus::read(uint32_t adr)
 
 void Bus::memoryMap(MemoryOperation op, uint32_t full_adr, uint8_t *data)
 {
+    if(cpu.VDA() && !cpu.VPA())
+    {
+        accessedAdr = full_adr;
+        isDataLoaded = true;
+    }
+
     uint8_t bank = (full_adr>>16)&0xFF;
     uint16_t adr = full_adr & 0xFFFF;
 
@@ -253,6 +259,8 @@ void Bus::run()
             }
         }
     }
+
+    debugger.saveTrace("../emul.log");
 }
 
 void Bus::dmaEnable(bool enable)

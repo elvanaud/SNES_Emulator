@@ -42,6 +42,11 @@ uint16_t W65816::getPC()
     return pc.val();
 }
 
+uint32_t W65816::getFullPC()
+{
+    return (uint32_t(pbr)<<16)|pc.val();
+}
+
 uint16_t W65816::getAcc()
 {
     return acc.val();
@@ -57,9 +62,24 @@ uint16_t W65816::getIDB()
     return idb.val();
 }
 
+uint16_t W65816::getS()
+{
+    return s.val();
+}
+
 uint16_t W65816::getD()
 {
     return d.val();
+}
+
+uint8_t W65816::getDBR()
+{
+    return dbr;
+}
+
+string W65816::getPString()
+{
+    return p.toString();
 }
 
 uint8_t W65816::getIR()
@@ -166,9 +186,10 @@ void W65816::RESET()
 {
     internalRST = false;
     adr.set(0xFFFC);
-    --pc; //TODO: Remove that ??
+    //--pc; //TODO: Remove that ??
 
     s.high = 0x01;
+    s.low = 0xFF; 
     d.set(0);
     x.set(0);
     y.set(0);

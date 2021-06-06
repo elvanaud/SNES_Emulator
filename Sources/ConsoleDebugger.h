@@ -21,6 +21,8 @@ public:
     bool tick();
     void processEvent(sf::Event & event);
     void attachBus(Bus* b);
+
+    void saveTrace(string path);
 private:
     W65816& cpu;
     Bus * bus;
@@ -31,6 +33,8 @@ private:
 
     std::vector<uint32_t> watches;
     std::vector<uint32_t> program_breakpoints;
+
+    string trace;
 };
 
 #endif // CONSOLE_DEBUGGER_H

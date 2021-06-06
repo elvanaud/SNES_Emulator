@@ -2,6 +2,9 @@
 
 #include "Bus.h"
 
+#include <iomanip>
+#include <sstream>
+
 ConsoleDebugger::ConsoleDebugger(W65816 & p_cpu) : cpu(p_cpu)
 {
 
@@ -120,11 +123,43 @@ bool ConsoleDebugger::tick()
         step = false;
         if(debugPrint)
         {
-            cout << "PC = " <<std::hex << cpu.getPC()-1 << "  ;  IR = " << (int)cpu.getIR() << "("<<cpu.getInst().getASM() << ")  ;  A = " << cpu.getAcc();
+            /*cout << "PC = " <<std::hex << cpu.getPC()-1 << "  ;  IR = " << (int)cpu.getIR() << "("<<cpu.getInst().getASM() << ")  ;  A = " << cpu.getAcc();
             cout << "  ;  Adr = " << cpu.getAdr() << "  ;  IDB = " << cpu.getIDB();
-            cout << " ; X = "<< cpu.getX() << " ; Y = " << cpu.getY() << " ; D = " << cpu.getD() << endl;
+            cout << " ; X = "<< cpu.getX() << " ; Y = " << cpu.getY() << " ; D = " << cpu.getD() << endl;*/
+            using std::setfill;
+            using std::setw;
+            using std::hex;
+            using std::stringstream;
 
-            uint8_t p = cpu.getP();
+            string instASM;
+            for(char c : cpu.getInst().getASM())
+                instASM+=tolower(c);
+
+            stringstream ss;
+
+            ss <<hex << setfill('0')<<setw(6)<<cpu.getFullPC()-1 <<" " << instASM;
+
+            /*if(bus->isDataLoaded)
+            {
+                cout << " ["<< setw(6)<<bus->accessedAdr<< "]";
+                bus->isDataLoaded = false;
+            }
+            else if(cpu.isBranchInstruction)
+            {
+                cout << " ["<< setw(6)<< cpu.branchAddress<< "]";
+                cpu.isBranchInstruction = false;
+            }
+            else */
+            ss << "         ";
+            ss << " A:" << setw(4) << cpu.getAcc();
+            ss << " X:"<< setw(4) << cpu.getX() << " Y:" <<setw(4)<< cpu.getY() << " S:"<< setw(4)<<cpu.getS()<<" D:" << setw(4)<<cpu.getD();
+            ss << " DB:" << int(cpu.getDBR()) << " " << cpu.getPString()<<endl;
+
+            string traceLine = ss.str();
+            cout << traceLine;
+            trace+=traceLine;
+
+            /*uint8_t p = cpu.getP();
             string status;
             if((p>>7)&1) status+="N";
             else status += "-"; //TODO: print flags in lower/upper case if set/unset
@@ -134,11 +169,20 @@ bool ConsoleDebugger::tick()
             else status += "-";
             if((p>>0)&1) status+="C";
             else status += "-";
-            cout << "Flags = " << status << " " << std::hex << int(p) << endl;
+            cout << "Flags = " << status << " " << std::hex << int(p) << endl;*/
+
             //std::getchar();
             for(uint32_t watch : watches)
                 cout << "Content of "<<std::hex<<watch<<" :"<<(int)bus->privateRead(watch)<<endl;
         }
     }
     return false;
+}
+
+void ConsoleDebugger::saveTrace(string path)
+{
+    std::ofstream of;
+    of.open(path);
+    of<<trace;
+    of.close();
 }

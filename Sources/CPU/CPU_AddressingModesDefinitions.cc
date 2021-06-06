@@ -353,7 +353,7 @@ void W65816::initializeAddressingModes()
 
     RelativeBranch.setStages({  {Stage(Stage::SIG_INST,dummyStage)}, //Special Case for branch instruction: the first stage is executed within the decode operation (in T1)
                                 {Stage(Stage::SIG_ALWAYS,dummyFetchLast),Stage(Stage::SIG_ALWAYS,halfAdd,&pc.low,&adr.low),Stage(Stage::SIG_NATIVE_MODE,fixCarry,&pc.high,&SIGN_EXTENDED_OP_HALF_ADD)}, //The following stages are those to be executed if the branch is taken
-                                {Stage(Stage::SIG_ALWAYS,dummyFetchLast),Stage(Stage::SIG_PC_CROSS_PAGE_IN_EMUL,fixCarry,&pc.high,&SIGN_EXTENDED_OP_HALF_ADD)}, //TODO: remove the sig_always on this line ?? (cycle accuracy of BNE (D0)
+                                {Stage(Stage::SIG_PC_CROSS_PAGE_IN_EMUL,dummyFetchLast),Stage(Stage::SIG_PC_CROSS_PAGE_IN_EMUL,fixCarry,&pc.high,&SIGN_EXTENDED_OP_HALF_ADD)}, //TODO: remove the sig_always on this line ?? (cycle accuracy of BNE (D0)
                                 {Stage(Stage::SIG_DUMMY_STAGE, dummyStage)}});
     RelativeBranch.setSignals({bind(incPC,this,1)});
     RelativeBranch.setPredecodeSignals({bind(branchInstruction,this)});
@@ -486,9 +486,9 @@ void W65816::initializeAddressingModes()
 
 
     StackInterupt.setStages({   {Stage(Stage::SIG_NATIVE_MODE,push,&pbr)},
-                                {Stage(Stage::SIG_INST,dummyStage),Stage(Stage::SIG_ALWAYS,push,&pc.high)},
+                                {Stage(Stage::SIG_ALWAYS,push,&pc.high)},
                                 {Stage(Stage::SIG_ALWAYS,push,&pc.low)},
-                                {Stage(Stage::SIG_ALWAYS,pushP),Stage(Stage::SIG_ALWAYS,enableInterupts,false)},
+                                {Stage(Stage::SIG_ALWAYS,pushP),Stage(Stage::SIG_ALWAYS,enableInterupts,false),Stage(Stage::SIG_INST,dummyStage)},//TODO: moved the instruction stage here (might cause problems ??)
                                 {Stage(Stage::SIG_ALWAYS,fetchIncLong,&ZERO,&adr,&pc.low),Stage(Stage::SIG_ALWAYS,moveReg8,&ZERO,&pbr)}, //TODO: Vector Pull signal here(and next line)
                                 {Stage(Stage::SIG_ALWAYS,fetchLong,&ZERO,&adr,&pc.high)},
                                 {Stage(Stage::SIG_DUMMY_STAGE,dummyStage)}});

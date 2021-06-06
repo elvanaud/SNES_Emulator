@@ -7,4 +7,5 @@ Games/
 *.layout
 build/
 emuldebug/
-
+.vscode/
+*.log
