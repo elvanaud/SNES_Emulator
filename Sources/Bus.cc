@@ -6,12 +6,16 @@
 #include <cstdio>
 #include <iostream>
 #include <fstream>
+#include <limits>
+#include <sstream>
 using std::cout;
+using std::cin;
 using std::endl;
+using std::stringstream;
 
 Bus::Bus(W65816 & c) : cpu(c), debugger(cpu)
 {
-    ram[0xFF]  = 0x38; //SEC
+    /*ram[0xFF]  = 0x38; //SEC
     ram[0x100] = 0x69; //ADC
     ram[0x101] = 19;
     ram[0x102] = 0x69; //ADC
@@ -25,19 +29,76 @@ Bus::Bus(W65816 & c) : cpu(c), debugger(cpu)
     ram[0x10A] = 0xC9; //CMP
     ram[0x10B] = 0x0A;
     ram[0x10C] = 0xA9; //LDA #42
-    ram[0x10D] = 42;
+    ram[0x10D] = 42;*/
 }
 
 void Bus::read(uint32_t adr)
 {
     if (!cpu.VDA() && !cpu.VPA()) return;
 
-    dmr = ram[adr]; //TODO: Might use privateRead in the future
+    dmr = privateRead(adr);
 }
 
 uint8_t Bus::privateRead(uint32_t adr)
 {
-    return ram[adr];
+    uint8_t bank = (adr>>16)&8;
+    adr &= 0xFFFF;
+
+    if(bank == 0x7E) return ram1[adr];
+    if(bank == 0x7F) return ram2[adr];
+    if(bank <= 0x3F)
+    {
+        if(adr < 0x8000)
+        {
+            //ram mirror and system area + expansion
+        }
+        else
+        {
+            //if bank == 0: header + vectors
+            //WS1 LoROM
+            adr -= 0x8000;
+            if(lorom[bank] != nullptr)
+                return lorom[bank][adr]; //TODO: check memType lo/hi rom
+        }
+    }
+    if(bank >= 0x40 && bank <= 0x7D)
+    {
+        //WS1 HiROM
+        if(memType == LoROM)
+        {
+            if(adr < 0x8000)
+            {
+                if(lorom[bank] != nullptr) return lorom[bank][adr];
+            }
+        }
+    }
+    if(bank >= 0x80 && bank < 0xC0)
+    {
+        if(adr < 0x8000)
+        {
+            //ram mirror and system area + expansion
+        }
+        else
+        {
+            //WS2 LoROM
+            bank -= 0x80;
+            adr -= 0x8000;
+            if(lorom[bank] != nullptr) return lorom[bank][adr];
+        }
+    }
+    if(bank >= 0xC0)
+    {
+        //WS2 HiROM
+        if(memType == LoROM)
+        {
+            if(adr < 0x8000)
+            {
+                if(lorom[bank] != nullptr) return lorom[bank][adr];
+            }
+        }
+    }
+
+    return ram1[adr];
 }
 
 void Bus::write(uint32_t adr, uint8_t data)
@@ -45,7 +106,50 @@ void Bus::write(uint32_t adr, uint8_t data)
     if (!cpu.VDA() && !cpu.VPA()) return;
 
     dmr = data;
-    ram[adr] = dmr;
+    uint8_t bank = (adr>>16)&8;
+    adr &= 0xFFFF;
+
+    if(bank == 0x7E) ram1[adr] = dmr;
+    if(bank == 0x7F) ram2[adr] = dmr;
+    if(bank <= 0x3F)
+    {
+        if(adr < 0x8000)
+        {
+            //ram mirror and system area + expansion
+        }
+        else
+        {
+            //if bank == 0: header + vectors
+            //WS1 LoROM
+            adr -= 0x8000;
+            if(lorom[bank] != nullptr)
+            {
+                //lorom[bank][adr] = dmr; //rom
+            }
+        }
+    }
+    if(bank >= 0x40 && bank <= 0x7D)
+    {
+        //WS1 HiROM
+    }
+    if(bank >= 0x80 && bank < 0xC0)
+    {
+        if(adr < 0x8000)
+        {
+            //ram mirror and system area + expansion
+        }
+        else
+        {
+            //WS2 LoROM
+            bank -= 0x80;
+            adr -= 0x8000;
+            if(lorom[bank] != nullptr) ;//lorom[bank][adr] = dmr; //rom
+        }
+    }
+    if(bank >= 0xC0)
+    {
+        //WS2 HiROM
+    }
 }
 
 uint8_t Bus::DMR()
@@ -57,7 +161,7 @@ void Bus::copyInMemory(uint32_t adr, vector<uint8_t> const & buffer)
 {
     for(auto value : buffer)
     {
-        ram[adr] = value;
+        write(adr,value);
         ++adr;
     }
 }
@@ -70,7 +174,45 @@ void Bus::loadCartridge(std::string const & path)
          exit(-1);
      }
 
-    input.read((char*)ram,0x10000);
+    input.ignore(std::numeric_limits<std::streamsize>::max());
+    std::streamsize romLength = input.gcount();
+    input.clear();   //  Since ignore will have set eof.
+    input.seekg(0, std::ios_base::beg);
+
+    cout << "ROM Length: "<< romLength << endl;
+    if((romLength & 0x3FF) == 0x200) //Useless header present
+    {
+        cout << "ignoring useless header\n";
+        romLength -= 0x200;
+        input.ignore(0x200);
+    }
+
+    if(romLength <= 64*32*1024) //LoROM
+    {
+        cout << "LoROM\n";
+        memType = LoROM;
+
+        bool allocateMem = true;
+        for(int i = 0; i < 64; ++i)
+        {
+            lorom[i] = nullptr;
+            if(allocateMem)
+            {
+                lorom[i] = new uint8_t[0x8000];
+                input.read((char*)lorom[i],0x8000);
+                if(!input) allocateMem = false;
+            }
+
+        }
+    }
+    else //HiROM
+    {
+        cout << "HiROM\n";
+        memType = HiROM;
+    }
+
+
+    //input.read((char*)ram1,0x10000);
 }
 
 void Bus::run()
@@ -79,9 +221,12 @@ void Bus::run()
     unsigned int clock = 6;
     unsigned int global_clock = 0;
 
-    bool debugPrint = false;
-    bool stepMode = false;
+    bool debugPrint = true;
+    bool stepMode = true;
     bool step = false;
+
+    bool memWatchEnabled = false;
+    vector<uint32_t> memWatch;
 
     uint16_t oldPC = cpu.getPC();
     while(app.isOpen())
@@ -133,6 +278,15 @@ void Bus::run()
                             if((p>>0)&1) status+="C"; else status += "-";
                             cout << "Flags = " << status << endl;
 
+                            if(memWatchEnabled)
+                            {
+                                cout << "Memory Watch\n";
+                                for(uint32_t mem : memWatch)
+                                {
+                                    cout << mem << ": " << privateRead(mem) << endl;
+                                }
+                            }
+
                             if(cpu.getPC() == oldPC)
                             {
                                 cout << "big pb or test passed (lol)";
@@ -178,6 +332,7 @@ void Bus::run()
                 {
                     switch(event.key.code)
                     {
+                    default: break;
                     case sf::Keyboard::B:
                         cout<<"cnskdcnsckj";
                         break;
@@ -187,8 +342,27 @@ void Bus::run()
                     case sf::Keyboard::S:
                         stepMode = true;
                         step = !step;
-                    default:
-                        ;
+                        break;
+                    case sf::Keyboard::C:
+                        stepMode = false;
+                        break;
+                    case sf::Keyboard::V:
+                        cout << "Enter debug command: ";
+                        string user_entry;
+                        getline(cin,user_entry);
+                        vector<string> res = split(user_entry, ' ');
+                        cin.ignore();
+                        if(res[0] == "watch")
+                        {
+                            memWatchEnabled = true;
+                            stringstream ss;
+                            ss << std::hex << res[1];
+                            uint32_t adr;
+                            ss >> adr;
+                            memWatch.push_back(adr);
+                        }
+                        break;
+
                     }
                 }
             }

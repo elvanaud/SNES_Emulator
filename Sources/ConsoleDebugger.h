@@ -4,6 +4,9 @@
 #include "CPU/W65816.h"
 #include "CPU/CPU_Debugger.h"
 
+vector<string> split(const string& s, char delimiter);
+string csvGet(string src,string field);
+
 class ConsoleDebugger
 {
 public:

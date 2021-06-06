@@ -9,7 +9,7 @@ using std::vector;
 
 class W65816;
 
-const unsigned int RAM_QUANTITY = 0x1'00'00; //TODO
+const unsigned int RAM_QUANTITY = 0x1'00'00;
 
 class Bus
 {
@@ -29,8 +29,15 @@ private:
     W65816 &cpu;
     ConsoleDebugger debugger;
 
+    enum MemType {LoROM, HiROM};
+    MemType memType;
+
     uint8_t dmr = 0;
-    uint8_t ram[RAM_QUANTITY];
+    uint8_t ram1[RAM_QUANTITY];
+    uint8_t ram2[RAM_QUANTITY];
+
+    uint8_t* lorom[64]; //8000
+    uint8_t* hirom[64];//62 or 64 banks on waitstate //1'00'00
 };
 
 #endif //Bus_H
