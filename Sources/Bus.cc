@@ -1,35 +1,22 @@
 #include "Bus.h"
 #include "CPU/W65816.h"
+#include "APU/SNES_APU.h"
+#include "PPU/SNES_PPU.h"
+#include "PPU/DmaHandler.h"
+#include "CartridgeHeader.h"
 
 #include <SFML/Graphics.hpp>
 
 #include <cstdio>
-#include <iostream>
 #include <fstream>
 #include <limits>
-#include <sstream>
-using std::cout;
-using std::cin;
-using std::endl;
-using std::stringstream;
 
-Bus::Bus(W65816 & c) : cpu(c), debugger(cpu)
+Bus::Bus(W65816 & c, SNES_APU &p_apu, SNES_PPU &p_ppu, DmaHandler &p_dma)
+    : cpu(c), apu(p_apu),ppu(p_ppu),dmaHandler(p_dma), debugger(cpu)
 {
-    /*ram[0xFF]  = 0x38; //SEC
-    ram[0x100] = 0x69; //ADC
-    ram[0x101] = 19;
-    ram[0x102] = 0x69; //ADC
-    ram[0x103] = 55;
-    ram[0x104] = 0x29; //AND
-    ram[0x105] = 0x3F;
-    ram[0x106] = 0x89; //BIT
-    ram[0x107] = 0x00;
-    ram[0x108] = 0x89; //BIT
-    ram[0x109] = 0x02;
-    ram[0x10A] = 0xC9; //CMP
-    ram[0x10B] = 0x0A;
-    ram[0x10C] = 0xA9; //LDA #42
-    ram[0x10D] = 42;*/
+    debugger.attachBus(this);
+    ppu.attachBus(this);
+    dmaHandler.attachBus(this);
 }
 
 void Bus::read(uint32_t adr)
@@ -39,117 +26,91 @@ void Bus::read(uint32_t adr)
     dmr = privateRead(adr);
 }
 
-uint8_t Bus::privateRead(uint32_t adr)
+void Bus::memoryMap(MemoryOperation op, uint32_t full_adr, uint8_t *data)
 {
-    uint8_t bank = (adr>>16)&8;
-    adr &= 0xFFFF;
+    uint8_t bank = (full_adr>>16)&0xFF;
+    uint16_t adr = full_adr & 0xFFFF;
 
-    if(bank == 0x7E) return ram1[adr];
-    if(bank == 0x7F) return ram2[adr];
-    if(bank <= 0x3F)
+    if(bank == 0x7E || bank == 0x7F) //RAM Access
     {
-        if(adr < 0x8000)
-        {
-            //ram mirror and system area + expansion
-        }
-        else
-        {
-            //if bank == 0: header + vectors
-            //WS1 LoROM
-            adr -= 0x8000;
-            if(lorom[bank] != nullptr)
-                return lorom[bank][adr]; //TODO: check memType lo/hi rom
-        }
+        doMemoryOperation(op, &ram[bank-0x7E][adr], data);
+        return; //Useless...
     }
-    if(bank >= 0x40 && bank <= 0x7D)
+    else if((bank >= 0x40 && bank <= 0x7D)||(bank >= 0xC0 && bank <= 0xFF)) //HiROM banks
     {
-        //WS1 HiROM
-        if(memType == LoROM)
+        cartridge.memoryMap(op,full_adr,data);
+    }
+    else if((bank >= 0x00 && bank <= 0x3F)||(bank >= 0x80 && bank <= 0xBF))
+    {
+        if(adr >= 0x6000) //LoROM bank and expansion region
         {
-            if(adr < 0x8000)
+            cartridge.memoryMap(op,full_adr,data);
+        }
+        else //System area
+        {
+            if(adr < 0x2000) //First 8kB of RAM Mirror
             {
-                if(lorom[bank] != nullptr) return lorom[bank][adr];
+                doMemoryOperation(op, &ram[0][adr], data);
+            }
+            else if(adr >= 0x2100 && adr <= 0x213F)
+            {
+                ppu.memoryMap(op,full_adr,data);
+            }
+            else if(adr >= 0x2140 && adr <= 0x217F)
+            {
+                apu.mainBusIO(op,full_adr,data);
+            }
+            else if(adr == 0x2180)
+            {
+                doMemoryOperation(op,&ram[WMADDH][(uint16_t(WMADDM)<<8)|WMADDL],data);
+                //Increment the address:
+                uint32_t address = (uint32_t(WMADDH)<<16)|(uint32_t(WMADDM)<<8)|WMADDL;
+                ++address;
+                WMADDL = address;
+                WMADDM = (address>>8)&0xFF;
+                WMADDH = (address>>16)&0x01; //Clip to one bit
+            }
+            else if(adr == 0x2181)
+            {
+                doMemoryOperation(op,&WMADDL,data); //TODO: limit this operation in writing only (same for the following addresses)
+            }
+            else if(adr == 0x2182)
+            {
+                doMemoryOperation(op,&WMADDM,data);
+            }
+            else if(adr == 0x2183)
+            {
+                (*data) &= 0x01; //TODO: Keep this register one bit (maybe this can cause problems when reading this adr)
+                doMemoryOperation(op,&WMADDH,data);
+            }
+            else if((adr >= 0x4300 && adr <= 0x437F)||(adr >= 0x420B && adr <= 0x420C))
+            {
+                dmaHandler.memoryMap(op,full_adr,data);
             }
         }
     }
-    if(bank >= 0x80 && bank < 0xC0)
-    {
-        if(adr < 0x8000)
-        {
-            //ram mirror and system area + expansion
-        }
-        else
-        {
-            //WS2 LoROM
-            bank -= 0x80;
-            adr -= 0x8000;
-            if(lorom[bank] != nullptr) return lorom[bank][adr];
-        }
-    }
-    if(bank >= 0xC0)
-    {
-        //WS2 HiROM
-        if(memType == LoROM)
-        {
-            if(adr < 0x8000)
-            {
-                if(lorom[bank] != nullptr) return lorom[bank][adr];
-            }
-        }
-    }
-
-    return ram1[adr];
 }
 
-void Bus::write(uint32_t adr, uint8_t data)
+uint8_t Bus::privateRead(uint32_t full_adr)
+{
+    uint8_t data = 0;
+    memoryMap(Read, full_adr, &data); //TODO: find a way to differentiate this with regular read so that read trigger IO ports don't react to private reads
+
+    return data;
+}
+
+void Bus::write(uint32_t full_adr, uint8_t data)
 {
     if (!cpu.VDA() && !cpu.VPA()) return;
 
     dmr = data;
-    uint8_t bank = (adr>>16)&8;
-    adr &= 0xFFFF;
+    memoryMap(Write, full_adr, &dmr);
+    //Writes in unmapped regions might indicate the presence of an unknown SRAM mapping on the cartridge
+}
 
-    if(bank == 0x7E) ram1[adr] = dmr;
-    if(bank == 0x7F) ram2[adr] = dmr;
-    if(bank <= 0x3F)
-    {
-        if(adr < 0x8000)
-        {
-            //ram mirror and system area + expansion
-        }
-        else
-        {
-            //if bank == 0: header + vectors
-            //WS1 LoROM
-            adr -= 0x8000;
-            if(lorom[bank] != nullptr)
-            {
-                //lorom[bank][adr] = dmr; //rom
-            }
-        }
-    }
-    if(bank >= 0x40 && bank <= 0x7D)
-    {
-        //WS1 HiROM
-    }
-    if(bank >= 0x80 && bank < 0xC0)
-    {
-        if(adr < 0x8000)
-        {
-            //ram mirror and system area + expansion
-        }
-        else
-        {
-            //WS2 LoROM
-            bank -= 0x80;
-            adr -= 0x8000;
-            if(lorom[bank] != nullptr) ;//lorom[bank][adr] = dmr; //rom
-        }
-    }
-    if(bank >= 0xC0)
-    {
-        //WS2 HiROM
-    }
+void Bus::privateWrite(uint32_t full_adr, uint8_t data)
+{
+    memoryMap(Write, full_adr, &data);
 }
 
 uint8_t Bus::DMR()
@@ -161,7 +122,7 @@ void Bus::copyInMemory(uint32_t adr, vector<uint8_t> const & buffer)
 {
     for(auto value : buffer)
     {
-        write(adr,value);
+        ram[0][adr] = value; //TODO: adapt that in the future
         ++adr;
     }
 }
@@ -169,157 +130,104 @@ void Bus::copyInMemory(uint32_t adr, vector<uint8_t> const & buffer)
 void Bus::loadCartridge(std::string const & path)
 {
     std::ifstream input(path, std::ios::binary);
-    if(!input){
-         std::cout << "ERREUR: Fichier ROM introuvable\n";
-         exit(-1);
-     }
-
-    input.ignore(std::numeric_limits<std::streamsize>::max());
-    std::streamsize romLength = input.gcount();
-    input.clear();   //  Since ignore will have set eof.
-    input.seekg(0, std::ios_base::beg);
-
-    cout << "ROM Length: "<< romLength << endl;
-    if((romLength & 0x3FF) == 0x200) //Useless header present
+    if(!input)
     {
-        cout << "ignoring useless header\n";
-        romLength -= 0x200;
-        input.ignore(0x200);
+        std::cout << "ERREUR: Fichier ROM introuvable\n";
+        exit(-1);
     }
 
-    if(romLength <= 64*32*1024) //LoROM
+    //Compute size of ROM file:
+    input.ignore( std::numeric_limits<std::streamsize>::max() );
+    std::streamsize cartridgeSize = input.gcount();
+    input.clear();   //  Since ignore will have set eof.
+
+    int extraHeaderSize = cartridgeSize & 0x3FF;
+    if(extraHeaderSize != 0)
     {
-        cout << "LoROM\n";
-        memType = LoROM;
+        cout << "Extra header present\n";
+        if(extraHeaderSize != 0x200)
+            cout << "Ill formed header; size="<<extraHeaderSize<<endl;
+        cout << "Skipping extra header..."<<endl;
+        cartridgeSize -= extraHeaderSize;
+    }
+    input.seekg(extraHeaderSize, std::ios_base::beg);
 
-        bool allocateMem = true;
-        for(int i = 0; i < 64; ++i)
+    uint8_t firstBank[BANK_SIZE];
+
+    input.read((char*)firstBank,BANK_SIZE);
+
+    input.seekg(extraHeaderSize, std::ios_base::beg); //Reset to beginning of file
+
+    CartridgeHeader header(firstBank,0x007F00);
+    cout << "Header loaded\n";
+    //TODO: maybe flatten those ifs and add a counter of how many good conditions were obtained
+    //We compute that score for each supported mappings/chipset
+    //We select the highest score
+    //This would probably be complicated for nothing...
+    if(header.valid) //Maybe remove that condition to run homebrew games
+    {
+        cout << "Coherent checksum\n";
+        if(header.romSize == cartridgeSize)
         {
-            lorom[i] = nullptr;
-            if(allocateMem)
+            cout << "Expected rom size and Actual Rom Size match." <<endl;
+            if(header.mapMode == CartridgeHeader::LoROM)
             {
-                lorom[i] = new uint8_t[0x8000];
-                input.read((char*)lorom[i],0x8000);
-                if(!input) allocateMem = false;
-            }
+                cout << "Valid LoROM Header" << endl;
 
+            }
+            else
+            {
+                cout << "Invalid LoROM Header - Expected LoRom but found: ";
+                cout << header.mapMode << " from SpeedMapMode: "<<int(header.speedMapMode)<<endl;
+            }
+        }
+        else
+        {
+            cout << "Rom size doesn't match.\nActual: "<< cartridgeSize <<" (Extra header removed)"<< endl;
+            cout << "Expected: " << header.romSize << endl << "Difference: " << int(header.romSize-cartridgeSize)<<endl;
         }
     }
-    else //HiROM
-    {
-        cout << "HiROM\n";
-        memType = HiROM;
-    }
+    cout << header.title<<endl;
+    cout << "This game uses " << header.ramSize << " bytes of RAM ";
+    if(header.battery) cout << "(with battery)";
+    cout << endl;
 
-
-    //input.read((char*)ram1,0x10000);
+    cartridge.load(input, header);
 }
 
 void Bus::run()
 {
-    sf::RenderWindow app(sf::VideoMode(300,300,32),"SNES Emulator");
-    unsigned int clock = 6;
+    sf::RenderWindow app(sf::VideoMode(400,400,32),"SNES Emulator");
+    ppu.setRenderWindow(&app);
+    unsigned int cpu_clock = 6;
+    unsigned int ppu_clock = 4;
     unsigned int global_clock = 0;
 
-    bool debugPrint = true;
-    bool stepMode = true;
-    bool step = false;
-
-    bool memWatchEnabled = false;
-    vector<uint32_t> memWatch;
-
-    uint16_t oldPC = cpu.getPC();
     while(app.isOpen())
     {
-        if(!stepMode || (stepMode && step))
+        if(debugger.executeSystem())
         {
-            --clock;
+            --cpu_clock;
+            --ppu_clock;
             ++global_clock;
-            /*if(debugger.isExecutionBlocked())
-            {
-                cout << "CPU Blocked" << endl;
-                getchar();
-                debugger.continueExec();
-            }*/
-            //cout << "TCycle = " << cpu.getTCycle() << endl;
-            if(clock == 0)
-            {
-                cpu.tick();
-                clock = 6;
 
-                //debugger.tick();
+            if(cpu_clock == 0)
+            {
+                cpu_clock = 6;
 
-                //cout << "PC = " <<std::hex << cpu.getPC() << "  ;  IR = " << (int)cpu.getIR() << "("<<cpu.getInst().getASM() << ")  ;  Acc = " << cpu.getAcc() << "  ;  Adr = " << cpu.getAdr();
-                //cout << "  ;  IDB = " << cpu.getIDB() <<endl;
-                /*uint8_t p = cpu.getP();
-                string status;
-                if((p>>7)&1) status+="N"; else status += "-";
-                if((p>>6)&1) status+="V"; else status += "-";
-                if((p>>1)&1) status+="Z"; else status += "-";
-                if((p>>0)&1) status+="C"; else status += "-";*/
-                //cout << "Flags = " << status << endl;
-                //cout << "VDA = " << cpu.VDA() << "  ;  VPA = " << cpu.VPA() << endl;
-                if(cpu.VDA() && cpu.VPA()) //Sync = Opcode Fetch
+                if(!dmaEnabled)
                 {
-
-                    //if(!stepMode || (stepMode && step))
-                    {
-                        step = false;
-                        if(debugPrint)
-                        {
-                            cout << "PC = " <<std::hex << cpu.getPC() << "  ;  IR = " << (int)cpu.getIR() << "("<<cpu.getInst().getASM() << ")  ;  Acc = " << cpu.getAcc() << "  ;  Adr = " << cpu.getAdr();
-                            cout << "  ;  IDB = " << cpu.getIDB() << " ; X = "<< cpu.getX() << " ; Y = " << cpu.getY() << endl;
-
-                            uint8_t p = cpu.getP();
-                            string status;
-                            if((p>>7)&1) status+="N"; else status += "-";
-                            if((p>>6)&1) status+="V"; else status += "-";
-                            if((p>>1)&1) status+="Z"; else status += "-";
-                            if((p>>0)&1) status+="C"; else status += "-";
-                            cout << "Flags = " << status << endl;
-
-                            if(memWatchEnabled)
-                            {
-                                cout << "Memory Watch\n";
-                                for(uint32_t mem : memWatch)
-                                {
-                                    cout << mem << ": " << privateRead(mem) << endl;
-                                }
-                            }
-
-                            if(cpu.getPC() == oldPC)
-                            {
-                                cout << "big pb or test passed (lol)";
-                            }
-                            oldPC = cpu.getPC();
-                            //cout << std::hex << cpu.getPC() << endl;
-                            //cout << std::hex << cpu.getPC() << "("<<cpu.getInst().getASM() << ")"<<endl;
-                            if(oldPC == 0x0449)
-                            {
-                                cout << "Y="<<std::hex <<cpu.getY()//<<//endl;
-                                     << " " << cpu.getInst().getASM() << endl;
-                            }
-                            //std::getchar();
-                        }
-
-                    }
+                    cpu.tick();
+                    debugger.tick();
                 }
             }
-
-
-            /*if(global_clock >= 1364*262) //Roughly one frame
+            if(ppu_clock == 0)
             {
-                global_clock = 0;
-                sf::Event event;
-                while(app.pollEvent(event))
-                {
-                    if(event.type == sf::Event::Closed) app.close();
-                }
-
-                app.clear(sf::Color::Red);
-                app.display();
-            }*/
-
+                ppu.tick();
+                ppu_clock = 4; //TODO: handle long dots and stuff
+            }
+            apu.tick();
+            dmaHandler.tick();
         }
         //else
         {
@@ -334,38 +242,20 @@ void Bus::run()
                     {
                     default: break;
                     case sf::Keyboard::B:
-                        cout<<"cnskdcnsckj";
-                        break;
                     case sf::Keyboard::D:
-                        debugPrint = !debugPrint;
-                        break;
                     case sf::Keyboard::S:
-                        stepMode = true;
-                        step = !step;
-                        break;
                     case sf::Keyboard::C:
-                        stepMode = false;
+                    case sf::Keyboard::W:
+                        debugger.processEvent(event);
                         break;
-                    case sf::Keyboard::V:
-                        cout << "Enter debug command: ";
-                        string user_entry;
-                        getline(cin,user_entry);
-                        vector<string> res = split(user_entry, ' ');
-                        cin.ignore();
-                        if(res[0] == "watch")
-                        {
-                            memWatchEnabled = true;
-                            stringstream ss;
-                            ss << std::hex << res[1];
-                            uint32_t adr;
-                            ss >> adr;
-                            memWatch.push_back(adr);
-                        }
-                        break;
-
                     }
                 }
             }
         }
     }
+}
+
+void Bus::dmaEnable(bool enable)
+{
+    dmaEnabled = enable;
 }

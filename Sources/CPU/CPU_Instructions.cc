@@ -446,6 +446,7 @@ void W65816::SEP()
 void W65816::STA()
 {
     setReg(idb, acc.val());
+    //cout<<"[STA]idb="<<std::hex<<int(idb.val())<<" adr="<<int(adr.val())<<endl;
 }
 
 void W65816::STP()

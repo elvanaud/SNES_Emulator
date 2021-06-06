@@ -44,7 +44,7 @@ void W65816::decode()
     if(thisIsABranch)
     {
         thisIsABranch = false;
-        instructionStages[0][0].get()(this); //no check whatoever, ignoring any other substage in the T1 (T2) stage
+        instructionStages[0][0].get()(this); //no check whatsoever, ignoring any other substage in the T1 (T2) stage
         if(branchTaken)
         {
             branchTaken = false;
@@ -164,6 +164,7 @@ void W65816::write(Register16 *adr, uint8_t * data)
     handleValidAddressPINS(DataFetch);
     generateAddress(adr->val());
     bus->write(addressBusBuffer, *data);
+    //cout << "[CPU_WRITE] adrBuffer="<<std::hex<<addressBusBuffer<<" data="<<int(*data)<<endl;
 }
 
 void W65816::writeInc(Register16 * adr, uint8_t * data)
@@ -238,12 +239,18 @@ void W65816::halfAdd(uint8_t * dst, uint8_t * op)
     uint16_t r = uint16_t(*dst) + *op;
     internalCarryBuffer = r>>8;
     *dst = r;
+
+    SIGN_EXTENDED_OP_HALF_ADD = 0;
+    if(((*op)>>7)&1)
+        SIGN_EXTENDED_OP_HALF_ADD = 0xFF;
 }
 
 void W65816::fixCarry(uint8_t * dst, uint8_t * op)
 {
     *dst = *dst + *op + internalCarryBuffer;
     internalCarryBuffer = 0;
+
+    SIGN_EXTENDED_OP_HALF_ADD = 0;
 }
 
 void W65816::fullAdd(Register16 * dst, Register16 * op)

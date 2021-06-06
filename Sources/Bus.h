@@ -1,43 +1,57 @@
 #ifndef Bus_H
 #define Bus_H
 
-#include <cstdint>
 #include <vector>
 using std::vector;
 
+#include "Common.h"
+
 #include "ConsoleDebugger.h"
+#include "Cartridge.h"
 
 class W65816;
+class SNES_APU;
+class SNES_PPU;
+class DmaHandler;
 
-const unsigned int RAM_QUANTITY = 0x1'00'00;
-
-class Bus
+class Bus : MemoryInterface
 {
 public:
-    Bus(W65816 &c);
+    Bus(W65816 &c, SNES_APU &p_apu, SNES_PPU &p_ppu, DmaHandler &p_dma);
 
     void run();
 
     void read(uint32_t adr);
     uint8_t privateRead(uint32_t adr);
+    void privateWrite(uint32_t adr, uint8_t data);
     void write(uint32_t adr, uint8_t data);
     uint8_t DMR();
 
     void copyInMemory(uint32_t adr, vector<uint8_t> const & buffer);
     void loadCartridge(std::string const & path);
+
+    virtual void memoryMap(MemoryOperation op, uint32_t full_adr, uint8_t *data);
+
+    void dmaEnable(bool enable);
 private:
     W65816 &cpu;
+    SNES_APU &apu;
+    SNES_PPU &ppu;
+    DmaHandler &dmaHandler;
     ConsoleDebugger debugger;
+    Cartridge cartridge;
+
+    bool dmaEnabled = false;
 
     enum MemType {LoROM, HiROM};
     MemType memType;
 
     uint8_t dmr = 0;
-    uint8_t ram1[RAM_QUANTITY];
-    uint8_t ram2[RAM_QUANTITY];
+    uint8_t ram[2][BANK_SIZE];
 
-    uint8_t* lorom[64]; //8000
-    uint8_t* hirom[64];//62 or 64 banks on waitstate //1'00'00
+    uint8_t WMADDH = 0;
+    uint8_t WMADDM = 0;
+    uint8_t WMADDL = 0;
 };
 
 #endif //Bus_H

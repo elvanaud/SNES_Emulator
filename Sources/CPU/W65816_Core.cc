@@ -7,6 +7,7 @@ using std::bind;
 using namespace std::placeholders;
 
 #include <iostream>
+#include<cassert>
 using std::cout;
 using std::endl;
 
@@ -54,6 +55,11 @@ uint16_t W65816::getAdr()
 uint16_t W65816::getIDB()
 {
     return idb.val();
+}
+
+uint16_t W65816::getD()
+{
+    return d.val();
 }
 
 uint8_t W65816::getIR()
@@ -246,6 +252,9 @@ bool W65816::isStageEnabled(Stage const& st)
         case Stage::SIG_ACC_ZERO: return acc.val()==0;
         case Stage::SIG_ACC_NOT_ZERO: return acc.val()!=0;
     }
+
+    assert(false);
+    return true; //Never reached
 }
 
 void W65816::handleValidAddressPINS(ValidAddressState state)
