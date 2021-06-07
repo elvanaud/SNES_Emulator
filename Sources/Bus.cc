@@ -260,7 +260,7 @@ void Bus::run()
         }
     }
 
-    debugger.saveTrace("../emul.log");
+    debugger.saveTrace("../Logs/original/emul.log");
 }
 
 void Bus::dmaEnable(bool enable)

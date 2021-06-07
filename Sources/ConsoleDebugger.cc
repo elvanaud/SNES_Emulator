@@ -157,7 +157,16 @@ bool ConsoleDebugger::tick()
                 cpu.isBranchInstruction = false;
             }
             else */
-            ss << "         ";
+            //ss << "         ";
+            if(instASM.size()>14)
+            {
+                cout << "inst asm size loong: "<< instASM<<endl;
+                throw "asm long";
+            }
+            for(int i = 0; i < 14-instASM.size(); i++)
+                ss << " ";
+            ss << "    ";
+
             ss << " A:" << setw(4) << cpu.getAcc();
             ss << " X:"<< setw(4) << cpu.getX() << " Y:" <<setw(4)<< cpu.getY() << " S:"<< setw(4)<<cpu.getS()<<" D:" << setw(4)<<cpu.getD();
             ss << " DB:" << setw(2)<<int(cpu.getDBR()) << " " << cpu.getPString()<<endl;

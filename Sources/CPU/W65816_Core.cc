@@ -201,12 +201,14 @@ void W65816::RESET()
 
 void W65816::setReg(Register16 & r, uint16_t v)
 {
+    if((&r == &idb) && decodingTable[ir].isIndexRelated() && !p.index8) {r.set(v); return;}
     if((r.isIndex && p.index8) || (!r.isIndex && p.mem8)) r.low = v & 0xFF;
     else r.set(v);
 }
 
 uint16_t W65816::getReg(Register16 & r)
 {
+    if((&r == &idb) && decodingTable[ir].isIndexRelated() && !p.index8) return r.val();
     if((r.isIndex && p.index8) || (!r.isIndex && p.mem8)) return r.low;
     return r.val();
 }

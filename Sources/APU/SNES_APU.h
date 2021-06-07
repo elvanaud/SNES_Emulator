@@ -18,6 +18,7 @@ public:
     uint8_t read(uint16_t adr);
     void write(uint16_t adr, uint8_t data);
 
+    const int SPC_CLOCK = 13;
 private:
     Bus * bus;
     SPC700 &spc;
@@ -38,6 +39,8 @@ private:
 
     uint8_t ia[4]; //Inputs from the SPC700 POV
     uint8_t oa[4];
+
+    int spc_clock = SPC_CLOCK; //test value (spc runs around 1MHz)
 };
 
 #endif // SNES_APU_H

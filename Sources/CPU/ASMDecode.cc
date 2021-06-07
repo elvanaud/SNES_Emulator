@@ -67,7 +67,7 @@ void W65816::initializeAdrModeASMDecode()
                {&AbsoluteIndirectJMP});
     setDecoder([&](std::stringstream& stream, string prefix)
                 {
-                   stream << " A";
+                   //stream << " A";
                 },
                {&Accumulator});
     setDecoder([&](std::stringstream& stream, string prefix)
@@ -113,7 +113,7 @@ void W65816::initializeAdrModeASMDecode()
     setDecoder([&](std::stringstream& stream, string prefix)
                 {
                     int dataWidth = 1;
-                    if(!p.mem8)
+                    if(!p.mem8 || (decodingTable[ir].isIndexRelated() && !p.index8))
                     {
                         dataWidth = 2;
                     }

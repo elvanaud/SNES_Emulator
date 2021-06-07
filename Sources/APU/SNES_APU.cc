@@ -30,8 +30,14 @@ void SNES_APU::write(uint16_t adr, uint8_t data)
 
 void SNES_APU::tick()
 {
-    spc.tick();
+    spc_clock--;
 
+    if(spc_clock == 0)
+    {
+        spc_clock = SPC_CLOCK;
+        spc.tick();
+    }
+    
 
     /*oa0 = ia0;
     if(ia1 == 0 && dataToProcess) //entry command
