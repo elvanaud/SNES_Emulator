@@ -121,6 +121,13 @@ bool ConsoleDebugger::tick()
     if(cpu.VDA() && cpu.VPA()) //Sync = Opcode Fetch
     {
         step = false;
+
+        if(firstTrace)
+        {
+            firstTrace = false;
+            return false;
+        }
+        
         if(debugPrint)
         {
             /*cout << "PC = " <<std::hex << cpu.getPC()-1 << "  ;  IR = " << (int)cpu.getIR() << "("<<cpu.getInst().getASM() << ")  ;  A = " << cpu.getAcc();
@@ -153,7 +160,7 @@ bool ConsoleDebugger::tick()
             ss << "         ";
             ss << " A:" << setw(4) << cpu.getAcc();
             ss << " X:"<< setw(4) << cpu.getX() << " Y:" <<setw(4)<< cpu.getY() << " S:"<< setw(4)<<cpu.getS()<<" D:" << setw(4)<<cpu.getD();
-            ss << " DB:" << int(cpu.getDBR()) << " " << cpu.getPString()<<endl;
+            ss << " DB:" << setw(2)<<int(cpu.getDBR()) << " " << cpu.getPString()<<endl;
 
             string traceLine = ss.str();
             cout << traceLine;

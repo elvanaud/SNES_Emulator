@@ -35,6 +35,8 @@ private:
     std::vector<uint32_t> program_breakpoints;
 
     string trace;
+
+    bool firstTrace = true;
 };
 
 #endif // CONSOLE_DEBUGGER_H
