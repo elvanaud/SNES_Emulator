@@ -260,7 +260,7 @@ void Bus::run()
         }
     }
 
-    debugger.saveTrace("../Logs/original/emul.log");
+    debugger.saveTrace("../Logs/emul.log");//probably too much memory -> need to save it in multiple segments
 }
 
 void Bus::dmaEnable(bool enable)

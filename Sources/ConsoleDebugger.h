@@ -37,6 +37,8 @@ private:
     string trace;
 
     bool firstTrace = true;
+
+    int nbExecutedInstructions = 0;
 };
 
 #endif // CONSOLE_DEBUGGER_H

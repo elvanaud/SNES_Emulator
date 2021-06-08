@@ -121,6 +121,7 @@ bool ConsoleDebugger::tick()
     if(cpu.VDA() && cpu.VPA()) //Sync = Opcode Fetch
     {
         step = false;
+        nbExecutedInstructions++;
 
         if(firstTrace)
         {
@@ -128,7 +129,7 @@ bool ConsoleDebugger::tick()
             return false;
         }
         
-        if(debugPrint)
+        
         {
             /*cout << "PC = " <<std::hex << cpu.getPC()-1 << "  ;  IR = " << (int)cpu.getIR() << "("<<cpu.getInst().getASM() << ")  ;  A = " << cpu.getAcc();
             cout << "  ;  Adr = " << cpu.getAdr() << "  ;  IDB = " << cpu.getIDB();
@@ -172,8 +173,11 @@ bool ConsoleDebugger::tick()
             ss << " DB:" << setw(2)<<int(cpu.getDBR()) << " " << cpu.getPString()<<endl;
 
             string traceLine = ss.str();
-            cout << traceLine;
+            if(debugPrint) cout << traceLine;
             trace+=traceLine;
+
+            if(nbExecutedInstructions % 50'000 == 0)
+                cout << "Executed " << nbExecutedInstructions << " instructions"<<endl;
 
             /*uint8_t p = cpu.getP();
             string status;

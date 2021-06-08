@@ -44,7 +44,7 @@ void W65816::initializeOpcodes()
     decodingTable[0x27] = Instruction("AND", DirectIndirectLong, AND);
     decodingTable[0x28] = Instruction("PLP", StackPop8, PLP);
     decodingTable[0x29] = Instruction("AND", Immediate, AND);
-    decodingTable[0x2A] = Instruction("ROL", Accumulator, ROL);
+    decodingTable[0x2A] = Instruction("ROL A", Accumulator, ROL);
     decodingTable[0x2B] = Instruction("PLD", StackPop16, PLD);
     decodingTable[0x2C] = Instruction("BIT", Absolute, BIT);
     decodingTable[0x2D] = Instruction("AND", Absolute, AND);
