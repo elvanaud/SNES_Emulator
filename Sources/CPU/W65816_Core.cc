@@ -24,6 +24,8 @@ W65816::W65816()
     interuptRESET   = Instruction("<interupt RST>", StackInterupt, RESET);
 
     triggerRESET();
+
+    p.cpu = this;
 }
 
 void W65816::attachBus(Bus * b)
@@ -239,6 +241,15 @@ void W65816::updateStatusFlags(uint32_t v, bool indexValue)
 void W65816::checkSignedOverflow(int a, int b, int c)
 {
     p.setV((a == 0 && b == 0 && c == 1) || (a == 1 && b == 1 && c == 0));
+}
+
+void W65816::shrinkIndexRegisters(bool doIt)
+{
+    if(doIt)
+    {
+        x.high = 0;
+        y.high = 0;
+    }
 }
 
 void W65816::reloadPipeline()

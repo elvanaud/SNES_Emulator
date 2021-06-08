@@ -22,6 +22,14 @@ void Cartridge::memoryMap(MemoryOperation op, uint32_t full_adr, uint8_t *data)
     adr &= 0x7FFF; //Ignoring A15
 
     //cout << "Cartridge map: "<<(int) full_adr<<" => " << (int) romBanks[bank][adr]<<endl;
+    if(bank >= NumberOfROMBanks)
+    {
+        switch(op)
+        {
+            case MemoryOperation::Write: return;
+            case MemoryOperation::Read: *data = 0; return;
+        }
+    }
 
     doMemoryOperation(op, &romBanks[bank][adr], data);
 }

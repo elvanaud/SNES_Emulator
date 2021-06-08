@@ -180,6 +180,7 @@ void SNES_PPU::handleTimings()
     if(hcounter == 0 && vcounter == 250) //Beginning of VBLank
     {
         //renderState = VBLANK;
+        bus->triggerNMI();//CAN'T interupts disabled probably, plus needs to be sync
         renderScreen();
     }
     //if(hcounter == 10 && vcounter == nVLines)

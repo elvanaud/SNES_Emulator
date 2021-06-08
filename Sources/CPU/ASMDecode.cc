@@ -37,22 +37,22 @@ void W65816::initializeAdrModeASMDecode()
 
     setDecoder([&](std::stringstream& stream, string prefix)
                 {
-                   stream << " " << std::hex << prefix << setfill('0')<<setw(6)<<getParam(1,3) << ", X";
+                   stream << " " << std::hex << prefix << setfill('0')<<setw(6)<<getParam(1,3) << ",X";
                 },
                {&AbsoluteXLong,&AbsoluteXLongWrite});
     setDecoder([&](std::stringstream& stream, string prefix)
                 {
-                   stream << " " << std::hex << prefix << setfill('0')<<setw(4)<<getParam(1,2) << ", X";
+                   stream << " " << std::hex << prefix << setfill('0')<<setw(4)<<getParam(1,2) << ",X";
                 },
                {&AbsoluteX,&AbsoluteXWrite,&AbsoluteXRMW});
     setDecoder([&](std::stringstream& stream, string prefix)
                 {
-                   stream << " " << std::hex << prefix << setfill('0')<<setw(4)<<getParam(1,2) << ", Y";
+                   stream << " " << std::hex << prefix << setfill('0')<<setw(4)<<getParam(1,2) << ",Y";
                 },
                {&AbsoluteY,&AbsoluteYWrite});
     setDecoder([&](std::stringstream& stream, string prefix)
                 {
-                   stream << " (" << std::hex << prefix << setfill('0')<<setw(4)<<getParam(1,2) << ", X)";
+                   stream << " (" << std::hex << prefix << setfill('0')<<setw(4)<<getParam(1,2) << ",X)";
                 },
                {&AbsoluteXIndirectJMP,&AbsoluteXIndirectJSR});
     setDecoder([&](std::stringstream& stream, string prefix)

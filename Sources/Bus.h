@@ -34,6 +34,8 @@ public:
 
     void dmaEnable(bool enable);
 
+    void triggerNMI();
+
     uint32_t accessedAdr = 0;
     bool isDataLoaded = false;
 private:

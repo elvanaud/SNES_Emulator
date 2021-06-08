@@ -201,6 +201,11 @@ void Bus::loadCartridge(std::string const & path)
     cartridge.load(input, header);
 }
 
+void Bus::triggerNMI()
+{
+    cpu.triggerNMI();
+}
+
 void Bus::run()
 {
     sf::RenderWindow app(sf::VideoMode(400,400,32),"SNES Emulator");

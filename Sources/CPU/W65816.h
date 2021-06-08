@@ -117,13 +117,15 @@ private:
     void updateNZFlags(uint16_t v, bool indexValue = false, bool force16 = false);
     void checkSignedOverflow(int a, int b, int c);
 
+    void shrinkIndexRegisters(bool doIt);
+
     //Registers
     struct Register16
     {
         Register16(bool idx = false) {isIndex = idx;}
         bool isIndex = false;
         uint8_t low = 0,high = 0;
-        uint16_t val() { return (uint16_t(high) << 8) | low; } //TODO: high=0 when index8
+        uint16_t val() { return (uint16_t(high) << 8) | low; } 
 
         void set(uint16_t v)
         {
@@ -191,7 +193,7 @@ private:
         void setB(bool status) { if(emulationMode) val = (val & ~(1<<4)) | (uint8_t(status)<<4); }
         void setE(bool status) { emulationMode = status; /*if(emulationMode)*/ {setM(true); setX(true);}}
 
-        void update() {setM(M()); setX(X());}
+        void update() {setM(M()); setX(X()); cpu->shrinkIndexRegisters(X());}
         void setVal(uint8_t v) {val = v; update();}
         uint8_t getVal() {return val;}
 
@@ -214,6 +216,7 @@ private:
         }
 
         private: uint8_t val = 0x30;
+        public: W65816* cpu;
     } p;
 
     void setReg(Register16 & r, uint16_t v); //TODO: How to differentiate between Index and ACC ???
