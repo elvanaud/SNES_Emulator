@@ -23,6 +23,8 @@ public:
     virtual void memoryMap(MemoryOperation op, uint32_t full_adr, uint8_t* data);
     void tick();
     void setRenderWindow(sf::RenderWindow* p_renderWindow);
+    uint16_t hcounter = -1; //auto increment when starting
+    uint16_t vcounter = 0;
 private:
     Bus* bus;
     void renderScreen();
@@ -36,8 +38,7 @@ private:
     uint8_t oamHigh[OAM_HIGH_SIZE];
     uint8_t cgram[CGRAM_SIZE];
 
-    uint16_t hcounter = -1; //auto increment when starting
-    uint16_t vcounter = 0;
+    
 
     bool forcedBlank = false;
     enum RenderState {HBLANK,VBLANK,RENDERING}; //Technically H-Blank still happens during VBlank
@@ -79,6 +80,8 @@ private:
     //CGRAM Access
     uint8_t cgDataLow = 0;
     uint16_t cgAddress = 0; //9bit word address
+
+    bool vblankInteruptEnabled = false;
 };
 
 #endif // SNES_PPU_H

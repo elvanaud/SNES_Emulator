@@ -23,6 +23,11 @@ public:
     void attachBus(Bus* b);
 
     void saveTrace(string path);
+
+    bool checkEvents();
+    void traceOrPrint();
+
+    bool traceOrPrintEnabled = true;
 private:
     W65816& cpu;
     Bus * bus;

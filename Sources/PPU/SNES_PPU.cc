@@ -134,6 +134,10 @@ void SNES_PPU::memoryMap(MemoryOperation op, uint32_t full_adr, uint8_t* data)
             ++cgAddress;
             cgAddress &= 0x1FF; //Clip to 9 bits
             break;
+        
+        case 0x4200:
+            vblankInteruptEnabled = (*data)>>7;
+        break;
         }
     }
 }
@@ -165,6 +169,7 @@ void SNES_PPU::renderScreen()
     sf::Sprite screenSprite;
     screenSprite.setTexture(screenTexture);
 
+    renderWindow->clear();
     renderWindow->draw(screenSprite);
     renderWindow->display();
 }
@@ -180,7 +185,8 @@ void SNES_PPU::handleTimings()
     if(hcounter == 0 && vcounter == 250) //Beginning of VBLank
     {
         //renderState = VBLANK;
-        bus->triggerNMI();//CAN'T interupts disabled probably, plus needs to be sync
+        if(vblankInteruptEnabled)
+            bus->triggerNMI();
         renderScreen();
     }
     //if(hcounter == 10 && vcounter == nVLines)
@@ -199,17 +205,18 @@ void SNES_PPU::handleTimings()
     {
         renderState = HBLANK;
     }*/
-    if(hcounter == 339)
+    if(hcounter == 339) //should be equals
     {
         //last dot of line
         ++vcounter;
-        hcounter = -1;
+        hcounter = -1; //-1
     }
     if(vcounter == 300)
     {
         //end of vblank
         vcounter = 0;
     }
+    
 }
 
 uint16_t SNES_PPU::translateAdr(uint16_t adr)

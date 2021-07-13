@@ -38,10 +38,11 @@ public:
 
     uint32_t accessedAdr = 0;
     bool isDataLoaded = false;
+    SNES_PPU &ppu;
 private:
     W65816 &cpu;
     SNES_APU &apu;
-    SNES_PPU &ppu;
+    
     DmaHandler &dmaHandler;
     ConsoleDebugger debugger;
     Cartridge cartridge;

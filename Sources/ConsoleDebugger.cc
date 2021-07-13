@@ -1,6 +1,7 @@
 #include "ConsoleDebugger.h"
 
 #include "Bus.h"
+#include "PPU/SNES_PPU.h"
 
 #include <iomanip>
 #include <sstream>
@@ -122,6 +123,11 @@ bool ConsoleDebugger::tick()
     {
         step = false;
         nbExecutedInstructions++;
+        if(nbExecutedInstructions == 1158363)
+        {
+            cout << "bonjour";
+            
+        }
 
         if(firstTrace)
         {
@@ -129,73 +135,70 @@ bool ConsoleDebugger::tick()
             return false;
         }
         
-        
+        if(traceOrPrintEnabled)
         {
-            /*cout << "PC = " <<std::hex << cpu.getPC()-1 << "  ;  IR = " << (int)cpu.getIR() << "("<<cpu.getInst().getASM() << ")  ;  A = " << cpu.getAcc();
-            cout << "  ;  Adr = " << cpu.getAdr() << "  ;  IDB = " << cpu.getIDB();
-            cout << " ; X = "<< cpu.getX() << " ; Y = " << cpu.getY() << " ; D = " << cpu.getD() << endl;*/
-            using std::setfill;
-            using std::setw;
-            using std::hex;
-            using std::stringstream;
-
-            string instASM;
-            for(char c : cpu.getInst().getASM())
-                instASM+=tolower(c);
-
-            stringstream ss;
-
-            ss <<hex << setfill('0')<<setw(6)<<cpu.getFullPC()-1 <<" " << instASM;
-
-            /*if(bus->isDataLoaded)
-            {
-                cout << " ["<< setw(6)<<bus->accessedAdr<< "]";
-                bus->isDataLoaded = false;
-            }
-            else if(cpu.isBranchInstruction)
-            {
-                cout << " ["<< setw(6)<< cpu.branchAddress<< "]";
-                cpu.isBranchInstruction = false;
-            }
-            else */
-            //ss << "         ";
-            if(instASM.size()>14)
-            {
-                cout << "inst asm size loong: "<< instASM<<endl;
-                throw "asm long";
-            }
-            for(int i = 0; i < 14-instASM.size(); i++)
-                ss << " ";
-            ss << "    ";
-
-            ss << " A:" << setw(4) << cpu.getAcc();
-            ss << " X:"<< setw(4) << cpu.getX() << " Y:" <<setw(4)<< cpu.getY() << " S:"<< setw(4)<<cpu.getS()<<" D:" << setw(4)<<cpu.getD();
-            ss << " DB:" << setw(2)<<int(cpu.getDBR()) << " " << cpu.getPString()<<endl;
-
-            string traceLine = ss.str();
-            if(debugPrint) cout << traceLine;
-            trace+=traceLine;
-
-            if(nbExecutedInstructions % 50'000 == 0)
-                cout << "Executed " << nbExecutedInstructions << " instructions"<<endl;
-
-            /*uint8_t p = cpu.getP();
-            string status;
-            if((p>>7)&1) status+="N";
-            else status += "-"; //TODO: print flags in lower/upper case if set/unset
-            if((p>>6)&1) status+="V";
-            else status += "-";
-            if((p>>1)&1) status+="Z";
-            else status += "-";
-            if((p>>0)&1) status+="C";
-            else status += "-";
-            cout << "Flags = " << status << " " << std::hex << int(p) << endl;*/
-
-            //std::getchar();
-            for(uint32_t watch : watches)
-                cout << "Content of "<<std::hex<<watch<<" :"<<(int)bus->privateRead(watch)<<endl;
+            traceOrPrint();
         }
+        if(nbExecutedInstructions % 50'000 == 0)
+            cout << "Executed " << nbExecutedInstructions << " instructions"<<endl;
+
+        //std::getchar();
+        for(uint32_t watch : watches)
+            cout << "Content of "<<std::hex<<watch<<" :"<<(int)bus->privateRead(watch)<<endl;
     }
+    return false;
+}
+
+void ConsoleDebugger::traceOrPrint()
+{
+    using std::setfill;
+    using std::setw;
+    using std::hex;
+    using std::stringstream;
+
+    string instASM;
+    for(char c : cpu.getInst().getASM())
+        instASM+=tolower(c);
+
+    stringstream ss;
+
+    ss <<hex << setfill('0')<<setw(6)<<cpu.getFullPC()-1 <<" " << instASM;
+
+    /*if(bus->isDataLoaded)
+    {
+        cout << " ["<< setw(6)<<bus->accessedAdr<< "]";
+        bus->isDataLoaded = false;
+    }
+    else if(cpu.isBranchInstruction)
+    {
+        cout << " ["<< setw(6)<< cpu.branchAddress<< "]";
+        cpu.isBranchInstruction = false;
+    }
+    else */
+    //ss << "         ";
+    if(instASM.size()>14)
+    {
+        cout << "inst asm size loong: "<< instASM<<endl;
+        throw "asm long";
+    }
+    for(int i = 0; i < 14-instASM.size(); i++)
+        ss << " ";
+    ss << "    ";
+
+    ss << " A:" << setw(4) << cpu.getAcc();
+    ss << " X:"<< setw(4) << cpu.getX() << " Y:" <<setw(4)<< cpu.getY() << " S:"<< setw(4)<<cpu.getS()<<" D:" << setw(4)<<cpu.getD();
+    ss << " DB:" << setw(2)<<int(cpu.getDBR()) << " " << cpu.getPString()<<endl;
+    //ss << " V:" <<std::dec<< setw(3)<<setfill(' ')<< bus->ppu.vcounter<< " H:" <<setw(3)<< bus->ppu.hcounter+36 << " F:" << endl;
+
+    string traceLine = ss.str();
+    if(debugPrint) cout << traceLine;
+    trace+=traceLine;
+}
+
+bool ConsoleDebugger::checkEvents()
+{
+    if(stepMode) return true;
+    if((bus->ppu.vcounter == 250) && bus->ppu.hcounter == 0) return true;
     return false;
 }
 

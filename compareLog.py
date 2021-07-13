@@ -33,11 +33,14 @@ while i != numberOfLines-1:
     if syncingBNEsourceAdvance:
         myOffset += 2
     myLine = " ".join(myLog[i+myOffset].split())
+    #myLine = myLine[:-11]
+    #myLine = myLine.strip()
+
     sourceLine = sourceLog[i]
 
     import re
     sourceLine = re.sub(r"\[[0-9a-f]{6}\] A","A",sourceLine)
-    sourceLine = sourceLine[:-16]
+    sourceLine = sourceLine[:-16]#2] #16]
 
     sourceLine = " ".join(sourceLine.split())
 
@@ -47,7 +50,7 @@ while i != numberOfLines-1:
         elif checkLoopSync(myLog[i+myOffset+1]):
             syncingBNEsourceAdvance = True
         else:
-            print("wtf")
+            #print("wtf")
             #print(myLine)
             #print(sourceLine)
             #print("SourceLigne:",i+1)
@@ -57,6 +60,7 @@ while i != numberOfLines-1:
             print("La Source:",sourceLine)
             print("SourceLigne:",i+1)
             print("MyLigne    :",i+myOffset+1)
+            print(len(myLine),len(sourceLine))
             break
     else:
         syncingBNEsourceAdvance = False

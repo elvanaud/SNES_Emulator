@@ -58,7 +58,7 @@ void Bus::memoryMap(MemoryOperation op, uint32_t full_adr, uint8_t *data)
             {
                 doMemoryOperation(op, &ram[0][adr], data);
             }
-            else if(adr >= 0x2100 && adr <= 0x213F)
+            else if((adr >= 0x2100 && adr <= 0x213F) || adr == 0x4200)
             {
                 ppu.memoryMap(op,full_adr,data);
             }
@@ -241,6 +241,7 @@ void Bus::run()
             dmaHandler.tick();
         }
         //else
+        if(debugger.checkEvents())//todo:replace with ClockManager
         {
             sf::Event event;
             while(app.pollEvent(event))
