@@ -27,13 +27,16 @@ public:
     bool checkEvents();
     void traceOrPrint();
 
-    bool traceOrPrintEnabled = true;
+    bool debugPrint = true;
+    bool debugTrace = true;
+
+    bool stepMode = true;
+
+    int nbExecutedInstructions = 0;
 private:
     W65816& cpu;
     Bus * bus;
 
-    bool debugPrint = true;
-    bool stepMode = true;
     bool step = true;
 
     std::vector<uint32_t> watches;
@@ -42,8 +45,6 @@ private:
     string trace;
 
     bool firstTrace = true;
-
-    int nbExecutedInstructions = 0;
 };
 
 #endif // CONSOLE_DEBUGGER_H

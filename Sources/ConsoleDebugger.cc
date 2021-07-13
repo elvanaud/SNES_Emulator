@@ -135,7 +135,7 @@ bool ConsoleDebugger::tick()
             return false;
         }
         
-        if(traceOrPrintEnabled)
+        if(debugPrint || debugTrace)
         {
             traceOrPrint();
         }
@@ -192,7 +192,7 @@ void ConsoleDebugger::traceOrPrint()
 
     string traceLine = ss.str();
     if(debugPrint) cout << traceLine;
-    trace+=traceLine;
+    if(debugTrace) trace+=traceLine;
 }
 
 bool ConsoleDebugger::checkEvents()
@@ -204,6 +204,7 @@ bool ConsoleDebugger::checkEvents()
 
 void ConsoleDebugger::saveTrace(string path)
 {
+    if(!debugTrace) return;
     std::ofstream of;
     of.open(path);
     of<<trace;

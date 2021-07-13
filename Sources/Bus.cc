@@ -214,6 +214,11 @@ void Bus::run()
     unsigned int ppu_clock = 4;
     unsigned int global_clock = 0;
 
+    clock_t startTime = clock();
+    debugger.debugTrace = false;
+    debugger.debugPrint = false;
+    debugger.stepMode = false;
+
     while(app.isOpen())
     {
         if(debugger.executeSystem())
@@ -240,7 +245,10 @@ void Bus::run()
             apu.tick();
             dmaHandler.tick();
         }
-        //else
+        /*if(global_clock >= 21148004)
+        {
+            app.close();
+        }*/
         if(debugger.checkEvents())//todo:replace with ClockManager
         {
             sf::Event event;
@@ -265,6 +273,10 @@ void Bus::run()
             }
         }
     }
+    clock_t endTime = clock();
+    double duration = ((double)(endTime-startTime)) / CLOCKS_PER_SEC;
+    cout << "\nTime:" << duration << " Nb inst: " << debugger.nbExecutedInstructions << " Nb cycles:" << global_clock << endl;
+    cout << "Freq: " << global_clock / duration << endl;
 
     debugger.saveTrace("../Logs/emul.log");//probably too much memory -> need to save it in multiple segments
 }
