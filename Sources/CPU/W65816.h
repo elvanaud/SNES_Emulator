@@ -63,7 +63,7 @@ private:
     Bus * bus;
 
     vector<vector<StageType>> pipeline;
-    vector<StageType> lastPipelineStage;
+    StageType lastPipelineStage;
     unsigned int tcycle = 0;
 
     bool vda = true;
@@ -100,7 +100,7 @@ private:
 
     void reloadPipeline();
     void processSignals();
-    bool isStageEnabled(Stage const & st);
+    bool isStageEnabled(Stage::EnablingCondition st);
     void initializeOpcodes();
     void initializeAddressingModes();
     void initializeAdrModeASMDecode();
@@ -359,7 +359,12 @@ private:
     AddressingMode BlockMoveN                   = AddressingMode(AdrModeName::BLOCK_MOVE_N);
     AddressingMode BlockMoveP                   = AddressingMode(AdrModeName::BLOCK_MOVE_P);
 
-
+    void endPipeline(StageType inst);
+    bool endOfPipeline = false;
+    bool preDecodeStage = false;
+    void DirectXIndirect(StageType inst);
+    void RelativeBranch(StageType inst);
+    
     //Instructions
     void ADC();
     void AND();

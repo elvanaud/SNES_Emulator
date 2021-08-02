@@ -193,14 +193,14 @@ void W65816::initializeAddressingModes()
     DirectRMW.setSignals({bind(incPC,this,1),bind(dhPrefetchInAdr,this)});
 
 
-    DirectXIndirect.setStages({ {Stage(Stage::SIG_DL_NOT_ZERO,dummyFetchLast),Stage(Stage::SIG_DL_NOT_ZERO,halfAdd,&adr.low,&d.low),Stage(Stage::SIG_DL_NOT_ZERO,fixCarry,&adr.high,&ZERO)},
+    /*DirectXIndirect.setStages({ {Stage(Stage::SIG_DL_NOT_ZERO,dummyFetchLast),Stage(Stage::SIG_DL_NOT_ZERO,halfAdd,&adr.low,&d.low),Stage(Stage::SIG_DL_NOT_ZERO,fixCarry,&adr.high,&ZERO)},
                                 {Stage(Stage::SIG_ALWAYS,dummyFetchLast),Stage(Stage::SIG_ALWAYS,fullAdd,&adr,&x)},
                                 {Stage(Stage::SIG_ALWAYS,fetchIncLong,&ZERO,&adr,&idb.low)},
                                 {Stage(Stage::SIG_ALWAYS,fetchLong,&ZERO,&adr,&adr.high),Stage(Stage::SIG_ALWAYS,moveReg8,&idb.low,&adr.low)},
                                 {Stage(Stage::SIG_ALWAYS,fetchIncLong,&ZERO,&adr,&idb.low)},
                                 {Stage(Stage::SIG_MODE16_ONLY,fetchLong,&ZERO,&adr,&idb.high)},
                                 {Stage(Stage::SIG_INST,dummyStage)}});
-    DirectXIndirect.setSignals({bind(incPC,this,1),bind(dhPrefetchInAdr,this)});
+    DirectXIndirect.setSignals({bind(incPC,this,1),bind(dhPrefetchInAdr,this)});*/
 
     DirectXIndirectWrite.setStages({{Stage(Stage::SIG_DL_NOT_ZERO,dummyFetchLast),Stage(Stage::SIG_DL_NOT_ZERO,halfAdd,&adr.low,&d.low),Stage(Stage::SIG_DL_NOT_ZERO,fixCarry,&adr.high,&ZERO)},
                                     {Stage(Stage::SIG_ALWAYS,dummyFetchLast),Stage(Stage::SIG_ALWAYS,fullAdd,&adr,&x)},
@@ -351,12 +351,12 @@ void W65816::initializeAddressingModes()
     ImpliedSpecial.setPredecodeSignals({bind(invalidPrefetch,this)});
 
 
-    RelativeBranch.setStages({  {Stage(Stage::SIG_INST,dummyStage)}, //Special Case for branch instruction: the first stage is executed within the decode operation (in T1)
+    /*RelativeBranch.setStages({  {Stage(Stage::SIG_INST,dummyStage)}, //Special Case for branch instruction: the first stage is executed within the decode operation (in T1)
                                 {Stage(Stage::SIG_ALWAYS,dummyFetchLast),Stage(Stage::SIG_ALWAYS,halfAdd,&pc.low,&adr.low),Stage(Stage::SIG_NATIVE_MODE,fixCarry,&pc.high,&SIGN_EXTENDED_OP_HALF_ADD)}, //The following stages are those to be executed if the branch is taken
                                 {Stage(Stage::SIG_PC_CROSS_PAGE_IN_EMUL,dummyFetchLast),Stage(Stage::SIG_PC_CROSS_PAGE_IN_EMUL,fixCarry,&pc.high,&SIGN_EXTENDED_OP_HALF_ADD)}, //TODO: remove the sig_always on this line ?? (cycle accuracy of BNE (D0)
                                 {Stage(Stage::SIG_DUMMY_STAGE, dummyStage)}});
     RelativeBranch.setSignals({bind(incPC,this,1)});
-    RelativeBranch.setPredecodeSignals({bind(branchInstruction,this)});
+    RelativeBranch.setPredecodeSignals({bind(branchInstruction,this)});*/
 
 
     RelativeBranchLong.setStages({  {Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&adr.high)},

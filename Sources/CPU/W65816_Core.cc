@@ -266,10 +266,10 @@ void W65816::reloadPipeline()
     pipeline.push_back(T2);
 }
 
-bool W65816::isStageEnabled(Stage const& st)
+bool W65816::isStageEnabled(Stage::EnablingCondition st)
 {
     uint8_t op;
-    switch(st.getEnablingCondition())
+    switch(st)//st.getEnablingCondition())
     {
         case Stage::SIG_ALWAYS: return true;
         case Stage::SIG_INST: return true;
