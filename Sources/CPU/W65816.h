@@ -223,7 +223,7 @@ private:
     uint16_t getReg(Register16 & r);
 
     //Internal Operations
-    void decode();
+    //void decode();
 
     void fetchInc(Register16 *src, uint8_t * dst);
     void fetchDec(Register16 *src, uint8_t * dst);
@@ -362,6 +362,11 @@ private:
     void endPipeline(StageType inst);
     bool endOfPipeline = false;
     bool preDecodeStage = false;
+    bool isStageEnabled(unsigned int cycle, Stage::EnablingCondition signal);
+    //bool enablingSignals[Stage::EnablingCondition::last];//obsolete
+    vector<bool> enabledStages;
+    void decode(bool predecode = false);
+
     void DirectXIndirect(StageType inst);
     void RelativeBranch(StageType inst);
     
