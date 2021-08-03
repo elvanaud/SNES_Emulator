@@ -12,20 +12,20 @@ void W65816::initializeAddressingModes()
     Absolute.setSignals({bind(incPC,this,1)});*/
 
 
-    AbsoluteWrite.setStages({   {Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&adr.high),Stage(Stage::SIG_INST,dummyStage)},
+    /*AbsoluteWrite.setStages({   {Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&adr.high),Stage(Stage::SIG_INST,dummyStage)},
                                 {Stage(Stage::SIG_ALWAYS,writeInc,&adr,&idb.low)},
                                 {Stage(Stage::SIG_MODE16_ONLY,write,&adr,&idb.high)},
                                 {Stage(Stage::SIG_DUMMY_STAGE,dummyStage)}});
-    AbsoluteWrite.setSignals({bind(incPC,this,1)});
+    AbsoluteWrite.setSignals({bind(incPC,this,1)});*/
 
 
-    AbsoluteRMW.setStages({ {Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&adr.high)},
+    /*AbsoluteRMW.setStages({ {Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&adr.high)},
                             {Stage(Stage::SIG_ALWAYS,fetchInc,&adr,&idb.low)},
                             {Stage(Stage::SIG_MODE16_ONLY,fetch,&adr,&idb.high)},
                             {Stage(Stage::SIG_ALWAYS,dummyFetchLast),Stage(Stage::SIG_INST,dummyStage),Stage(Stage::SIG_MODE8_ONLY,decReg,&adr)},
                             {Stage(Stage::SIG_MODE16_ONLY,writeDec,&adr,&idb.high)},{Stage(Stage::SIG_ALWAYS,write,&adr,&idb.low)},
                             {Stage(Stage::SIG_DUMMY_STAGE, dummyStage)}});
-    AbsoluteRMW.setSignals({bind(incPC,this,1)});
+    AbsoluteRMW.setSignals({bind(incPC,this,1)});*/
 
 
     AbsoluteJMP.setStages({ {Stage(Stage::SIG_ALWAYS,fetch,&pc,&pc.high),Stage(Stage::SIG_ALWAYS,moveReg8,&adr.low,&pc.low)},

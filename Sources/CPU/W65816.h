@@ -372,11 +372,14 @@ private:
 
 	bool isIndexRelated = false;
 
+	bool enablingSignals[EnablingCondition::last]; //back in fashion !
     vector<bool> enabledStages;
     int pipelineSize = 0;
     void decode(bool predecode = false);
 
 	void Absolute				(StageType&& inst);
+	void AbsoluteWrite			(StageType&& inst);
+	void AbsoluteRMW			(StageType&& inst);
     void DirectXIndirect		(StageType&& inst);
     void RelativeBranch			(StageType&& inst);
     void RelativeBranchLong		(StageType&& inst);
