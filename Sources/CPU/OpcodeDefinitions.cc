@@ -155,9 +155,6 @@ void W65816::initializeOpcodes()
     decodingTable[0xA9] = Instruction("LDA", Immediate, LDA);
     decodingTable[0xAA] = Instruction("TAX", Implied, TAX);
     decodingTable[0xAB] = Instruction("PLB", StackPop8, PLB);
-    decodingTable[0xAC] = Instruction("LDY", Absolute, LDY); decodingTable[0xAC].setIsIndexRelated(true);
-    decodingTable[0xAD] = Instruction("LDA", Absolute, LDA);
-    decodingTable[0xAE] = Instruction("LDX", Absolute, LDX); decodingTable[0xAE].setIsIndexRelated(true);
     decodingTable[0xAF] = Instruction("LDA", AbsoluteLong, LDA);
     decodingTable[0xB1] = Instruction("LDA", DirectIndirectY, LDA);
     decodingTable[0xB2] = Instruction("LDA", DirectIndirect, LDA);
@@ -185,8 +182,6 @@ void W65816::initializeOpcodes()
     decodingTable[0xC9] = Instruction("CMP", Immediate, CMP);
     decodingTable[0xCA] = Instruction("DEX", Implied, DEX);
     decodingTable[0xCB] = Instruction("WAI", ImpliedSpecial, WAI);
-    decodingTable[0xCC] = Instruction("CPY", Absolute, CPY); decodingTable[0xCC].setIsIndexRelated(true);
-    decodingTable[0xCD] = Instruction("CMP", Absolute, CMP);
     decodingTable[0xCE] = Instruction("DEC", AbsoluteRMW, DEC);
     decodingTable[0xCF] = Instruction("CMP", AbsoluteLong, CMP);
     decodingTable[0xD1] = Instruction("CMP", DirectIndirectY, CMP);
@@ -215,8 +210,6 @@ void W65816::initializeOpcodes()
     decodingTable[0xE9] = Instruction("SBC", Immediate, SBC);
     decodingTable[0xEA] = Instruction("NOP", Implied, dummyStage);
     decodingTable[0xEB] = Instruction("XBA", ImpliedSpecial, XBA);
-    decodingTable[0xEC] = Instruction("CPX", Absolute, CPX); decodingTable[0xEC].setIsIndexRelated(true);
-    decodingTable[0xED] = Instruction("SBC", Absolute, SBC);
     decodingTable[0xEE] = Instruction("INC", AbsoluteRMW, INC);
     decodingTable[0xEF] = Instruction("SBC", AbsoluteLong, SBC);
     decodingTable[0xF1] = Instruction("SBC", DirectIndirectY, SBC);

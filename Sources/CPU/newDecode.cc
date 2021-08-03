@@ -15,6 +15,7 @@ void W65816::tick()
     {
         lastPipelineStage(this);
         lastPipelineStage = StageType(dummyStage);
+		isIndexRelated = false; //this must be reset here after the last stage is executed
 
         fetchInc(&pc,&ir);
     }
@@ -38,7 +39,7 @@ void W65816::tick()
     {
         checkInterupts();
         tcycle = 0;
-		pipelineContent = REGULAR_INST;
+		pipelineContent = REGULAR_INST;//move that in cycle 0 for more clarity
 		prefetchIncPC = true;
     }
 }
@@ -112,11 +113,17 @@ void W65816::decode(bool predecode)
         case 0x82: RelativeBranchLong   (StageType(dummyStage)); break;//BRL
         case 0x90: RelativeBranch       (StageType(BCC)); break;
         case 0xA1: DirectXIndirect      (StageType(LDA)); break;
-		case 0xAC: Absolute      		(StageType(LDY)); break;//index
+		case 0xAC: isIndexRelated=true;Absolute(StageType(LDY)); break;//this is the worst line of code ever wrote in all history
+		case 0xAD: Absolute      		(StageType(LDA)); break;
+		case 0xAE: isIndexRelated=true;Absolute(StageType(LDX)); break;
         case 0xB0: RelativeBranch       (StageType(BCS)); break;
         case 0xC1: DirectXIndirect      (StageType(CMP)); break;
+		case 0xCC: isIndexRelated=true;Absolute(StageType(CPY)); break;
+		case 0xCD: Absolute				(StageType(CMP)); break;
         case 0xD0: RelativeBranch       (StageType(BNE)); break;
         case 0xE1: DirectXIndirect      (StageType(SBC)); break;
+		case 0xEC: isIndexRelated=true;Absolute(StageType(CPX)); break;
+		case 0xED: Absolute				(StageType(SBC)); break;
         case 0xF0: RelativeBranch       (StageType(BEQ)); break;
         }
     }

@@ -113,7 +113,7 @@ void W65816::initializeAdrModeASMDecode()
     setDecoder([&](std::stringstream& stream, string prefix)
                 {
                     int dataWidth = 1;
-                    if(!p.mem8 || (decodingTable[ir].isIndexRelated() && !p.index8))
+                    if(!p.mem8 || (isIndexRelated && !p.index8))
                     {
                         dataWidth = 2;
                     }

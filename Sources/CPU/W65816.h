@@ -370,6 +370,8 @@ private:
 	enum PipelineContent {REGULAR_INST, IRQ_INTERUPT, NMI_INTERUPT, RESET_INTERUPT};
     PipelineContent pipelineContent = REGULAR_INST;
 
+	bool isIndexRelated = false;
+
     vector<bool> enabledStages;
     int pipelineSize = 0;
     void decode(bool predecode = false);

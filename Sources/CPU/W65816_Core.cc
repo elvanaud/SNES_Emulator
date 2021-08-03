@@ -204,14 +204,14 @@ void W65816::RESET()
 
 void W65816::setReg(Register16 & r, uint16_t v)
 {
-    if((&r == &idb) && decodingTable[ir].isIndexRelated() && !p.index8) {r.set(v); return;}
+    if((&r == &idb) && isIndexRelated && !p.index8) {r.set(v); return;}
     if((r.isIndex && p.index8) || (!r.isIndex && p.mem8)) r.low = v & 0xFF;
     else r.set(v);
 }
 
 uint16_t W65816::getReg(Register16 & r)
 {
-    if((&r == &idb) && decodingTable[ir].isIndexRelated() && !p.index8) return r.val();
+    if((&r == &idb) && isIndexRelated && !p.index8) return r.val();
     if((r.isIndex && p.index8) || (!r.isIndex && p.mem8)) return r.low;
     return r.val();
 }
@@ -275,8 +275,8 @@ bool W65816::isStageEnabled(EnablingCondition st)
         case Stage::SIG_ALWAYS: return true;
         case Stage::SIG_INST: return true;
         case Stage::SIG_MEM16_ONLY: return !p.mem8;
-        case Stage::SIG_MODE16_ONLY: if(decodingTable[ir].isIndexRelated()) return !p.index8; else return !p.mem8;
-        case Stage::SIG_MODE8_ONLY: if(decodingTable[ir].isIndexRelated()) return p.index8; else return p.mem8;
+        case Stage::SIG_MODE16_ONLY: if(isIndexRelated) return !p.index8; else return !p.mem8;
+        case Stage::SIG_MODE8_ONLY: if(isIndexRelated) return p.index8; else return p.mem8;
         case Stage::SIG_DUMMY_STAGE: return true;
         case Stage::SIG_X_CROSS_PAGE: op = bus->privateRead(pc.val()); return op > op+x.low;
         case Stage::SIG_Y_CROSS_PAGE: op = bus->privateRead(pc.val()); return op > op+y.low;
