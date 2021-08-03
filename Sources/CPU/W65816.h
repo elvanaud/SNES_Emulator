@@ -359,12 +359,13 @@ private:
     AddressingMode BlockMoveN                   = AddressingMode(AdrModeName::BLOCK_MOVE_N);
     AddressingMode BlockMoveP                   = AddressingMode(AdrModeName::BLOCK_MOVE_P);
 
-    void endPipeline(StageType inst);
-    bool endOfPipeline = false;
+    //void endPipeline(StageType inst);
+    //bool endOfPipeline = false;
     bool preDecodeStage = false;
     bool isStageEnabled(unsigned int cycle, Stage::EnablingCondition signal);
     //bool enablingSignals[Stage::EnablingCondition::last];//obsolete
     vector<bool> enabledStages;
+    int pipelineSize = 0;
     void decode(bool predecode = false);
 
     void DirectXIndirect(StageType inst);

@@ -18,6 +18,7 @@ W65816::W65816()
     initializeOpcodes();
     reloadPipeline();
     pc.set(0xFF); //Becomes useless
+    lastPipelineStage = StageType(dummyStage);
 
     interuptIRQ     = Instruction("<interupt IRQ>", StackInterupt, IRQ);
     interuptNMI     = Instruction("<interupt NMI>", StackInterupt, NMI);

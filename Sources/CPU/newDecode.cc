@@ -11,41 +11,48 @@ void W65816::tick()
         return;
     }
 
-    if(endOfPipeline)
+    /*if(endOfPipeline)
     {
         tcycle = 0;
         endOfPipeline = false;
-    }
+    }*/
 
-    switch(tcycle)
+    if(tcycle == 0)
     {
-    case 0:
         lastPipelineStage(this);
         checkInterupts();
 
         fetchInc(&pc,&ir);
-        break;
-    case 1:
+    }
+    else if(tcycle == 1)
+    {
         decode(true);//instruction specific predecode signals here
         /*for(int i = 0; i < Stage::EnablingCondition::last; i++)
         {
             enablingSignals[i] = isStageEnabled(Stage::EnablingCondition(i));
         }*/
+        int i = 0;
+        for(i = enabledStages.size(); i > 0 && !enabledStages[i-1]; i--);
+        pipelineSize = i + 2;
 
         fetchInc(&pc,&adr.low); //auto inc pc by default...?
-        break;
-    default:
+    }
+    else
+    {
         decode();
-        break;
     }
     ++tcycle;
+    if(tcycle >= pipelineSize)
+    {
+        tcycle = 0;
+    }
 }
 
-void W65816::endPipeline(StageType inst)
+/*void W65816::endPipeline(StageType inst)
 {
     lastPipelineStage = inst;
     endOfPipeline = true;
-}
+}*/
 
 bool W65816::isStageEnabled(unsigned int cycle, Stage::EnablingCondition signal)
 {
@@ -53,14 +60,13 @@ bool W65816::isStageEnabled(unsigned int cycle, Stage::EnablingCondition signal)
     {
         enabledStages.resize(cycle,false);
         enabledStages[cycle] = isStageEnabled(signal);
-        //popback last false elements, then can use the same condition for end of pipeline
         return false;
     }
 
     if(tcycle == cycle)
     {
         //if(enablingSignals[signal])
-        if(enabledStages[tcycle])
+        if(enabledStages[tcycle])//TODO: should loop !! (multiple disabled stages in a row)
         {
             return true;
         }
@@ -76,7 +82,7 @@ void W65816::decode(bool predecode)
 {
     if(predecode) preDecodeStage = true;
     const int STARTING_CYCLE = 2;
-    tcycle-=STARTING_CYCLE; 
+    tcycle-=STARTING_CYCLE; //move that in isstageenabled
     switch(ir)
     {
     case 0x00://brk
@@ -98,12 +104,14 @@ void W65816::RelativeBranch(StageType inst)
     if(preDecodeStage)
     {
         inst(this);
+        lastPipelineStage = StageType(dummyStage);
+        //incPC();
+
         if(!branchTaken)
         {
-            endPipeline(StageType(dummyStage));
+            enabledStages.resize(0);
+            return;
         }
-        //incPC();
-        return;
     }
 
     if(isStageEnabled(0,Stage::SIG_ALWAYS))
@@ -118,8 +126,6 @@ void W65816::RelativeBranch(StageType inst)
         dummyFetchLast();
         fixCarry(&pc.high,&SIGN_EXTENDED_OP_HALF_ADD);
     }
-    
-    endPipeline(StageType(dummyStage));
 }
 
 void W65816::DirectXIndirect(StageType inst)
@@ -127,13 +133,8 @@ void W65816::DirectXIndirect(StageType inst)
     if(preDecodeStage)
     {
         //incPC(); //done before ?
-        dhPrefetchInAdr(); //here or in the if
-        //lastPipelineStage = inst;
-        /*if(enablingSignals[Stage::SIG_MEM16_ONLY])
-            endOfPipeline(5,inst);
-        else
-            endOfPipeline(4,inst);
-        return;*/
+        dhPrefetchInAdr();
+        lastPipelineStage = inst;
     }
 
     if(isStageEnabled(0,Stage::SIG_DL_NOT_ZERO))
@@ -141,7 +142,7 @@ void W65816::DirectXIndirect(StageType inst)
         dummyFetchLast();
         halfAdd(&adr.low,&d.low);
         fixCarry(&adr.high,&ZERO);
-    }//tcycle++;//auto handled in method ^
+    }
     if(isStageEnabled(1,Stage::SIG_ALWAYS))
     {
         dummyFetchLast();
@@ -164,7 +165,4 @@ void W65816::DirectXIndirect(StageType inst)
     {
         fetchLong(&ZERO,&adr,&idb.high);
     }
-    //tcycle++; //todo: create a macro for that if followed by inc, (have the macro create the cases too)
-    //case 6:
-    //endPipeline(inst);
 }
