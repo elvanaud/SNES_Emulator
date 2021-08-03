@@ -11,6 +11,11 @@ void W65816::incPC(unsigned int whatCycle)
     //cout << "incPc" << endl;
 }
 
+void W65816::noAutoIncPC()
+{
+    prefetchIncPC = false;
+}
+
 void W65816::opPrefetchInIDB()
 {
     //if(tcycle == 1) 

@@ -364,13 +364,21 @@ private:
     bool preDecodeStage = false;
     bool isStageEnabled(unsigned int cycle, EnablingCondition signal);
     
+	void noAutoIncPC();
+	bool prefetchIncPC = true;
+
+	enum PipelineContent {REGULAR_INST, IRQ_INTERUPT, NMI_INTERUPT, RESET_INTERUPT};
+    PipelineContent pipelineContent = REGULAR_INST;
+
     vector<bool> enabledStages;
     int pipelineSize = 0;
     void decode(bool predecode = false);
 
-    void DirectXIndirect        (StageType&& inst);
-    void RelativeBranch         (StageType&& inst);
-    void RelativeBranchLong     (StageType&& inst);
+	void Absolute				(StageType&& inst);
+    void DirectXIndirect		(StageType&& inst);
+    void RelativeBranch			(StageType&& inst);
+    void RelativeBranchLong		(StageType&& inst);
+    void StackInterupt			(StageType&& inst);
     
     //Instructions
     void ADC();

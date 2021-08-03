@@ -5,11 +5,11 @@ using namespace std::placeholders;
 
 void W65816::initializeAddressingModes()
 {
-    Absolute.setStages({{Stage(Stage::SIG_ALWAYS, fetchInc,&pc,&adr.high)},
+    /*Absolute.setStages({{Stage(Stage::SIG_ALWAYS, fetchInc,&pc,&adr.high)},
                         {Stage(Stage::SIG_ALWAYS,fetchInc,&adr,&idb.low)},
                         {Stage(Stage::SIG_MODE16_ONLY,fetch,&adr,&idb.high)},
                         {Stage(Stage::SIG_INST,dummyStage)}});
-    Absolute.setSignals({bind(incPC,this,1)});
+    Absolute.setSignals({bind(incPC,this,1)});*/
 
 
     AbsoluteWrite.setStages({   {Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&adr.high),Stage(Stage::SIG_INST,dummyStage)},
@@ -485,14 +485,15 @@ void W65816::initializeAddressingModes()
     StackRelativeIndirectYWrite.setSignals({bind(incPC,this,1)});
 
 
-    StackInterupt.setStages({   {Stage(Stage::SIG_NATIVE_MODE,push,&pbr)},
+    /*StackInterupt.setStages({   {Stage(Stage::SIG_NATIVE_MODE,push,&pbr)},
                                 {Stage(Stage::SIG_ALWAYS,push,&pc.high)},
                                 {Stage(Stage::SIG_ALWAYS,push,&pc.low)},
                                 {Stage(Stage::SIG_ALWAYS,pushP),Stage(Stage::SIG_ALWAYS,enableInterupts,false),Stage(Stage::SIG_INST,dummyStage)},//TODO: moved the instruction stage here (might cause problems ??)
                                 {Stage(Stage::SIG_ALWAYS,fetchIncLong,&ZERO,&adr,&pc.low),Stage(Stage::SIG_ALWAYS,moveReg8,&ZERO,&pbr)}, //TODO: Vector Pull signal here(and next line)
                                 {Stage(Stage::SIG_ALWAYS,fetchLong,&ZERO,&adr,&pc.high)},
                                 {Stage(Stage::SIG_DUMMY_STAGE,dummyStage)}});
-    StackInterupt.setSignals({bind(incPC,this,1)});
+    StackInterupt.setSignals({bind(incPC,this,1)});//shouldn't be any inc pc !! ?? wtf
+    */
 
 
     BlockMoveN.setStages({  {Stage(Stage::SIG_ALWAYS,fetchDec,&pc,&adr.high),Stage(Stage::SIG_ALWAYS,moveReg8,&adr.low,&dbr)},

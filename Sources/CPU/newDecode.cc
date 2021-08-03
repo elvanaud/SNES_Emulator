@@ -11,25 +11,10 @@ void W65816::tick()
         return;
     }
 
-    /////////// in decode stage
-    if(executeInterupt)
-    {
-        bool effectiveInterupt = true;
-        if(internalIRQ && p.I()) effectiveInterupt = false;
-
-        if(internalIRQ && !p.I()) {instToDecode = interuptIRQ;}
-        if(internalNMI) {instToDecode = interuptNMI;}
-        if(internalRST) {instToDecode = interuptRESET;}
-
-        if(effectiveInterupt) {--pc; invalidPrefetch();}
-        executeInterupt = false;
-    }
-    ////////////////
-
     if(tcycle == 0)
     {
         lastPipelineStage(this);
-        checkInterupts();
+        lastPipelineStage = StageType(dummyStage);
 
         fetchInc(&pc,&ir);
     }
@@ -42,7 +27,7 @@ void W65816::tick()
         pipelineSize = i + 2;
 
         fetch(&pc,&adr.low); //auto inc pc by default...? yes 52 out of 63 adr mode have a incPC signal
-        ++pc;//disable this with noIncPC signal
+        if(prefetchIncPC) ++pc;
     }
     else
     {
@@ -51,7 +36,10 @@ void W65816::tick()
     ++tcycle;
     if(tcycle >= pipelineSize)
     {
+        checkInterupts();
         tcycle = 0;
+		pipelineContent = REGULAR_INST;
+		prefetchIncPC = true;
     }
 }
 
@@ -80,33 +68,91 @@ bool W65816::isStageEnabled(unsigned int cycle, EnablingCondition signal)
 
 void W65816::decode(bool predecode)
 {
-    if(predecode) preDecodeStage = true;
-    const int STARTING_CYCLE = 2;
-    tcycle-=STARTING_CYCLE; //move that in isstageenabled
-    switch(ir)
+    if(predecode) 
     {
-    case 0x00://brk
-        break;
-    case 0x01: DirectXIndirect      (StageType(ORA)); break;
-    case 0x10: RelativeBranch       (StageType(BPL)); break;
-    case 0x21: DirectXIndirect      (StageType(AND)); break;
-    case 0x30: RelativeBranch       (StageType(BMI)); break;
-    case 0x41: DirectXIndirect      (StageType(EOR)); break;
-    case 0x50: RelativeBranch       (StageType(BVC)); break;
-    case 0x61: DirectXIndirect      (StageType(ADC)); break;
-    case 0x70: RelativeBranch       (StageType(BVS)); break;
-    case 0x80: RelativeBranch       (StageType(BRA)); break;
-    case 0x82: RelativeBranchLong   (StageType(dummyStage)); break;//BRL
-    case 0x90: RelativeBranch       (StageType(BCC)); break;
-    case 0xA1: DirectXIndirect      (StageType(LDA)); break;
-    case 0xB0: RelativeBranch       (StageType(BCS)); break;
-    case 0xC1: DirectXIndirect      (StageType(CMP)); break;
-    case 0xD0: RelativeBranch       (StageType(BNE)); break;
-    case 0xE1: DirectXIndirect      (StageType(SBC)); break;
-    case 0xF0: RelativeBranch       (StageType(BEQ)); break;
+        preDecodeStage = true;
+
+        if(executeInterupt)
+        {
+            bool effectiveInterupt = true;
+            if(internalIRQ && p.I()) effectiveInterupt = false;
+
+            
+
+            if(internalIRQ && !p.I()) {pipelineContent = IRQ_INTERUPT;}
+            if(internalNMI) {pipelineContent = NMI_INTERUPT;}
+            if(internalRST) {pipelineContent = RESET_INTERUPT;}
+
+            if(effectiveInterupt) {--pc; invalidPrefetch();}
+            executeInterupt = false;
+        }
     }
+    const int STARTING_CYCLE = 2;
+    tcycle-=STARTING_CYCLE; //move that in isStageEnabled
+    if(pipelineContent == REGULAR_INST)
+    {
+        switch(ir)
+        {
+		case 0x00: StackInterupt      	(StageType(BRK)); break;
+        case 0x01: DirectXIndirect      (StageType(ORA)); break;
+		case 0x02: StackInterupt      	(StageType(COP)); break;
+		case 0x0D: Absolute      		(StageType(ORA)); break;
+        case 0x10: RelativeBranch       (StageType(BPL)); break;
+        case 0x21: DirectXIndirect      (StageType(AND)); break;
+		case 0x2C: Absolute      		(StageType(BIT)); break;
+		case 0x2D: Absolute      		(StageType(AND)); break;
+        case 0x30: RelativeBranch       (StageType(BMI)); break;
+        case 0x41: DirectXIndirect      (StageType(EOR)); break;
+		case 0x4D: Absolute      		(StageType(EOR)); break;
+        case 0x50: RelativeBranch       (StageType(BVC)); break;
+        case 0x61: DirectXIndirect      (StageType(ADC)); break;
+		case 0x6D: Absolute      		(StageType(ADC)); break;
+        case 0x70: RelativeBranch       (StageType(BVS)); break;
+        case 0x80: RelativeBranch       (StageType(BRA)); break;
+        case 0x82: RelativeBranchLong   (StageType(dummyStage)); break;//BRL
+        case 0x90: RelativeBranch       (StageType(BCC)); break;
+        case 0xA1: DirectXIndirect      (StageType(LDA)); break;
+		case 0xAC: Absolute      		(StageType(LDY)); break;//index
+        case 0xB0: RelativeBranch       (StageType(BCS)); break;
+        case 0xC1: DirectXIndirect      (StageType(CMP)); break;
+        case 0xD0: RelativeBranch       (StageType(BNE)); break;
+        case 0xE1: DirectXIndirect      (StageType(SBC)); break;
+        case 0xF0: RelativeBranch       (StageType(BEQ)); break;
+        }
+    }
+    else
+    {
+        switch(pipelineContent)
+        {
+            case IRQ_INTERUPT:      StackInterupt(StageType(IRQ));	 break;
+            case NMI_INTERUPT:		StackInterupt(StageType(NMI));	 break;
+            case RESET_INTERUPT:    StackInterupt(StageType(RESET)); break;
+        }
+    }
+    
     tcycle+=STARTING_CYCLE;
     if(predecode) preDecodeStage = false;
+}
+
+void W65816::Absolute(StageType&& inst)
+{
+	if(preDecodeStage)
+	{
+		lastPipelineStage = inst;
+	}
+
+	if(isStageEnabled(0,SIG_ALWAYS))
+	{
+		fetchInc(&pc,&adr.high);
+	}
+	if(isStageEnabled(1,SIG_ALWAYS))
+	{
+		fetchInc(&adr,&idb.low);
+	}
+	if(isStageEnabled(2,SIG_MODE16_ONLY))
+	{
+		fetch(&adr,&idb.high);
+	}
 }
 
 void W65816::DirectXIndirect(StageType&& inst)
@@ -189,5 +235,43 @@ void W65816::RelativeBranchLong(StageType&& inst)
     if(isStageEnabled(1,SIG_ALWAYS))
     {
         fullAdd(&pc,&adr);
+    }
+}
+
+void W65816::StackInterupt(StageType&& inst)
+{
+    if(preDecodeStage)
+    {
+        lastPipelineStage = StageType(dummyStage);
+        noAutoIncPC();
+    }
+
+    if(isStageEnabled(0,SIG_NATIVE_MODE))
+    {
+        push(&pbr);
+    }
+    if(isStageEnabled(1,SIG_ALWAYS))
+    {
+        push(&pc.high);
+    }
+    if(isStageEnabled(2,SIG_ALWAYS))
+    {
+        push(&pc.low);
+    }
+    if(isStageEnabled(3,SIG_ALWAYS))
+    {
+        pushP();
+        enableInterupts(false);
+    }
+    if(isStageEnabled(4,SIG_ALWAYS))
+    {
+        inst(this);
+        fetchIncLong(&ZERO,&adr,&pc.low);
+        moveReg8(&ZERO,&pbr); 
+        //TODO: Vector Pull signal here(and next line)
+    }
+    if(isStageEnabled(5,SIG_ALWAYS))
+    {
+        fetchLong(&ZERO,&adr,&pc.high);
     }
 }
