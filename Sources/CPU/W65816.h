@@ -98,9 +98,14 @@ private:
     bool branchTaken = false;
     bool clockStopped = false;
 
+    enum EnablingCondition{
+        SIG_ALWAYS,SIG_INST,SIG_DUMMY_STAGE,SIG_MEM16_ONLY,SIG_MODE16_ONLY,SIG_MODE8_ONLY,
+        SIG_X_CROSS_PAGE,SIG_Y_CROSS_PAGE,SIG_DL_NOT_ZERO, SIG_INDIRECT_Y_CROSS_PAGE_OR_X16,
+        SIG_PC_CROSS_PAGE_IN_EMUL, SIG_NATIVE_MODE, SIG_ACC_ZERO, SIG_ACC_NOT_ZERO, last};
+
     void reloadPipeline();
     void processSignals();
-    bool isStageEnabled(Stage::EnablingCondition st);
+    bool isStageEnabled(EnablingCondition st);
     void initializeOpcodes();
     void initializeAddressingModes();
     void initializeAdrModeASMDecode();
@@ -318,7 +323,6 @@ private:
     AddressingMode Direct                       = AddressingMode(AdrModeName::DIRECT);
     AddressingMode DirectWrite                  = AddressingMode(AdrModeName::DIRECT_WRITE);
     AddressingMode DirectRMW                    = AddressingMode(AdrModeName::DIRECT_RMW);
-    AddressingMode DirectXIndirect              = AddressingMode(AdrModeName::DIRECT_X_INDIRECT);
     AddressingMode DirectXIndirectWrite         = AddressingMode(AdrModeName::DIRECT_X_INDIRECT_WRITE);
     AddressingMode DirectIndirect               = AddressingMode(AdrModeName::DIRECT_INDIRECT);
     AddressingMode DirectIndirectWrite          = AddressingMode(AdrModeName::DIRECT_INDIRECT_WRITE);
@@ -337,8 +341,6 @@ private:
     AddressingMode ImmediateSpecial             = AddressingMode(AdrModeName::IMMEDIATE_SPECIAL);
     AddressingMode Implied                      = AddressingMode(AdrModeName::IMPLIED);
     AddressingMode ImpliedSpecial               = AddressingMode(AdrModeName::IMPLIED_SPECIAL);
-    AddressingMode RelativeBranch               = AddressingMode(AdrModeName::RELATIVE_BRANCH);
-    AddressingMode RelativeBranchLong           = AddressingMode(AdrModeName::RELATIVE_BRANCH_LONG);
     AddressingMode StackPop                     = AddressingMode(AdrModeName::STACK_POP);
     AddressingMode StackPop8                    = AddressingMode(AdrModeName::STACK_POP_8);
     AddressingMode StackPop16                   = AddressingMode(AdrModeName::STACK_POP_16);
@@ -359,17 +361,16 @@ private:
     AddressingMode BlockMoveN                   = AddressingMode(AdrModeName::BLOCK_MOVE_N);
     AddressingMode BlockMoveP                   = AddressingMode(AdrModeName::BLOCK_MOVE_P);
 
-    //void endPipeline(StageType inst);
-    //bool endOfPipeline = false;
     bool preDecodeStage = false;
-    bool isStageEnabled(unsigned int cycle, Stage::EnablingCondition signal);
-    //bool enablingSignals[Stage::EnablingCondition::last];//obsolete
+    bool isStageEnabled(unsigned int cycle, EnablingCondition signal);
+    
     vector<bool> enabledStages;
     int pipelineSize = 0;
     void decode(bool predecode = false);
 
-    void DirectXIndirect(StageType inst);
-    void RelativeBranch(StageType inst);
+    void DirectXIndirect        (StageType&& inst);
+    void RelativeBranch         (StageType&& inst);
+    void RelativeBranchLong     (StageType&& inst);
     
     //Instructions
     void ADC();

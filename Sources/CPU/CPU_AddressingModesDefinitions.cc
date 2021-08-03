@@ -359,10 +359,10 @@ void W65816::initializeAddressingModes()
     RelativeBranch.setPredecodeSignals({bind(branchInstruction,this)});*/
 
 
-    RelativeBranchLong.setStages({  {Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&adr.high)},
+    /*RelativeBranchLong.setStages({  {Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&adr.high)},
                                     {Stage(Stage::SIG_ALWAYS,fullAdd,&pc,&adr)},
                                     {Stage(Stage::SIG_INST, dummyStage)}});
-    RelativeBranchLong.setSignals({bind(incPC,this,1)});
+    RelativeBranchLong.setSignals({bind(incPC,this,1)});*/
 
 
     StackPop.setStages({{Stage(Stage::SIG_DUMMY_STAGE,dummyStage)}, //The inc is supposed to happen here but I do it all in the "pop" operation

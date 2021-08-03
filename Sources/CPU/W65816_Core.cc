@@ -253,7 +253,7 @@ void W65816::shrinkIndexRegisters(bool doIt)
     }
 }
 
-void W65816::reloadPipeline()
+/*void W65816::reloadPipeline()
 {
     pipeline.clear();
     tcycle = 0;
@@ -265,9 +265,9 @@ void W65816::reloadPipeline()
 
     vector<StageType> T2 = {Stage(Stage::SIG_ALWAYS,decode).get(), Stage(Stage::SIG_ALWAYS,fetch,&pc,&adr.low).get()}; //Careful to keep the decode before the fetch
     pipeline.push_back(T2);
-}
+}*/
 
-bool W65816::isStageEnabled(Stage::EnablingCondition st)
+bool W65816::isStageEnabled(EnablingCondition st)
 {
     uint8_t op;
     switch(st)//st.getEnablingCondition())
@@ -329,7 +329,7 @@ void W65816::checkInterupts()
     if(internalIRQ || internalNMI || internalRST) executeInterupt = true;
 }
 
-void W65816::tick()
+/*void W65816::tick()
 {
     handleValidAddressPINS(ValidAddressState::InternalOperation);
     if(!rdy || clockStopped)
@@ -352,4 +352,4 @@ void W65816::tick()
     {
         reloadPipeline();
     }
-}
+}*/
