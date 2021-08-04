@@ -101,8 +101,10 @@ void W65816::decode(bool predecode)
 		case 0x0E: AbsoluteRMW			(StageType(ASL)); break;
 		case 0x0F: AbsoluteLong			(StageType(ORA)); break;
         case 0x10: RelativeBranch       (StageType(BPL)); break;
+		case 0x19: AbsoluteY    		(StageType(ORA)); break;
 		case 0x1C: AbsoluteRMW			(StageType(TRB)); break;
         case 0x1D: AbsoluteX    		(StageType(ORA)); break;
+		case 0x1E: AbsoluteXRMW			(StageType(ASL)); break;
         case 0x1F: AbsoluteXLong		(StageType(ORA)); break;
 		case 0x20: AbsoluteJSR			(StageType(dummyStage)); break;//JSR
         case 0x21: DirectXIndirect      (StageType(AND)); break;
@@ -112,8 +114,10 @@ void W65816::decode(bool predecode)
 		case 0x2E: AbsoluteRMW			(StageType(ROL)); break;
 		case 0x2F: AbsoluteLong			(StageType(AND)); break;
         case 0x30: RelativeBranch       (StageType(BMI)); break;
+		case 0x39: AbsoluteY    		(StageType(AND)); break;
         case 0x3C: AbsoluteX    		(StageType(BIT)); break;
         case 0x3D: AbsoluteX    		(StageType(AND)); break;
+		case 0x3E: AbsoluteXRMW			(StageType(ROL)); break;
         case 0x3F: AbsoluteXLong		(StageType(AND)); break;
         case 0x41: DirectXIndirect      (StageType(EOR)); break;
 		case 0x4C: AbsoluteJMP      	(StageType(dummyStage)); break;//JMP
@@ -121,15 +125,21 @@ void W65816::decode(bool predecode)
 		case 0x4E: AbsoluteRMW			(StageType(LSR)); break;
 		case 0x4F: AbsoluteLong			(StageType(EOR)); break;
         case 0x50: RelativeBranch       (StageType(BVC)); break;
+		case 0x59: AbsoluteY    		(StageType(EOR)); break;
         case 0x5C: AbsoluteLongJMP  	(StageType(dummyStage)); break;//JMP
         case 0x5D: AbsoluteX    		(StageType(EOR)); break;
+		case 0x5E: AbsoluteXRMW			(StageType(LSR)); break;
         case 0x5F: AbsoluteXLong		(StageType(EOR)); break;
         case 0x61: DirectXIndirect      (StageType(ADC)); break;
+		case 0x6C: AbsoluteIndirectJMP  (StageType(dummyStage)); break;//JMP
 		case 0x6D: Absolute      		(StageType(ADC)); break;
 		case 0x6E: AbsoluteRMW			(StageType(ROR)); break;
 		case 0x6F: AbsoluteLong			(StageType(ADC)); break;
         case 0x70: RelativeBranch       (StageType(BVS)); break;
+		case 0x79: AbsoluteY    		(StageType(ADC)); break;
+		case 0x7C: AbsoluteXIndirectJMP	(StageType(dummyStage)); break;//JMP
         case 0x7D: AbsoluteX    		(StageType(ADC)); break;
+		case 0x7E: AbsoluteXRMW			(StageType(ROR)); break;
         case 0x7F: AbsoluteXLong		(StageType(ADC)); break;
         case 0x80: RelativeBranch       (StageType(BRA)); break;
         case 0x82: RelativeBranchLong   (StageType(dummyStage)); break;//BRL
@@ -138,7 +148,10 @@ void W65816::decode(bool predecode)
 		case 0x8E: isIndexRelated=true;AbsoluteWrite(StageType(STX)); break;
 		case 0x8F: AbsoluteLongWrite	(StageType(STA)); break;
         case 0x90: RelativeBranch       (StageType(BCC)); break;
+		case 0x99: AbsoluteYWrite    	(StageType(STA)); break;
 		case 0x9C: AbsoluteWrite		(StageType(STZ)); break;
+        case 0x9D: AbsoluteXWrite    	(StageType(STA)); break;
+        case 0x9E: AbsoluteXWrite    	(StageType(STZ)); break;
         case 0x9F: AbsoluteXLongWrite	(StageType(STA)); break;
         case 0xA1: DirectXIndirect      (StageType(LDA)); break;
 		case 0xAC: isIndexRelated=true;Absolute(StageType(LDY)); break;//this is the worst line of code ever wrote in all history
@@ -146,8 +159,10 @@ void W65816::decode(bool predecode)
 		case 0xAE: isIndexRelated=true;Absolute(StageType(LDX)); break;
 		case 0xAF: AbsoluteLong			(StageType(LDA)); break;
         case 0xB0: RelativeBranch       (StageType(BCS)); break;
+		case 0xB9: AbsoluteY    		(StageType(LDA)); break;
         case 0xBC: isIndexRelated=true;AbsoluteX(StageType(LDY)); break;
         case 0xBD: AbsoluteX    		(StageType(LDA)); break;
+		case 0xBE: isIndexRelated=true;AbsoluteY(StageType(LDX)); break;
         case 0xBF: AbsoluteXLong		(StageType(LDA)); break;
         case 0xC1: DirectXIndirect      (StageType(CMP)); break;
 		case 0xCC: isIndexRelated=true;Absolute(StageType(CPY)); break;
@@ -155,7 +170,10 @@ void W65816::decode(bool predecode)
 		case 0xCE: AbsoluteRMW			(StageType(DEC)); break;
 		case 0xCF: AbsoluteLong			(StageType(CMP)); break;
         case 0xD0: RelativeBranch       (StageType(BNE)); break;
+		case 0xD9: AbsoluteY    		(StageType(CMP)); break;
+		case 0xDC: AbsoluteIndirectJML  (StageType(dummyStage)); break;//JML
         case 0xDD: AbsoluteX    		(StageType(CMP)); break;
+		case 0xDE: AbsoluteXRMW			(StageType(DEC)); break;
         case 0xDF: AbsoluteXLong		(StageType(CMP)); break;
         case 0xE1: DirectXIndirect      (StageType(SBC)); break;
 		case 0xEC: isIndexRelated=true;Absolute(StageType(CPX)); break;
@@ -163,7 +181,10 @@ void W65816::decode(bool predecode)
 		case 0xEE: AbsoluteRMW			(StageType(INC)); break;
 		case 0xEF: AbsoluteLong			(StageType(SBC)); break;
         case 0xF0: RelativeBranch       (StageType(BEQ)); break;
+		case 0xF9: AbsoluteY    		(StageType(SBC)); break;
+		case 0xFC: AbsoluteXIndirectJSR	(StageType(dummyStage)); break;//JSR
         case 0xFD: AbsoluteX    		(StageType(SBC)); break;
+		case 0xFE: AbsoluteXRMW			(StageType(INC)); break;
         case 0xFF: AbsoluteXLong		(StageType(SBC)); break;
         }
     }
@@ -485,6 +506,241 @@ void W65816::AbsoluteX(StageType&& inst)
 		fetch(&adr,&idb.high);
 	}
 }
+
+void W65816::AbsoluteXWrite(StageType&& inst)
+{
+	if(preDecodeStage)
+	{
+		; //empty
+	}
+
+	if(isStageEnabled(0,SIG_ALWAYS))
+	{
+		fetchInc(&pc,&adr.high);
+        halfAdd(&adr.low,&x.low);
+	}
+	if(isStageEnabled(1,SIG_X_CROSS_PAGE))
+	{
+		dummyFetchLong(&dbr,&adr);
+        fixCarry(&adr.high,&x.high);
+	}
+    if(isStageEnabled(2,SIG_ALWAYS))
+	{
+		inst(this);
+        writeInc(&adr,&idb.low);
+	}
+    if(isStageEnabled(3,SIG_MODE16_ONLY))
+	{
+		write(&adr,&idb.high);
+	}
+}
+
+void W65816::AbsoluteXRMW(StageType&& inst)
+{
+	if(preDecodeStage)
+	{
+		; //empty
+	}
+
+	if(isStageEnabled(0,SIG_ALWAYS))
+	{
+		fetchInc(&pc,&adr.high);
+        halfAdd(&adr.low,&x.low);
+	}
+	if(isStageEnabled(1,SIG_X_CROSS_PAGE))
+	{
+		dummyFetchLong(&dbr,&adr);
+        fixCarry(&adr.high,&x.high);
+	}
+    if(isStageEnabled(2,SIG_ALWAYS))
+	{
+		fetchInc(&adr,&idb.low);
+	}
+    if(isStageEnabled(3,SIG_MODE16_ONLY))
+	{
+		fetch(&adr,&idb.high);
+	}
+	if(isStageEnabled(4,SIG_ALWAYS))
+	{
+		dummyFetchLast();
+		inst(this);
+		if(enablingSignals[SIG_MODE8_ONLY])
+			decReg(&adr);
+	}
+	if(isStageEnabled(5,SIG_MODE16_ONLY))
+	{
+		writeDec(&adr,&idb.high);
+	}
+	if(isStageEnabled(6,SIG_ALWAYS))
+	{
+		write(&adr,&idb.low);
+	}
+}
+
+void W65816::AbsoluteY(StageType&& inst)
+{
+	if(preDecodeStage)
+	{
+		lastPipelineStage = inst;
+	}
+
+	if(isStageEnabled(0,SIG_ALWAYS))
+	{
+		fetchInc(&pc,&adr.high);
+        halfAdd(&adr.low,&y.low);
+	}
+	if(isStageEnabled(1,SIG_Y_CROSS_PAGE))
+	{
+		dummyFetchLong(&dbr,&adr);
+        fixCarry(&adr.high,&y.high);
+	}
+    if(isStageEnabled(2,SIG_ALWAYS))
+	{
+		fetchInc(&adr,&idb.low);
+	}
+    if(isStageEnabled(3,SIG_MODE16_ONLY))
+	{
+		fetch(&adr,&idb.high);
+	}
+}
+
+void W65816::AbsoluteYWrite(StageType&& inst)
+{
+	if(preDecodeStage)
+	{
+		; //empty
+	}
+
+	if(isStageEnabled(0,SIG_ALWAYS))
+	{
+		fetchInc(&pc,&adr.high);
+        halfAdd(&adr.low,&y.low);
+	}
+	if(isStageEnabled(1,SIG_Y_CROSS_PAGE))
+	{
+		dummyFetchLong(&dbr,&adr);
+        fixCarry(&adr.high,&y.high);
+	}
+    if(isStageEnabled(2,SIG_ALWAYS))
+	{
+		inst(this);
+        writeInc(&adr,&idb.low);
+	}
+    if(isStageEnabled(3,SIG_MODE16_ONLY))
+	{
+		write(&adr,&idb.high);
+	}
+}
+
+void W65816::AbsoluteXIndirectJMP(StageType&& inst)
+{
+	if(preDecodeStage)
+	{
+		lastPipelineStage = inst;
+	}
+
+	if(isStageEnabled(0,SIG_ALWAYS))
+	{
+		fetchInc(&pc,&adr.high);
+	}
+	if(isStageEnabled(1,SIG_ALWAYS))
+	{
+		dummyFetchLast();
+		fullAdd(&adr,&x);
+	}
+    if(isStageEnabled(2,SIG_ALWAYS))
+	{
+		fetchIncLong(&pbr,&adr,&pc.low);
+	}
+    if(isStageEnabled(3,SIG_ALWAYS))
+	{
+		fetchLong(&pbr,&adr,&pc.high);
+	}
+}
+
+void W65816::AbsoluteXIndirectJSR(StageType&& inst)
+{
+	if(preDecodeStage)
+	{
+		lastPipelineStage = inst;
+	}
+
+	if(isStageEnabled(0,SIG_ALWAYS))
+	{
+		push(&pc.high);
+	}
+	if(isStageEnabled(1,SIG_ALWAYS))
+	{
+		push(&pc.low);
+	}
+    if(isStageEnabled(2,SIG_ALWAYS))
+	{
+		fetch(&pc,&adr.high);
+	}
+    if(isStageEnabled(3,SIG_ALWAYS))
+	{
+		dummyFetchLast();
+		fullAdd(&adr,&x);
+	}
+	if(isStageEnabled(4,SIG_ALWAYS))
+	{
+		fetchIncLong(&pbr,&adr,&pc.low);
+	}
+	if(isStageEnabled(5,SIG_ALWAYS))
+	{
+		fetchLong(&pbr,&adr,&pc.high);
+	}
+}
+
+void W65816::AbsoluteIndirectJML(StageType&& inst)
+{
+	if(preDecodeStage)
+	{
+		lastPipelineStage = inst;
+	}
+
+	if(isStageEnabled(0,SIG_ALWAYS))
+	{
+		fetchInc(&pc,&adr.high);
+	}
+	if(isStageEnabled(1,SIG_ALWAYS))
+	{
+		fetchIncLong(&ZERO,&adr,&pc.low);
+	}
+    if(isStageEnabled(2,SIG_ALWAYS))
+	{
+		fetchIncLong(&ZERO,&adr,&pc.high);
+	}
+    if(isStageEnabled(3,SIG_ALWAYS))
+	{
+		fetchLong(&ZERO,&adr,&pbr);
+	}
+}
+
+void W65816::AbsoluteIndirectJMP(StageType&& inst)
+{
+	if(preDecodeStage)
+	{
+		lastPipelineStage = inst;
+	}
+
+	if(isStageEnabled(0,SIG_ALWAYS))
+	{
+		fetchInc(&pc,&adr.high);
+	}
+	if(isStageEnabled(1,SIG_ALWAYS))
+	{
+		fetchIncLong(&ZERO,&adr,&pc.low);
+	}
+    if(isStageEnabled(2,SIG_ALWAYS))
+	{
+		fetchLong(&ZERO,&adr,&pc.high);
+	}
+}
+
+
+
+
 
 /////////////////////////
 void W65816::DirectXIndirect(StageType&& inst)

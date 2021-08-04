@@ -389,6 +389,14 @@ private:
     void AbsoluteXLong			(StageType&& inst);
     void AbsoluteXLongWrite		(StageType&& inst);
     void AbsoluteX      		(StageType&& inst);
+	void AbsoluteXWrite    		(StageType&& inst);
+	void AbsoluteXRMW    		(StageType&& inst);
+	void AbsoluteY      		(StageType&& inst);
+	void AbsoluteYWrite    		(StageType&& inst);
+	void AbsoluteXIndirectJMP	(StageType&& inst);
+	void AbsoluteXIndirectJSR	(StageType&& inst);
+	void AbsoluteIndirectJML	(StageType&& inst);
+	void AbsoluteIndirectJMP	(StageType&& inst);
 
     void DirectXIndirect		(StageType&& inst);
     void RelativeBranch			(StageType&& inst);
