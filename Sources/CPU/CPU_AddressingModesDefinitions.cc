@@ -5,43 +5,6 @@ using namespace std::placeholders;
 
 void W65816::initializeAddressingModes()
 {
-    Accumulator.setStages({{Stage(Stage::SIG_INST,dummyStage),Stage(Stage::SIG_ALWAYS,moveReg8,&idb.low,&acc.low),Stage(Stage::SIG_MODE16_ONLY,moveReg8,&idb.high,&acc.high)}});
-    Accumulator.setPredecodeSignals({bind(invalidPrefetch,this),bind(accPrefetchInIDB,this)});
-
-
-    Direct.setStages({  {Stage(Stage::SIG_DL_NOT_ZERO,dummyFetchLast),Stage(Stage::SIG_DL_NOT_ZERO,halfAdd,&adr.low,&d.low),Stage(Stage::SIG_DL_NOT_ZERO,fixCarry,&adr.high,&ZERO)},
-                        {Stage(Stage::SIG_ALWAYS,fetchIncLong,&ZERO,&adr,&idb.low)},
-                        {Stage(Stage::SIG_MODE16_ONLY,fetchLong,&ZERO,&adr,&idb.high)},
-                        {Stage(Stage::SIG_INST,dummyStage)}});
-    Direct.setSignals({bind(incPC,this,1),bind(dhPrefetchInAdr,this)});
-
-
-    DirectWrite.setStages({ {Stage(Stage::SIG_DL_NOT_ZERO,dummyFetchLast),Stage(Stage::SIG_DL_NOT_ZERO,halfAdd,&adr.low,&d.low),Stage(Stage::SIG_DL_NOT_ZERO,fixCarry,&adr.high,&ZERO)},
-                            {Stage(Stage::SIG_INST,dummyStage),Stage(Stage::SIG_ALWAYS,writeIncLong,&ZERO,&adr,&idb.low)},
-                            {Stage(Stage::SIG_MODE16_ONLY,writeLong,&ZERO,&adr,&idb.high)},
-                            {Stage(Stage::SIG_DUMMY_STAGE,dummyStage)}});
-    DirectWrite.setSignals({bind(incPC,this,1),bind(dhPrefetchInAdr,this)});
-
-
-    DirectRMW.setStages({   {Stage(Stage::SIG_DL_NOT_ZERO,dummyFetchLast),Stage(Stage::SIG_DL_NOT_ZERO,halfAdd,&adr.low,&d.low),Stage(Stage::SIG_DL_NOT_ZERO,fixCarry,&adr.high,&ZERO)},
-                            {Stage(Stage::SIG_ALWAYS,fetchIncLong,&ZERO,&adr,&idb.low)},
-                            {Stage(Stage::SIG_MODE16_ONLY,fetchLong,&ZERO,&adr,&idb.high)},
-                            {Stage(Stage::SIG_ALWAYS,dummyFetchLast),Stage(Stage::SIG_INST,dummyStage),Stage(Stage::SIG_MODE8_ONLY,decReg,&adr)},
-                            {Stage(Stage::SIG_MODE16_ONLY,writeDecLong,&ZERO,&adr,&idb.high)},
-                            {Stage(Stage::SIG_ALWAYS,writeLong,&ZERO,&adr,&idb.low)},
-                            {Stage(Stage::SIG_DUMMY_STAGE,dummyStage)}});
-    DirectRMW.setSignals({bind(incPC,this,1),bind(dhPrefetchInAdr,this)});
-
-    DirectXIndirectWrite.setStages({{Stage(Stage::SIG_DL_NOT_ZERO,dummyFetchLast),Stage(Stage::SIG_DL_NOT_ZERO,halfAdd,&adr.low,&d.low),Stage(Stage::SIG_DL_NOT_ZERO,fixCarry,&adr.high,&ZERO)},
-                                    {Stage(Stage::SIG_ALWAYS,dummyFetchLast),Stage(Stage::SIG_ALWAYS,fullAdd,&adr,&x)},
-                                    {Stage(Stage::SIG_ALWAYS,fetchIncLong,&ZERO,&adr,&idb.low)},
-                                    {Stage(Stage::SIG_ALWAYS,fetchLong,&ZERO,&adr,&adr.high),Stage(Stage::SIG_ALWAYS,moveReg8,&idb.low,&adr.low)},
-                                    {Stage(Stage::SIG_INST,dummyStage),Stage(Stage::SIG_ALWAYS,writeIncLong,&ZERO,&adr,&idb.low)},
-                                    {Stage(Stage::SIG_MODE16_ONLY,writeLong,&ZERO,&adr,&idb.high)},
-                                    {Stage(Stage::SIG_DUMMY_STAGE,dummyStage)}});
-    DirectXIndirectWrite.setSignals({bind(incPC,this,1),bind(dhPrefetchInAdr,this)});
-
-
     DirectIndirect.setStages({  {Stage(Stage::SIG_DL_NOT_ZERO,dummyFetchLast),Stage(Stage::SIG_DL_NOT_ZERO,halfAdd,&adr.low,&d.low),Stage(Stage::SIG_DL_NOT_ZERO,fixCarry,&adr.high,&ZERO)},
                                 {Stage(Stage::SIG_ALWAYS,fetchIncLong,&ZERO,&adr,&idb.low)},
                                 {Stage(Stage::SIG_ALWAYS,fetchLong,&ZERO,&adr,&adr.high),Stage(Stage::SIG_ALWAYS,moveReg8,&idb.low,&adr.low)},

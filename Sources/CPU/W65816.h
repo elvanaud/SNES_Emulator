@@ -397,8 +397,13 @@ private:
 	void AbsoluteXIndirectJSR	(StageType&& inst);
 	void AbsoluteIndirectJML	(StageType&& inst);
 	void AbsoluteIndirectJMP	(StageType&& inst);
-
+	void Accumulator			(StageType&& inst);
+	void Direct					(StageType&& inst);
+	void DirectWrite			(StageType&& inst);
+	void DirectRMW				(StageType&& inst);
     void DirectXIndirect		(StageType&& inst);
+	void DirectXIndirectWrite	(StageType&& inst);
+
     void RelativeBranch			(StageType&& inst);
     void RelativeBranchLong		(StageType&& inst);
     void StackInterupt			(StageType&& inst);

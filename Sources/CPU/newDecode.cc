@@ -96,12 +96,18 @@ void W65816::decode(bool predecode)
 		case 0x00: StackInterupt      	(StageType(BRK)); break;
         case 0x01: DirectXIndirect      (StageType(ORA)); break;
 		case 0x02: StackInterupt      	(StageType(COP)); break;
+		case 0x04: DirectRMW      		(StageType(TSB)); break;
+		case 0x05: Direct      			(StageType(ORA)); break;
+		case 0x06: DirectRMW      		(StageType(ASL)); break;
+		case 0x0A: Accumulator      	(StageType(ASL)); break;
 		case 0x0C: AbsoluteRMW			(StageType(TSB)); break;
 		case 0x0D: Absolute      		(StageType(ORA)); break;
 		case 0x0E: AbsoluteRMW			(StageType(ASL)); break;
 		case 0x0F: AbsoluteLong			(StageType(ORA)); break;
         case 0x10: RelativeBranch       (StageType(BPL)); break;
+		case 0x14: DirectRMW      		(StageType(TRB)); break;
 		case 0x19: AbsoluteY    		(StageType(ORA)); break;
+		case 0x1A: Accumulator      	(StageType(INC)); break;
 		case 0x1C: AbsoluteRMW			(StageType(TRB)); break;
         case 0x1D: AbsoluteX    		(StageType(ORA)); break;
 		case 0x1E: AbsoluteXRMW			(StageType(ASL)); break;
@@ -109,17 +115,25 @@ void W65816::decode(bool predecode)
 		case 0x20: AbsoluteJSR			(StageType(dummyStage)); break;//JSR
         case 0x21: DirectXIndirect      (StageType(AND)); break;
         case 0x22: AbsoluteLongJSL  	(StageType(dummyStage)); break;//JSL
+		case 0x24: Direct      			(StageType(BIT)); break;
+		case 0x25: Direct      			(StageType(AND)); break;
+		case 0x26: DirectRMW      		(StageType(ROL)); break;
+		case 0x2A: Accumulator      	(StageType(ROL)); break;//ROL A
 		case 0x2C: Absolute      		(StageType(BIT)); break;
 		case 0x2D: Absolute      		(StageType(AND)); break;
 		case 0x2E: AbsoluteRMW			(StageType(ROL)); break;
 		case 0x2F: AbsoluteLong			(StageType(AND)); break;
         case 0x30: RelativeBranch       (StageType(BMI)); break;
 		case 0x39: AbsoluteY    		(StageType(AND)); break;
+		case 0x3A: Accumulator      	(StageType(DEC)); break;
         case 0x3C: AbsoluteX    		(StageType(BIT)); break;
         case 0x3D: AbsoluteX    		(StageType(AND)); break;
 		case 0x3E: AbsoluteXRMW			(StageType(ROL)); break;
         case 0x3F: AbsoluteXLong		(StageType(AND)); break;
         case 0x41: DirectXIndirect      (StageType(EOR)); break;
+		case 0x45: Direct      			(StageType(EOR)); break;
+		case 0x46: DirectRMW      		(StageType(LSR)); break;
+		case 0x4A: Accumulator      	(StageType(LSR)); break;
 		case 0x4C: AbsoluteJMP      	(StageType(dummyStage)); break;//JMP
 		case 0x4D: Absolute      		(StageType(EOR)); break;
 		case 0x4E: AbsoluteRMW			(StageType(LSR)); break;
@@ -131,6 +145,10 @@ void W65816::decode(bool predecode)
 		case 0x5E: AbsoluteXRMW			(StageType(LSR)); break;
         case 0x5F: AbsoluteXLong		(StageType(EOR)); break;
         case 0x61: DirectXIndirect      (StageType(ADC)); break;
+		case 0x64: DirectWrite      	(StageType(STZ)); break;
+		case 0x65: Direct      			(StageType(ADC)); break;
+		case 0x66: DirectRMW      		(StageType(ROR)); break;
+		case 0x6A: Accumulator      	(StageType(ROR)); break;
 		case 0x6C: AbsoluteIndirectJMP  (StageType(dummyStage)); break;//JMP
 		case 0x6D: Absolute      		(StageType(ADC)); break;
 		case 0x6E: AbsoluteRMW			(StageType(ROR)); break;
@@ -142,7 +160,11 @@ void W65816::decode(bool predecode)
 		case 0x7E: AbsoluteXRMW			(StageType(ROR)); break;
         case 0x7F: AbsoluteXLong		(StageType(ADC)); break;
         case 0x80: RelativeBranch       (StageType(BRA)); break;
+		case 0x81: DirectXIndirectWrite (StageType(STA)); break;
         case 0x82: RelativeBranchLong   (StageType(dummyStage)); break;//BRL
+		case 0x84: isIndexRelated=true;DirectWrite(StageType(STY)); break;
+		case 0x85: DirectWrite      	(StageType(STA)); break;
+		case 0x86: isIndexRelated=true;DirectWrite(StageType(STX)); break;
 		case 0x8C: isIndexRelated=true;AbsoluteWrite(StageType(STY)); break;
 		case 0x8D: AbsoluteWrite		(StageType(STA)); break;
 		case 0x8E: isIndexRelated=true;AbsoluteWrite(StageType(STX)); break;
@@ -154,6 +176,9 @@ void W65816::decode(bool predecode)
         case 0x9E: AbsoluteXWrite    	(StageType(STZ)); break;
         case 0x9F: AbsoluteXLongWrite	(StageType(STA)); break;
         case 0xA1: DirectXIndirect      (StageType(LDA)); break;
+		case 0xA4: isIndexRelated=true;Direct(StageType(LDY)); break;
+		case 0xA5: Direct      			(StageType(LDA)); break;
+		case 0xA6: isIndexRelated=true;Direct(StageType(LDX)); break;
 		case 0xAC: isIndexRelated=true;Absolute(StageType(LDY)); break;//this is the worst line of code ever wrote in all history
 		case 0xAD: Absolute      		(StageType(LDA)); break;
 		case 0xAE: isIndexRelated=true;Absolute(StageType(LDX)); break;
@@ -165,6 +190,9 @@ void W65816::decode(bool predecode)
 		case 0xBE: isIndexRelated=true;AbsoluteY(StageType(LDX)); break;
         case 0xBF: AbsoluteXLong		(StageType(LDA)); break;
         case 0xC1: DirectXIndirect      (StageType(CMP)); break;
+		case 0xC4: isIndexRelated=true;Direct(StageType(CPY)); break;
+		case 0xC5: Direct      			(StageType(CMP)); break;
+		case 0xC6: DirectRMW      		(StageType(DEC)); break;
 		case 0xCC: isIndexRelated=true;Absolute(StageType(CPY)); break;
 		case 0xCD: Absolute				(StageType(CMP)); break;
 		case 0xCE: AbsoluteRMW			(StageType(DEC)); break;
@@ -176,6 +204,9 @@ void W65816::decode(bool predecode)
 		case 0xDE: AbsoluteXRMW			(StageType(DEC)); break;
         case 0xDF: AbsoluteXLong		(StageType(CMP)); break;
         case 0xE1: DirectXIndirect      (StageType(SBC)); break;
+		case 0xE4: isIndexRelated=true;Direct(StageType(CPX)); break;
+		case 0xE5: Direct      			(StageType(SBC)); break;
+		case 0xE6: DirectRMW      		(StageType(INC)); break;
 		case 0xEC: isIndexRelated=true;Absolute(StageType(CPX)); break;
 		case 0xED: Absolute				(StageType(SBC)); break;
 		case 0xEE: AbsoluteRMW			(StageType(INC)); break;
@@ -738,11 +769,110 @@ void W65816::AbsoluteIndirectJMP(StageType&& inst)
 	}
 }
 
+void W65816::Accumulator(StageType&& inst)
+{
+    if(preDecodeStage)
+    {
+        invalidPrefetch();
+		accPrefetchInIDB();
+		noAutoIncPC();
+    }
 
+    if(isStageEnabled(0,SIG_ALWAYS))
+    {
+		inst(this);
+		moveReg8(&idb.low,&acc.low);
+		if(enablingSignals[SIG_MODE16_ONLY])
+			moveReg8(&idb.high,&acc.high);
+	}
+}
 
+void W65816::Direct(StageType&& inst)
+{
+    if(preDecodeStage)
+    {
+        dhPrefetchInAdr();
+        lastPipelineStage = inst;
+    }
 
+    if(isStageEnabled(0,SIG_DL_NOT_ZERO))
+    {
+        dummyFetchLast();
+        halfAdd(&adr.low,&d.low);
+        fixCarry(&adr.high,&ZERO);
+    }
+	if(isStageEnabled(1,SIG_ALWAYS))
+	{
+		fetchIncLong(&ZERO,&adr,&idb.low);
+	}
+	if(isStageEnabled(2,SIG_MODE16_ONLY))
+	{
+		fetchLong(&ZERO,&adr,&idb.high);
+	}
+}
 
-/////////////////////////
+void W65816::DirectWrite(StageType&& inst)
+{
+    if(preDecodeStage)
+    {
+        dhPrefetchInAdr();
+    }
+
+    if(isStageEnabled(0,SIG_DL_NOT_ZERO))
+    {
+        dummyFetchLast();
+        halfAdd(&adr.low,&d.low);
+        fixCarry(&adr.high,&ZERO);
+    }
+	if(isStageEnabled(1,SIG_ALWAYS))
+	{
+		inst(this);
+		writeIncLong(&ZERO,&adr,&idb.low);
+	}
+	if(isStageEnabled(2,SIG_MODE16_ONLY))
+	{
+		writeLong(&ZERO,&adr,&idb.high);
+	}
+}	
+
+void W65816::DirectRMW(StageType&& inst)
+{
+    if(preDecodeStage)
+    {
+        dhPrefetchInAdr();
+    }
+
+    if(isStageEnabled(0,SIG_DL_NOT_ZERO))
+    {
+        dummyFetchLast();
+        halfAdd(&adr.low,&d.low);
+        fixCarry(&adr.high,&ZERO);
+    }
+    if(isStageEnabled(1,SIG_ALWAYS))
+    {
+        fetchIncLong(&ZERO,&adr,&idb.low);
+    }
+	if(isStageEnabled(2,SIG_MODE16_ONLY))
+	{
+		fetchLong(&ZERO,&adr,&idb.high);
+	}
+	if(isStageEnabled(3,SIG_ALWAYS))
+	{
+		dummyFetchLast();
+		inst(this);
+		if(enablingSignals[SIG_MODE8_ONLY])
+			decReg(&adr);
+	}
+	if(isStageEnabled(4,SIG_MODE16_ONLY))
+	{
+		writeDecLong(&ZERO,&adr,&idb.high);
+	}
+	if(isStageEnabled(5,SIG_ALWAYS))
+	{
+		writeLong(&ZERO,&adr,&idb.low);
+	}
+}	
+
 void W65816::DirectXIndirect(StageType&& inst)
 {
     if(preDecodeStage)
@@ -781,6 +911,49 @@ void W65816::DirectXIndirect(StageType&& inst)
     }
 }
 
+void W65816::DirectXIndirectWrite(StageType&& inst)
+{
+    if(preDecodeStage)
+    {
+        dhPrefetchInAdr();
+    }
+
+    if(isStageEnabled(0,SIG_DL_NOT_ZERO))
+    {
+        dummyFetchLast();
+        halfAdd(&adr.low,&d.low);
+        fixCarry(&adr.high,&ZERO);
+    }
+    if(isStageEnabled(1,SIG_ALWAYS))
+    {
+        dummyFetchLast();
+        fullAdd(&adr,&x);
+    }
+    if(isStageEnabled(2,SIG_ALWAYS))
+    {
+        fetchIncLong(&ZERO,&adr,&idb.low);
+    }
+    if(isStageEnabled(3,SIG_ALWAYS))
+    {
+        fetchLong(&ZERO,&adr,&adr.high);
+        moveReg8(&idb.low,&adr.low);
+    }
+    if(isStageEnabled(4,SIG_ALWAYS))
+    {
+        inst(this);
+		writeIncLong(&ZERO,&adr,&idb.low);
+    }
+    if(isStageEnabled(5,SIG_MODE16_ONLY))
+    {
+        writeLong(&ZERO,&adr,&idb.high);
+    }
+}
+
+
+
+
+
+/////////////
 void W65816::RelativeBranch(StageType&& inst)
 {
     if(preDecodeStage)
