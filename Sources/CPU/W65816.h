@@ -380,6 +380,16 @@ private:
 	void Absolute				(StageType&& inst);
 	void AbsoluteWrite			(StageType&& inst);
 	void AbsoluteRMW			(StageType&& inst);
+	void AbsoluteJMP			(StageType&& inst);
+	void AbsoluteJSR			(StageType&& inst);
+	void AbsoluteLong			(StageType&& inst);
+	void AbsoluteLongWrite		(StageType&& inst);
+    void AbsoluteLongJMP		(StageType&& inst);
+    void AbsoluteLongJSL		(StageType&& inst);
+    void AbsoluteXLong			(StageType&& inst);
+    void AbsoluteXLongWrite		(StageType&& inst);
+    void AbsoluteX      		(StageType&& inst);
+
     void DirectXIndirect		(StageType&& inst);
     void RelativeBranch			(StageType&& inst);
     void RelativeBranchLong		(StageType&& inst);
