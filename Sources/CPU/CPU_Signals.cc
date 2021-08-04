@@ -19,7 +19,8 @@ void W65816::noAutoIncPC()
 void W65816::opPrefetchInIDB()
 {
     //if(tcycle == 1) 
-    idb.low = adr.low;
+    //idb.low = adr.low;
+    doPrefetchInIDB = true;
     //cout << "opPrefetchInIDB" << endl;
 }
 

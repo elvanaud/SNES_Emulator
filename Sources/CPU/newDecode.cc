@@ -14,8 +14,12 @@ void W65816::tick()
     if(tcycle == 0)
     {
         lastPipelineStage(this);
+
         lastPipelineStage = StageType(dummyStage);
+		pipelineContent = REGULAR_INST;//move that in cycle 0 for more clarity
+		prefetchIncPC = true;
 		isIndexRelated = false; //this must be reset here after the last stage is executed
+		doPrefetchInIDB = false;
 
         fetchInc(&pc,&ir);
     }
@@ -29,6 +33,7 @@ void W65816::tick()
         pipelineSize = i + 2;
 
         fetch(&pc,&adr.low); //auto inc pc by default...? yes 52 out of 63 adr mode have a incPC signal
+		if(doPrefetchInIDB) idb.low = adr.low;
         if(prefetchIncPC) ++pc;
     }
     else
@@ -40,8 +45,6 @@ void W65816::tick()
     {
         checkInterupts();
         tcycle = 0;
-		pipelineContent = REGULAR_INST;//move that in cycle 0 for more clarity
-		prefetchIncPC = true;
     }
 }
 
@@ -100,6 +103,7 @@ void W65816::decode(bool predecode)
 		case 0x05: Direct      				(StageType(ORA)); break;
 		case 0x06: DirectRMW      			(StageType(ASL)); break;
 		case 0x07: DirectIndirectLong      	(StageType(ORA)); break;
+		case 0x09: Immediate		      	(StageType(ORA)); break;
 		case 0x0A: Accumulator      		(StageType(ASL)); break;
 		case 0x0C: AbsoluteRMW				(StageType(TSB)); break;
 		case 0x0D: Absolute      			(StageType(ORA)); break;
@@ -125,6 +129,7 @@ void W65816::decode(bool predecode)
 		case 0x25: Direct      				(StageType(AND)); break;
 		case 0x26: DirectRMW      			(StageType(ROL)); break;
 		case 0x27: DirectIndirectLong      	(StageType(AND)); break;
+		case 0x29: Immediate		      	(StageType(AND)); break;
 		case 0x2A: Accumulator      		(StageType(ROL)); break;//ROL A
 		case 0x2C: Absolute      			(StageType(BIT)); break;
 		case 0x2D: Absolute      			(StageType(AND)); break;
@@ -144,9 +149,11 @@ void W65816::decode(bool predecode)
 		case 0x3E: AbsoluteXRMW				(StageType(ROL)); break;
         case 0x3F: AbsoluteXLong			(StageType(AND)); break;
         case 0x41: DirectXIndirect      	(StageType(EOR)); break;
+		case 0x42: Immediate		      	(StageType(dummyStage)); break;//WDM
 		case 0x45: Direct      				(StageType(EOR)); break;
 		case 0x46: DirectRMW      			(StageType(LSR)); break;
 		case 0x47: DirectIndirectLong      	(StageType(EOR)); break;
+		case 0x49: Immediate		      	(StageType(EOR)); break;
 		case 0x4A: Accumulator      		(StageType(LSR)); break;
 		case 0x4C: AbsoluteJMP      		(StageType(dummyStage)); break;//JMP
 		case 0x4D: Absolute      			(StageType(EOR)); break;
@@ -168,6 +175,7 @@ void W65816::decode(bool predecode)
 		case 0x65: Direct      				(StageType(ADC)); break;
 		case 0x66: DirectRMW      			(StageType(ROR)); break;
 		case 0x67: DirectIndirectLong      	(StageType(ADC)); break;
+		case 0x69: Immediate		      	(StageType(ADC)); break;
 		case 0x6A: Accumulator      		(StageType(ROR)); break;
 		case 0x6C: AbsoluteIndirectJMP  	(StageType(dummyStage)); break;//JMP
 		case 0x6D: Absolute      			(StageType(ADC)); break;
@@ -192,6 +200,7 @@ void W65816::decode(bool predecode)
 		case 0x85: DirectWrite      		(StageType(STA)); break;
 		case 0x86: isIndexRelated=true;DirectWrite(StageType(STX)); break;
 		case 0x87: DirectIndirectLongWrite  (StageType(STA)); break;
+		case 0x89: Immediate		      	(StageType(BIT)); break;
 		case 0x8C: isIndexRelated=true;AbsoluteWrite(StageType(STY)); break;
 		case 0x8D: AbsoluteWrite			(StageType(STA)); break;
 		case 0x8E: isIndexRelated=true;AbsoluteWrite(StageType(STX)); break;
@@ -208,11 +217,14 @@ void W65816::decode(bool predecode)
         case 0x9D: AbsoluteXWrite    		(StageType(STA)); break;
         case 0x9E: AbsoluteXWrite    		(StageType(STZ)); break;
         case 0x9F: AbsoluteXLongWrite		(StageType(STA)); break;
+		case 0xA0: isIndexRelated=true;Immediate(StageType(LDY)); break;
         case 0xA1: DirectXIndirect      	(StageType(LDA)); break;
+		case 0xA2: isIndexRelated=true;Immediate(StageType(LDX)); break;
 		case 0xA4: isIndexRelated=true;Direct(StageType(LDY)); break;
 		case 0xA5: Direct      				(StageType(LDA)); break;
 		case 0xA6: isIndexRelated=true;Direct(StageType(LDX)); break;
 		case 0xA7: DirectIndirectLong      	(StageType(LDA)); break;
+		case 0xA9: Immediate		      	(StageType(LDA)); break;
 		case 0xAC: isIndexRelated=true;Absolute(StageType(LDY)); break;//this is the worst line of code ever wrote in all history
 		case 0xAD: Absolute      			(StageType(LDA)); break;
 		case 0xAE: isIndexRelated=true;Absolute(StageType(LDX)); break;
@@ -229,11 +241,13 @@ void W65816::decode(bool predecode)
         case 0xBD: AbsoluteX    			(StageType(LDA)); break;
 		case 0xBE: isIndexRelated=true;AbsoluteY(StageType(LDX)); break;
         case 0xBF: AbsoluteXLong			(StageType(LDA)); break;
+		case 0xC0: isIndexRelated=true;Immediate(StageType(CPY)); break;
         case 0xC1: DirectXIndirect      	(StageType(CMP)); break;
 		case 0xC4: isIndexRelated=true;Direct(StageType(CPY)); break;
 		case 0xC5: Direct      				(StageType(CMP)); break;
 		case 0xC6: DirectRMW      			(StageType(DEC)); break;
 		case 0xC7: DirectIndirectLong      	(StageType(CMP)); break;
+		case 0xC9: Immediate		      	(StageType(CMP)); break;
 		case 0xCC: isIndexRelated=true;Absolute(StageType(CPY)); break;
 		case 0xCD: Absolute					(StageType(CMP)); break;
 		case 0xCE: AbsoluteRMW				(StageType(DEC)); break;
@@ -249,11 +263,13 @@ void W65816::decode(bool predecode)
         case 0xDD: AbsoluteX    			(StageType(CMP)); break;
 		case 0xDE: AbsoluteXRMW				(StageType(DEC)); break;
         case 0xDF: AbsoluteXLong			(StageType(CMP)); break;
+		case 0xE0: isIndexRelated=true;Immediate(StageType(CPX)); break;
         case 0xE1: DirectXIndirect      	(StageType(SBC)); break;
 		case 0xE4: isIndexRelated=true;Direct(StageType(CPX)); break;
 		case 0xE5: Direct      				(StageType(SBC)); break;
 		case 0xE6: DirectRMW      			(StageType(INC)); break;
 		case 0xE7: DirectIndirectLong      	(StageType(SBC)); break;
+		case 0xE9: Immediate		      	(StageType(SBC)); break;
 		case 0xEC: isIndexRelated=true;Absolute(StageType(CPX)); break;
 		case 0xED: Absolute					(StageType(SBC)); break;
 		case 0xEE: AbsoluteRMW				(StageType(INC)); break;
@@ -1457,6 +1473,21 @@ void W65816::DirectYWrite(StageType&& inst)
         writeLong(&ZERO,&adr,&idb.high);
     }
 }
+
+void W65816::Immediate(StageType&& inst)
+{
+    if(preDecodeStage)
+    {
+        opPrefetchInIDB();
+		lastPipelineStage = inst;
+    }
+
+    if(isStageEnabled(0,SIG_MODE16_ONLY))
+    {
+        fetchInc(&pc,&idb.high);
+    }
+}
+
 
 
 /////////////

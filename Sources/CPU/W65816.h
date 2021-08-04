@@ -366,6 +366,7 @@ private:
     
 	void noAutoIncPC();
 	bool prefetchIncPC = true;
+	bool doPrefetchInIDB = false;
 
 	enum PipelineContent {REGULAR_INST, IRQ_INTERUPT, NMI_INTERUPT, RESET_INTERUPT};
     PipelineContent pipelineContent = REGULAR_INST;
@@ -416,6 +417,7 @@ private:
 	void DirectXRMW					(StageType&& inst);
 	void DirectY					(StageType&& inst);
 	void DirectYWrite				(StageType&& inst);
+	void Immediate					(StageType&& inst);
 
     void RelativeBranch				(StageType&& inst);
     void RelativeBranchLong			(StageType&& inst);
