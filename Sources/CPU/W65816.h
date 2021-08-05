@@ -429,6 +429,16 @@ private:
 	void StackPush                  (StageType&& inst);
 	void StackPush8                 (StageType&& inst);
 	void StackPush16                (StageType&& inst);
+	void StackPEA                   (StageType&& inst);
+	void StackPEI                   (StageType&& inst);
+	void StackPER                   (StageType&& inst);
+	void StackRTI                   (StageType&& inst);
+	void StackRTS                   (StageType&& inst);
+	void StackRTL                   (StageType&& inst);
+	void StackRelative              (StageType&& inst);
+	void StackRelativeWrite         (StageType&& inst);
+	void StackRelativeIndirectY     (StageType&& inst);
+	void StackRelativeIndirectYWrite(StageType&& inst);
 	
 	void StackInterupt              (StageType&& inst);
 	
