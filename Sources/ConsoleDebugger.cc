@@ -158,7 +158,7 @@ void ConsoleDebugger::traceOrPrint()
 	using std::stringstream;
 
 	string instASM;
-	for(char c : cpu.getInst().getASM())
+	for(char c : cpu.getASM())
 		instASM+=tolower(c);
 
 	stringstream ss;

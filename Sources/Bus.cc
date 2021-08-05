@@ -215,9 +215,9 @@ void Bus::run()
 	unsigned int global_clock = 0;
 
 	clock_t startTime = clock();
-	debugger.debugTrace = false;
-	debugger.debugPrint = false;
-	debugger.stepMode = false;
+	debugger.debugTrace = true;
+	debugger.debugPrint = true;
+	debugger.stepMode = true;
 
 	while(app.isOpen())
 	{

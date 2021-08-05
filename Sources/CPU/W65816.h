@@ -53,6 +53,7 @@ public:
 
 	bool isBranchInstruction = false;   //used for debugging purposes (no effect in cpu emulation)
 	uint32_t branchAddress = 0;         // "
+	string getASM();
 
 private:
 	//Private Internal State

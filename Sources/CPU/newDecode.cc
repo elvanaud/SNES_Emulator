@@ -25,14 +25,15 @@ void W65816::tick()
 		//asm disassembly should be accessible here
 		//move decode(true) here ??
 		decode(true);//instruction specific predecode signals here
-	}
-	else if(tcycle == 1)
-	{
 		for(int i = 0; i < EnablingCondition::last; i++) enablingSignals[i] = isStageEnabled(EnablingCondition(i)); //evaluate after predecode signals
 
 		int i = 0;
 		for(i = enabledStages.size(); i > 0 && !enabledStages[i-1]; i--);
 		pipelineSize = i + 2;
+	}
+	else if(tcycle == 1)
+	{
+		
 
 		fetch(&pc,&adr.low); //auto inc pc by default...? yes 52 out of 63 adr mode have a incPC signal
 		if(doPrefetchInIDB) idb.low = adr.low;
@@ -54,7 +55,7 @@ bool W65816::isStageEnabled(unsigned int cycle, EnablingCondition signal)
 {
 	if(preDecodeStage)
 	{
-		enabledStages.resize(cycle,false);
+		enabledStages.resize(cycle+1,false);
 		enabledStages[cycle] = isStageEnabled(signal);
 		return false;
 	}
@@ -368,4 +369,9 @@ void W65816::decode(bool predecode)
 	
 	tcycle+=STARTING_CYCLE;
 	if(predecode) preDecodeStage = false;
+}
+
+string W65816::getASM()
+{
+	return opcodeASM;
 }

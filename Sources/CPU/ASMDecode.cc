@@ -11,7 +11,7 @@ using std::stringstream;
 void W65816::initializeAdrModeASMDecode()
 {
 	//string prefix = "$";
-
+	/*
 	auto absoluteAsm = [&](std::stringstream& stream, string prefix)
 	{
 		stream << " " << std::hex << prefix << setfill('0')<<setw(4)<< getParam(1,2);
@@ -142,7 +142,7 @@ void W65816::initializeAdrModeASMDecode()
 					branchAddress = (uint32_t(pbr)<<16)| uint16_t(pc.val()+offset+1);
 					stream << " " << std::hex << prefix << setfill('0')<<setw(4)<<uint16_t(pc.val()+offset+1);// << "(+"<<prefix<<uint32_t(offset)<<")";//TODO: display as signed decimal..
 				},
-			   {&RelativeBranchLong});
+			   {&RelativeBranchLong});*/
 }
 
 uint32_t W65816::getParam(int index, int length)
