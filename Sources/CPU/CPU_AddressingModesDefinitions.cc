@@ -5,14 +5,6 @@ using namespace std::placeholders;
 
 void W65816::initializeAddressingModes()
 {
-    ImmediateSpecial.setStages({{Stage(Stage::SIG_INST,dummyStage)},
-                                {Stage(Stage::SIG_DUMMY_STAGE, dummyStage)}});
-    ImmediateSpecial.setSignals({bind(incPC,this,2),bind(opPrefetchInIDB,this)});
-
-
-    Implied.setStages({{Stage(Stage::SIG_INST,dummyStage)}});
-    Implied.setPredecodeSignals({bind(invalidPrefetch,this)});
-
     ImpliedSpecial.setStages({  {Stage(Stage::SIG_INST,dummyStage)},
                                 {Stage(Stage::SIG_DUMMY_STAGE, dummyStage)}});
     ImpliedSpecial.setPredecodeSignals({bind(invalidPrefetch,this)});

@@ -16,491 +16,493 @@ class Bus;
 class W65816
 {
 public:
-    W65816();
-    void attachBus(Bus * b);
-    void tick();
+	W65816();
+	void attachBus(Bus * b);
+	void tick();
 
-    //Pins
-    bool VDA();
-    bool VPA();
-    bool E();
-    bool M();
-    bool X();
-    bool RDY();
+	//Pins
+	bool VDA();
+	bool VPA();
+	bool E();
+	bool M();
+	bool X();
+	bool RDY();
 
-    void triggerRDY(bool status);
+	void triggerRDY(bool status);
 
-    void triggerRESET();
-    void triggerIRQ();
-    void triggerNMI();
+	void triggerRESET();
+	void triggerIRQ();
+	void triggerNMI();
 
-    //Getters - Registers
-    uint16_t getPC();
-    uint32_t getFullPC();
-    uint16_t getAcc();
-    uint8_t  getIR();
-    uint8_t  getP();
-    uint32_t getAddressBus();
-    uint16_t getX();
-    uint16_t getY();
-    uint16_t getS();
-    uint16_t getD();
-    uint8_t  getDBR();
+	//Getters - Registers
+	uint16_t getPC();
+	uint32_t getFullPC();
+	uint16_t getAcc();
+	uint8_t  getIR();
+	uint8_t  getP();
+	uint32_t getAddressBus();
+	uint16_t getX();
+	uint16_t getY();
+	uint16_t getS();
+	uint16_t getD();
+	uint8_t  getDBR();
 
-    string getPString();
+	string getPString();
 
-    //Getters - Internal
-    unsigned int getTCycle();
-    uint16_t getAdr();
-    uint16_t getIDB();
-    Instruction & getInst();
+	//Getters - Internal
+	unsigned int getTCycle();
+	uint16_t getAdr();
+	uint16_t getIDB();
+	Instruction & getInst();
 
-    bool isBranchInstruction = false;   //used for debugging purposes (no effect in cpu emulation)
-    uint32_t branchAddress = 0;         // "
+	bool isBranchInstruction = false;   //used for debugging purposes (no effect in cpu emulation)
+	uint32_t branchAddress = 0;         // "
 
 private:
-    //Private Internal State
-    Bus * bus;
+	//Private Internal State
+	Bus * bus;
 
-    vector<vector<StageType>> pipeline;
-    StageType lastPipelineStage;
-    unsigned int tcycle = 0;
+	vector<vector<StageType>> pipeline;
+	StageType lastPipelineStage;
+	unsigned int tcycle = 0;
 
-    bool vda = true;
-    bool vpa = true;
-    bool rdy = true;
+	bool vda = true;
+	bool vpa = true;
+	bool rdy = true;
 
-    Instruction decodingTable[0x100];
+	Instruction decodingTable[0x100];
 
-    Instruction interuptIRQ;
-    Instruction interuptNMI;
-    Instruction interuptRESET;
+	Instruction interuptIRQ;
+	Instruction interuptNMI;
+	Instruction interuptRESET;
 
-    void IRQ();
-    void NMI();
-    void RESET();
+	void IRQ();
+	void NMI();
+	void RESET();
 
-    bool internalNMI = false;
-    bool internalIRQ = false;
-    bool internalRST = false;
+	bool internalNMI = false;
+	bool internalIRQ = false;
+	bool internalRST = false;
 
-    bool executeInterupt = false;
+	bool executeInterupt = false;
 
-    void checkInterupts();
+	void checkInterupts();
 
-    uint8_t ZERO = 0;
-    uint8_t SIGN_EXTENDED_OP_HALF_ADD = 0;
+	uint8_t ZERO = 0;
+	uint8_t SIGN_EXTENDED_OP_HALF_ADD = 0;
 
-    //Private helper methods
-    bool forceInternalOperation = false;
-    bool forceTmpBank = false;
-    bool thisIsABranch = false;
-    bool branchTaken = false;
-    bool clockStopped = false;
+	//Private helper methods
+	bool forceInternalOperation = false;
+	bool forceTmpBank = false;
+	bool thisIsABranch = false;
+	bool branchTaken = false;
+	bool clockStopped = false;
 
-    enum EnablingCondition{
-        SIG_ALWAYS,SIG_INST,SIG_DUMMY_STAGE,SIG_MEM16_ONLY,SIG_MODE16_ONLY,SIG_MODE8_ONLY,
-        SIG_X_CROSS_PAGE,SIG_Y_CROSS_PAGE,SIG_DL_NOT_ZERO, SIG_INDIRECT_Y_CROSS_PAGE_OR_X16,
-        SIG_PC_CROSS_PAGE_IN_EMUL, SIG_NATIVE_MODE, SIG_ACC_ZERO, SIG_ACC_NOT_ZERO, last};
+	enum EnablingCondition{
+		SIG_ALWAYS,SIG_INST,SIG_DUMMY_STAGE,SIG_MEM16_ONLY,SIG_MODE16_ONLY,SIG_MODE8_ONLY,
+		SIG_X_CROSS_PAGE,SIG_Y_CROSS_PAGE,SIG_DL_NOT_ZERO, SIG_INDIRECT_Y_CROSS_PAGE_OR_X16,
+		SIG_PC_CROSS_PAGE_IN_EMUL, SIG_NATIVE_MODE, SIG_ACC_ZERO, SIG_ACC_NOT_ZERO, last};
 
-    void reloadPipeline();
-    void processSignals();
-    bool isStageEnabled(EnablingCondition st);
-    void initializeOpcodes();
-    void initializeAddressingModes();
-    void initializeAdrModeASMDecode();
-    uint32_t getParam(int index, int length = 1);
+	void reloadPipeline();
+	void processSignals();
+	bool isStageEnabled(EnablingCondition st);
+	void initializeOpcodes();
+	void initializeAddressingModes();
+	void initializeAdrModeASMDecode();
+	uint32_t getParam(int index, int length = 1);
 
-    enum ValidAddressState {OpcodeFetch, InternalOperation, DataFetch, OperandFetch};
-    void handleValidAddressPINS(ValidAddressState state);
-    void preDecode();
+	enum ValidAddressState {OpcodeFetch, InternalOperation, DataFetch, OperandFetch};
+	void handleValidAddressPINS(ValidAddressState state);
+	void preDecode();
 
-    void generateAddress(uint8_t bank, uint16_t adr);
-    void generateAddress(uint16_t adr);
+	void generateAddress(uint8_t bank, uint16_t adr);
+	void generateAddress(uint16_t adr);
 
-    void updateStatusFlags(uint32_t v, bool indexValue = false);
-    void updateNZFlags(uint16_t v, bool indexValue = false, bool force16 = false);
-    void checkSignedOverflow(int a, int b, int c);
+	void updateStatusFlags(uint32_t v, bool indexValue = false);
+	void updateNZFlags(uint16_t v, bool indexValue = false, bool force16 = false);
+	void checkSignedOverflow(int a, int b, int c);
 
-    void shrinkIndexRegisters(bool doIt);
+	void shrinkIndexRegisters(bool doIt);
 
-    //Registers
-    struct Register16
-    {
-        Register16(bool idx = false) {isIndex = idx;}
-        bool isIndex = false;
-        uint8_t low = 0,high = 0;
-        uint16_t val() { return (uint16_t(high) << 8) | low; } 
+	//Registers
+	struct Register16
+	{
+		Register16(bool idx = false) {isIndex = idx;}
+		bool isIndex = false;
+		uint8_t low = 0,high = 0;
+		uint16_t val() { return (uint16_t(high) << 8) | low; } 
 
-        void set(uint16_t v)
-        {
-            high = (v>>8)&0xFF;
-            low = v & 0xFF;
-        }
+		void set(uint16_t v)
+		{
+			high = (v>>8)&0xFF;
+			low = v & 0xFF;
+		}
 
-        uint16_t operator++()
-        {
-            uint16_t v = val()+1;
-            set(v);
-            return v;
-        }
+		uint16_t operator++()
+		{
+			uint16_t v = val()+1;
+			set(v);
+			return v;
+		}
 
-        uint16_t operator--()
-        {
-            uint16_t v = val()-1;
-            set(v);
-            return v;
-        }
-    };
+		uint16_t operator--()
+		{
+			uint16_t v = val()-1;
+			set(v);
+			return v;
+		}
+	};
 
-    Register16 pc; //Could be uint16_t directly ?
-    Register16 adr;
-    uint32_t addressBusBuffer;
+	Register16 pc; //Could be uint16_t directly ?
+	Register16 adr;
+	uint32_t addressBusBuffer;
 
-    Register16 idb;
-    Register16 acc;
-    Register16 x = Register16(true);
-    Register16 y = Register16(true);
-    Register16 d;
-    Register16 s;
+	Register16 idb;
+	Register16 acc;
+	Register16 x = Register16(true);
+	Register16 y = Register16(true);
+	Register16 d;
+	Register16 s;
 
-    uint8_t dbr = 0;
-    uint8_t pbr = 0;
-    uint8_t tmpBank;
+	uint8_t dbr = 0;
+	uint8_t pbr = 0;
+	uint8_t tmpBank;
 
-    uint8_t ir; //Instruction Register
+	uint8_t ir; //Instruction Register
 
-    //Status Register
-    struct {
-        bool mem8 = true; //Should probably not be public
-        bool index8 = true;
-        bool emulationMode = true;
-        //Common
-        uint8_t C() { return (val>>0)&1; }
-        uint8_t Z() { return (val>>1)&1; }
-        uint8_t I() { return (val>>2)&1; }
-        uint8_t D() { return (val>>3)&1; }
-        uint8_t V() { return (val>>6)&1; }
-        uint8_t N() { return (val>>7)&1; }
-        void setC(bool status) { val = (val & ~(1<<0)) | (uint8_t(status)<<0); }
-        void setZ(bool status) { val = (val & ~(1<<1)) | (uint8_t(status)<<1); }
-        void setI(bool status) { val = (val & ~(1<<2)) | (uint8_t(status)<<2); }
-        void setD(bool status) { val = (val & ~(1<<3)) | (uint8_t(status)<<3); }
-        void setV(bool status) { val = (val & ~(1<<6)) | (uint8_t(status)<<6); }
-        void setN(bool status) { val = (val & ~(1<<7)) | (uint8_t(status)<<7); }
-        //Depending on Mode
-        uint8_t M() { if(!emulationMode) return (val>>5)&1; return mem8;}
-        uint8_t X() { if(!emulationMode) return (val>>4)&1; return index8;}
-        uint8_t B() { if(emulationMode) return (val>>4)&1; return false;}
-        uint8_t E() { return emulationMode;}
-        void setM(bool status) { if(!emulationMode) val = (val & ~(1<<5)) | (uint8_t(status)<<5); mem8 = status;}
-        void setX(bool status) { if(!emulationMode) val = (val & ~(1<<4)) | (uint8_t(status)<<4); index8 = status;}
-        void setB(bool status) { if(emulationMode) val = (val & ~(1<<4)) | (uint8_t(status)<<4); }
-        void setE(bool status) { emulationMode = status; /*if(emulationMode)*/ {setM(true); setX(true);}}
+	//Status Register
+	struct {
+		bool mem8 = true; //Should probably not be public
+		bool index8 = true;
+		bool emulationMode = true;
+		//Common
+		uint8_t C() { return (val>>0)&1; }
+		uint8_t Z() { return (val>>1)&1; }
+		uint8_t I() { return (val>>2)&1; }
+		uint8_t D() { return (val>>3)&1; }
+		uint8_t V() { return (val>>6)&1; }
+		uint8_t N() { return (val>>7)&1; }
+		void setC(bool status) { val = (val & ~(1<<0)) | (uint8_t(status)<<0); }
+		void setZ(bool status) { val = (val & ~(1<<1)) | (uint8_t(status)<<1); }
+		void setI(bool status) { val = (val & ~(1<<2)) | (uint8_t(status)<<2); }
+		void setD(bool status) { val = (val & ~(1<<3)) | (uint8_t(status)<<3); }
+		void setV(bool status) { val = (val & ~(1<<6)) | (uint8_t(status)<<6); }
+		void setN(bool status) { val = (val & ~(1<<7)) | (uint8_t(status)<<7); }
+		//Depending on Mode
+		uint8_t M() { if(!emulationMode) return (val>>5)&1; return mem8;}
+		uint8_t X() { if(!emulationMode) return (val>>4)&1; return index8;}
+		uint8_t B() { if(emulationMode) return (val>>4)&1; return false;}
+		uint8_t E() { return emulationMode;}
+		void setM(bool status) { if(!emulationMode) val = (val & ~(1<<5)) | (uint8_t(status)<<5); mem8 = status;}
+		void setX(bool status) { if(!emulationMode) val = (val & ~(1<<4)) | (uint8_t(status)<<4); index8 = status;}
+		void setB(bool status) { if(emulationMode) val = (val & ~(1<<4)) | (uint8_t(status)<<4); }
+		void setE(bool status) { emulationMode = status; /*if(emulationMode)*/ {setM(true); setX(true);}}
 
-        void update() {setM(M()); setX(X()); cpu->shrinkIndexRegisters(X());}
-        void setVal(uint8_t v) {val = v; update();}
-        uint8_t getVal() {return val;}
+		void update() {setM(M()); setX(X()); cpu->shrinkIndexRegisters(X());}
+		void setVal(uint8_t v) {val = v; update();}
+		uint8_t getVal() {return val;}
 
-        string toString() 
-        {
-            string status = "nvmxdizc"; //16bit mode by default
-            for(int i = 0; i < 8; i++)
-            {
-                if(emulationMode)
-                {
-                    if(i == 5) status[7-i] = '1';
-                    else if(i == 4) status[7-i] = B() ? 'B' : 'b';
-                }
-                if(((val>>i)&1) && ~(((i==5)||(i==4))&&emulationMode))
-                {
-                    status[7-i] = toupper(status[7-i]);
-                }
-            }
-            return status;
-        }
+		string toString() 
+		{
+			string status = "nvmxdizc"; //16bit mode by default
+			for(int i = 0; i < 8; i++)
+			{
+				if(emulationMode)
+				{
+					if(i == 5) status[7-i] = '1';
+					else if(i == 4) status[7-i] = B() ? 'B' : 'b';
+				}
+				if(((val>>i)&1) && ~(((i==5)||(i==4))&&emulationMode))
+				{
+					status[7-i] = toupper(status[7-i]);
+				}
+			}
+			return status;
+		}
 
-        private: uint8_t val = 0x30;
-        public: W65816* cpu;
-    } p;
+		private: uint8_t val = 0x30;
+		public: W65816* cpu;
+	} p;
 
-    void setReg(Register16 & r, uint16_t v); //TODO: How to differentiate between Index and ACC ???
-    uint16_t getReg(Register16 & r);
+	void setReg(Register16 & r, uint16_t v); //TODO: How to differentiate between Index and ACC ???
+	uint16_t getReg(Register16 & r);
 
-    //Internal Operations
-    //void decode();
+	//Internal Operations
+	//void decode();
 
-    void fetchInc(Register16 *src, uint8_t * dst);
-    void fetchDec(Register16 *src, uint8_t * dst);
-    void fetch(Register16 *src, uint8_t * dst);
+	void fetchInc(Register16 *src, uint8_t * dst);
+	void fetchDec(Register16 *src, uint8_t * dst);
+	void fetch(Register16 *src, uint8_t * dst);
 
-    void fetchLong(uint8_t * bank, Register16 *src, uint8_t * dst);
-    void fetchIncLong(uint8_t * bank, Register16 *src, uint8_t * dst);
-    void fetchDecLong(uint8_t * bank, Register16 *src, uint8_t * dst);
+	void fetchLong(uint8_t * bank, Register16 *src, uint8_t * dst);
+	void fetchIncLong(uint8_t * bank, Register16 *src, uint8_t * dst);
+	void fetchDecLong(uint8_t * bank, Register16 *src, uint8_t * dst);
 
-    void dummyFetch(Register16 *src);
-    void dummyFetchLong(uint8_t *bank,Register16 *src);
-    void dummyFetchLast();
+	void dummyFetch(Register16 *src);
+	void dummyFetchLong(uint8_t *bank,Register16 *src);
+	void dummyFetchLast();
 
-    void moveReg8(uint8_t * src, uint8_t * dst);
-    void moveReg16(Register16 * src, Register16 * dst);
+	void moveReg8(uint8_t * src, uint8_t * dst);
+	void moveReg16(Register16 * src, Register16 * dst);
 
-    void write(Register16 * adr, uint8_t * data);
-    void writeInc(Register16 * adr, uint8_t * data);
-    void writeDec(Register16 * adr, uint8_t * data);
+	void write(Register16 * adr, uint8_t * data);
+	void writeInc(Register16 * adr, uint8_t * data);
+	void writeDec(Register16 * adr, uint8_t * data);
 
-    void writeLong(uint8_t * bank, Register16 * adr, uint8_t * data);
-    void writeIncLong(uint8_t * bank, Register16 * adr, uint8_t * data);
-    void writeDecLong(uint8_t * bank, Register16 * adr, uint8_t * data);
+	void writeLong(uint8_t * bank, Register16 * adr, uint8_t * data);
+	void writeIncLong(uint8_t * bank, Register16 * adr, uint8_t * data);
+	void writeDecLong(uint8_t * bank, Register16 * adr, uint8_t * data);
 
-    void push(uint8_t * src);
-    void pop(uint8_t * dst);
-    void pushP();
-    void popP();
+	void push(uint8_t * src);
+	void pop(uint8_t * dst);
+	void pushP();
+	void popP();
 
-    void halfAdd(uint8_t * dst, uint8_t * op); uint8_t internalCarryBuffer = 0;
-    void fixCarry(uint8_t * dst, uint8_t * op);
-    void fullAdd(Register16 * dst, Register16 * op);
+	void halfAdd(uint8_t * dst, uint8_t * op); uint8_t internalCarryBuffer = 0;
+	void fixCarry(uint8_t * dst, uint8_t * op);
+	void fullAdd(Register16 * dst, Register16 * op);
 
-    void dummyStage(); //Dummy operation
+	void dummyStage(); //Dummy operation
 
-    void decReg(Register16 * reg);
-    void incReg(Register16 * reg);
+	void decReg(Register16 * reg);
+	void incReg(Register16 * reg);
 
-    void enableInterupts(bool enable); //TODO: Signal or stage ? Note: It also disable the D flag when disabling interupts
+	void enableInterupts(bool enable); //TODO: Signal or stage ? Note: It also disable the D flag when disabling interupts
 
-    //Signals
-    void incPC(unsigned int whatCycle = 1);
-    void opPrefetchInIDB();
-    void accPrefetchInIDB();
-    void dhPrefetchInAdr();
+	//Signals
+	void incPC(unsigned int whatCycle = 1);
+	void opPrefetchInIDB();
+	void accPrefetchInIDB();
+	void dhPrefetchInAdr();
 
-    //Predecode Signals
-    void invalidPrefetch();
-    void branchInstruction();
+	//Predecode Signals
+	void invalidPrefetch();
+	void branchInstruction();
 
-    //Addressing Modes
-    enum AdrModeName {
-        ABSOLUTE, ABSOLUTE_WRITE, ABSOLUTE_RMW, ABSOLUTE_JMP, ABSOLUTE_JSR, ABSOLUTE_LONG,
-            ABSOLUTE_LONG_WRITE, ABSOLUTE_LONG_JMP, ABSOLUTE_LONG_JSL, ABSOLUTE_LONG_X, ABSOLUTE_X,
-            ABSOLUTE_X_WRITE, ABSOLUTE_X_LONG_WRITE, ABSOLUTE_X_RMW, ABSOLUTE_Y, ABSOLUTE_Y_WRITE,
-            ABSOLUTE_X_INDIRECT_JMP, ABSOLUTE_X_INDIRECT_JSR, ABSOLUTE_INDIRECT_JML, ABSOLUTE_INDIRECT_JMP,
-        ACCUMULATOR,
-        DIRECT, DIRECT_WRITE, DIRECT_RMW, DIRECT_X_INDIRECT, DIRECT_X_INDIRECT_WRITE, DIRECT_INDIRECT,
-            DIRECT_INDIRECT_WRITE, DIRECT_INDIRECT_Y, DIRECT_INDIRECT_Y_WRITE, DIRECT_INDIRECT_Y_LONG,
-            DIRECT_INDIRECT_Y_LONG_WRITE, DIRECT_INDIRECT_LONG, DIRECT_INDIRECT_LONG_WRITE,
-            DIRECT_X, DIRECT_X_WRITE, DIRECT_X_RMW, DIRECT_Y, DIRECT_Y_WRITE,
-        IMMEDIATE, IMMEDIATE_SPECIAL,
-        IMPLIED, IMPLIED_SPECIAL,
-        RELATIVE_BRANCH, RELATIVE_BRANCH_LONG,
-        STACK_POP, STACK_POP_8, STACK_POP_16, STACK_PUSH, STACK_PUSH_8, STACK_PUSH_16, STACK_PEA,
-            STACK_PEI, STACK_PER, STACK_RTI, STACK_RTS, STACK_RTL, STACK_RELATIVE, STACK_RELATIVE_WRITE,
-            STACK_RELATIVE_INDIRECT_Y, STACK_RELATIVE_INDIRECT_Y_WRITE, STACK_INTERUPT,
-        BLOCK_MOVE_N, BLOCK_MOVE_P
-        };
+	//Addressing Modes
+	enum AdrModeName {
+		ABSOLUTE, ABSOLUTE_WRITE, ABSOLUTE_RMW, ABSOLUTE_JMP, ABSOLUTE_JSR, ABSOLUTE_LONG,
+			ABSOLUTE_LONG_WRITE, ABSOLUTE_LONG_JMP, ABSOLUTE_LONG_JSL, ABSOLUTE_LONG_X, ABSOLUTE_X,
+			ABSOLUTE_X_WRITE, ABSOLUTE_X_LONG_WRITE, ABSOLUTE_X_RMW, ABSOLUTE_Y, ABSOLUTE_Y_WRITE,
+			ABSOLUTE_X_INDIRECT_JMP, ABSOLUTE_X_INDIRECT_JSR, ABSOLUTE_INDIRECT_JML, ABSOLUTE_INDIRECT_JMP,
+		ACCUMULATOR,
+		DIRECT, DIRECT_WRITE, DIRECT_RMW, DIRECT_X_INDIRECT, DIRECT_X_INDIRECT_WRITE, DIRECT_INDIRECT,
+			DIRECT_INDIRECT_WRITE, DIRECT_INDIRECT_Y, DIRECT_INDIRECT_Y_WRITE, DIRECT_INDIRECT_Y_LONG,
+			DIRECT_INDIRECT_Y_LONG_WRITE, DIRECT_INDIRECT_LONG, DIRECT_INDIRECT_LONG_WRITE,
+			DIRECT_X, DIRECT_X_WRITE, DIRECT_X_RMW, DIRECT_Y, DIRECT_Y_WRITE,
+		IMMEDIATE, IMMEDIATE_SPECIAL,
+		IMPLIED, IMPLIED_SPECIAL,
+		RELATIVE_BRANCH, RELATIVE_BRANCH_LONG,
+		STACK_POP, STACK_POP_8, STACK_POP_16, STACK_PUSH, STACK_PUSH_8, STACK_PUSH_16, STACK_PEA,
+			STACK_PEI, STACK_PER, STACK_RTI, STACK_RTS, STACK_RTL, STACK_RELATIVE, STACK_RELATIVE_WRITE,
+			STACK_RELATIVE_INDIRECT_Y, STACK_RELATIVE_INDIRECT_Y_WRITE, STACK_INTERUPT,
+		BLOCK_MOVE_N, BLOCK_MOVE_P
+		};
 
-    AddressingMode Absolute                     = AddressingMode(AdrModeName::ABSOLUTE);
-    AddressingMode AbsoluteWrite                = AddressingMode(AdrModeName::ABSOLUTE_WRITE);
-    AddressingMode AbsoluteRMW                  = AddressingMode(AdrModeName::ABSOLUTE_RMW);
-    AddressingMode AbsoluteJMP                  = AddressingMode(AdrModeName::ABSOLUTE_JMP);
-    AddressingMode AbsoluteJSR                  = AddressingMode(AdrModeName::ABSOLUTE_JSR);
-    AddressingMode AbsoluteLong                 = AddressingMode(AdrModeName::ABSOLUTE_LONG);
-    AddressingMode AbsoluteLongWrite            = AddressingMode(AdrModeName::ABSOLUTE_LONG_WRITE);
-    AddressingMode AbsoluteLongJMP              = AddressingMode(AdrModeName::ABSOLUTE_LONG_JMP);
-    AddressingMode AbsoluteLongJSL              = AddressingMode(AdrModeName::ABSOLUTE_LONG_JSL);
-    AddressingMode AbsoluteXLong                = AddressingMode(AdrModeName::ABSOLUTE_LONG_X);
-    AddressingMode AbsoluteX                    = AddressingMode(AdrModeName::ABSOLUTE_X);
-    AddressingMode AbsoluteXWrite               = AddressingMode(AdrModeName::ABSOLUTE_X_WRITE);
-    AddressingMode AbsoluteXLongWrite           = AddressingMode(AdrModeName::ABSOLUTE_X_LONG_WRITE);
-    AddressingMode AbsoluteXRMW                 = AddressingMode(AdrModeName::ABSOLUTE_X_RMW);
-    AddressingMode AbsoluteY                    = AddressingMode(AdrModeName::ABSOLUTE_Y);
-    AddressingMode AbsoluteYWrite               = AddressingMode(AdrModeName::ABSOLUTE_Y_WRITE);
-    AddressingMode AbsoluteXIndirectJMP         = AddressingMode(AdrModeName::ABSOLUTE_X_INDIRECT_JMP);
-    AddressingMode AbsoluteXIndirectJSR         = AddressingMode(AdrModeName::ABSOLUTE_X_INDIRECT_JSR);
-    AddressingMode AbsoluteIndirectJML          = AddressingMode(AdrModeName::ABSOLUTE_INDIRECT_JML);
-    AddressingMode AbsoluteIndirectJMP          = AddressingMode(AdrModeName::ABSOLUTE_INDIRECT_JMP);
-    AddressingMode Accumulator                  = AddressingMode(AdrModeName::ACCUMULATOR);
-    AddressingMode Direct                       = AddressingMode(AdrModeName::DIRECT);
-    AddressingMode DirectWrite                  = AddressingMode(AdrModeName::DIRECT_WRITE);
-    AddressingMode DirectRMW                    = AddressingMode(AdrModeName::DIRECT_RMW);
-    AddressingMode DirectXIndirectWrite         = AddressingMode(AdrModeName::DIRECT_X_INDIRECT_WRITE);
-    AddressingMode DirectIndirect               = AddressingMode(AdrModeName::DIRECT_INDIRECT);
-    AddressingMode DirectIndirectWrite          = AddressingMode(AdrModeName::DIRECT_INDIRECT_WRITE);
-    AddressingMode DirectIndirectY              = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y);
-    AddressingMode DirectIndirectYWrite         = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y_WRITE);
-    AddressingMode DirectIndirectYLong          = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y);
-    AddressingMode DirectIndirectYLongWrite     = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y_WRITE);
-    AddressingMode DirectIndirectLong           = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y);
-    AddressingMode DirectIndirectLongWrite      = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y_WRITE);
-    AddressingMode DirectX                      = AddressingMode(AdrModeName::DIRECT_X);
-    AddressingMode DirectXWrite                 = AddressingMode(AdrModeName::DIRECT_X_WRITE);
-    AddressingMode DirectXRMW                   = AddressingMode(AdrModeName::DIRECT_X_RMW);
-    AddressingMode DirectY                      = AddressingMode(AdrModeName::DIRECT_Y);
-    AddressingMode DirectYWrite                 = AddressingMode(AdrModeName::DIRECT_Y_WRITE);
-    AddressingMode Immediate                    = AddressingMode(AdrModeName::IMMEDIATE);
-    AddressingMode ImmediateSpecial             = AddressingMode(AdrModeName::IMMEDIATE_SPECIAL);
-    AddressingMode Implied                      = AddressingMode(AdrModeName::IMPLIED);
-    AddressingMode ImpliedSpecial               = AddressingMode(AdrModeName::IMPLIED_SPECIAL);
-    AddressingMode StackPop                     = AddressingMode(AdrModeName::STACK_POP);
-    AddressingMode StackPop8                    = AddressingMode(AdrModeName::STACK_POP_8);
-    AddressingMode StackPop16                   = AddressingMode(AdrModeName::STACK_POP_16);
-    AddressingMode StackPush                    = AddressingMode(AdrModeName::STACK_PUSH);
-    AddressingMode StackPush8                   = AddressingMode(AdrModeName::STACK_PUSH_8);
-    AddressingMode StackPush16                  = AddressingMode(AdrModeName::STACK_PUSH_16);
-    AddressingMode StackPEA                     = AddressingMode(AdrModeName::STACK_PEA);
-    AddressingMode StackPEI                     = AddressingMode(AdrModeName::STACK_PEI);
-    AddressingMode StackPER                     = AddressingMode(AdrModeName::STACK_PER);
-    AddressingMode StackRTI                     = AddressingMode(AdrModeName::STACK_RTI);
-    AddressingMode StackRTS                     = AddressingMode(AdrModeName::STACK_RTS);
-    AddressingMode StackRTL                     = AddressingMode(AdrModeName::STACK_RTL);
-    AddressingMode StackRelative                = AddressingMode(AdrModeName::STACK_RELATIVE);
-    AddressingMode StackRelativeWrite           = AddressingMode(AdrModeName::STACK_RELATIVE_WRITE);
-    AddressingMode StackRelativeIndirectY       = AddressingMode(AdrModeName::STACK_RELATIVE_INDIRECT_Y);
-    AddressingMode StackRelativeIndirectYWrite  = AddressingMode(AdrModeName::STACK_RELATIVE_INDIRECT_Y_WRITE);
-    AddressingMode StackInterupt                = AddressingMode(AdrModeName::STACK_INTERUPT);
-    AddressingMode BlockMoveN                   = AddressingMode(AdrModeName::BLOCK_MOVE_N);
-    AddressingMode BlockMoveP                   = AddressingMode(AdrModeName::BLOCK_MOVE_P);
+	AddressingMode Absolute                     = AddressingMode(AdrModeName::ABSOLUTE);
+	AddressingMode AbsoluteWrite                = AddressingMode(AdrModeName::ABSOLUTE_WRITE);
+	AddressingMode AbsoluteRMW                  = AddressingMode(AdrModeName::ABSOLUTE_RMW);
+	AddressingMode AbsoluteJMP                  = AddressingMode(AdrModeName::ABSOLUTE_JMP);
+	AddressingMode AbsoluteJSR                  = AddressingMode(AdrModeName::ABSOLUTE_JSR);
+	AddressingMode AbsoluteLong                 = AddressingMode(AdrModeName::ABSOLUTE_LONG);
+	AddressingMode AbsoluteLongWrite            = AddressingMode(AdrModeName::ABSOLUTE_LONG_WRITE);
+	AddressingMode AbsoluteLongJMP              = AddressingMode(AdrModeName::ABSOLUTE_LONG_JMP);
+	AddressingMode AbsoluteLongJSL              = AddressingMode(AdrModeName::ABSOLUTE_LONG_JSL);
+	AddressingMode AbsoluteXLong                = AddressingMode(AdrModeName::ABSOLUTE_LONG_X);
+	AddressingMode AbsoluteX                    = AddressingMode(AdrModeName::ABSOLUTE_X);
+	AddressingMode AbsoluteXWrite               = AddressingMode(AdrModeName::ABSOLUTE_X_WRITE);
+	AddressingMode AbsoluteXLongWrite           = AddressingMode(AdrModeName::ABSOLUTE_X_LONG_WRITE);
+	AddressingMode AbsoluteXRMW                 = AddressingMode(AdrModeName::ABSOLUTE_X_RMW);
+	AddressingMode AbsoluteY                    = AddressingMode(AdrModeName::ABSOLUTE_Y);
+	AddressingMode AbsoluteYWrite               = AddressingMode(AdrModeName::ABSOLUTE_Y_WRITE);
+	AddressingMode AbsoluteXIndirectJMP         = AddressingMode(AdrModeName::ABSOLUTE_X_INDIRECT_JMP);
+	AddressingMode AbsoluteXIndirectJSR         = AddressingMode(AdrModeName::ABSOLUTE_X_INDIRECT_JSR);
+	AddressingMode AbsoluteIndirectJML          = AddressingMode(AdrModeName::ABSOLUTE_INDIRECT_JML);
+	AddressingMode AbsoluteIndirectJMP          = AddressingMode(AdrModeName::ABSOLUTE_INDIRECT_JMP);
+	AddressingMode Accumulator                  = AddressingMode(AdrModeName::ACCUMULATOR);
+	AddressingMode Direct                       = AddressingMode(AdrModeName::DIRECT);
+	AddressingMode DirectWrite                  = AddressingMode(AdrModeName::DIRECT_WRITE);
+	AddressingMode DirectRMW                    = AddressingMode(AdrModeName::DIRECT_RMW);
+	AddressingMode DirectXIndirectWrite         = AddressingMode(AdrModeName::DIRECT_X_INDIRECT_WRITE);
+	AddressingMode DirectIndirect               = AddressingMode(AdrModeName::DIRECT_INDIRECT);
+	AddressingMode DirectIndirectWrite          = AddressingMode(AdrModeName::DIRECT_INDIRECT_WRITE);
+	AddressingMode DirectIndirectY              = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y);
+	AddressingMode DirectIndirectYWrite         = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y_WRITE);
+	AddressingMode DirectIndirectYLong          = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y);
+	AddressingMode DirectIndirectYLongWrite     = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y_WRITE);
+	AddressingMode DirectIndirectLong           = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y);
+	AddressingMode DirectIndirectLongWrite      = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y_WRITE);
+	AddressingMode DirectX                      = AddressingMode(AdrModeName::DIRECT_X);
+	AddressingMode DirectXWrite                 = AddressingMode(AdrModeName::DIRECT_X_WRITE);
+	AddressingMode DirectXRMW                   = AddressingMode(AdrModeName::DIRECT_X_RMW);
+	AddressingMode DirectY                      = AddressingMode(AdrModeName::DIRECT_Y);
+	AddressingMode DirectYWrite                 = AddressingMode(AdrModeName::DIRECT_Y_WRITE);
+	AddressingMode Immediate                    = AddressingMode(AdrModeName::IMMEDIATE);
+	AddressingMode ImmediateSpecial             = AddressingMode(AdrModeName::IMMEDIATE_SPECIAL);
+	AddressingMode Implied                      = AddressingMode(AdrModeName::IMPLIED);
+	AddressingMode ImpliedSpecial               = AddressingMode(AdrModeName::IMPLIED_SPECIAL);
+	AddressingMode StackPop                     = AddressingMode(AdrModeName::STACK_POP);
+	AddressingMode StackPop8                    = AddressingMode(AdrModeName::STACK_POP_8);
+	AddressingMode StackPop16                   = AddressingMode(AdrModeName::STACK_POP_16);
+	AddressingMode StackPush                    = AddressingMode(AdrModeName::STACK_PUSH);
+	AddressingMode StackPush8                   = AddressingMode(AdrModeName::STACK_PUSH_8);
+	AddressingMode StackPush16                  = AddressingMode(AdrModeName::STACK_PUSH_16);
+	AddressingMode StackPEA                     = AddressingMode(AdrModeName::STACK_PEA);
+	AddressingMode StackPEI                     = AddressingMode(AdrModeName::STACK_PEI);
+	AddressingMode StackPER                     = AddressingMode(AdrModeName::STACK_PER);
+	AddressingMode StackRTI                     = AddressingMode(AdrModeName::STACK_RTI);
+	AddressingMode StackRTS                     = AddressingMode(AdrModeName::STACK_RTS);
+	AddressingMode StackRTL                     = AddressingMode(AdrModeName::STACK_RTL);
+	AddressingMode StackRelative                = AddressingMode(AdrModeName::STACK_RELATIVE);
+	AddressingMode StackRelativeWrite           = AddressingMode(AdrModeName::STACK_RELATIVE_WRITE);
+	AddressingMode StackRelativeIndirectY       = AddressingMode(AdrModeName::STACK_RELATIVE_INDIRECT_Y);
+	AddressingMode StackRelativeIndirectYWrite  = AddressingMode(AdrModeName::STACK_RELATIVE_INDIRECT_Y_WRITE);
+	AddressingMode StackInterupt                = AddressingMode(AdrModeName::STACK_INTERUPT);
+	AddressingMode BlockMoveN                   = AddressingMode(AdrModeName::BLOCK_MOVE_N);
+	AddressingMode BlockMoveP                   = AddressingMode(AdrModeName::BLOCK_MOVE_P);
 
-    bool preDecodeStage = false;
-    bool isStageEnabled(unsigned int cycle, EnablingCondition signal);
-    
+	bool preDecodeStage = false;
+	bool isStageEnabled(unsigned int cycle, EnablingCondition signal);
+	
 	void noAutoIncPC();
 	bool prefetchIncPC = true;
 	bool doPrefetchInIDB = false;
 
 	enum PipelineContent {REGULAR_INST, IRQ_INTERUPT, NMI_INTERUPT, RESET_INTERUPT};
-    PipelineContent pipelineContent = REGULAR_INST;
+	PipelineContent pipelineContent = REGULAR_INST;
 
 	bool isIndexRelated = false;
 
 	bool enablingSignals[EnablingCondition::last]; //back in fashion !
-    vector<bool> enabledStages;
-    int pipelineSize = 0;
-    void decode(bool predecode = false);
+	vector<bool> enabledStages;
+	int pipelineSize = 0;
+	void decode(bool predecode = false);
 
-	void Absolute					(StageType&& inst);
-	void AbsoluteWrite				(StageType&& inst);
-	void AbsoluteRMW				(StageType&& inst);
-	void AbsoluteJMP				(StageType&& inst);
-	void AbsoluteJSR				(StageType&& inst);
-	void AbsoluteLong				(StageType&& inst);
-	void AbsoluteLongWrite			(StageType&& inst);
-    void AbsoluteLongJMP			(StageType&& inst);
-    void AbsoluteLongJSL			(StageType&& inst);
-    void AbsoluteXLong				(StageType&& inst);
-    void AbsoluteXLongWrite			(StageType&& inst);
-    void AbsoluteX      			(StageType&& inst);
-	void AbsoluteXWrite    			(StageType&& inst);
-	void AbsoluteXRMW    			(StageType&& inst);
-	void AbsoluteY      			(StageType&& inst);
-	void AbsoluteYWrite    			(StageType&& inst);
-	void AbsoluteXIndirectJMP		(StageType&& inst);
-	void AbsoluteXIndirectJSR		(StageType&& inst);
-	void AbsoluteIndirectJML		(StageType&& inst);
-	void AbsoluteIndirectJMP		(StageType&& inst);
-	void Accumulator				(StageType&& inst);
-	void Direct						(StageType&& inst);
-	void DirectWrite				(StageType&& inst);
-	void DirectRMW					(StageType&& inst);
-    void DirectXIndirect			(StageType&& inst);
-	void DirectXIndirectWrite		(StageType&& inst);
-	void DirectIndirect				(StageType&& inst);
-	void DirectIndirectWrite		(StageType&& inst);
-	void DirectIndirectY			(StageType&& inst);
-	void DirectIndirectYWrite		(StageType&& inst);
-	void DirectIndirectYLong		(StageType&& inst);
-	void DirectIndirectYLongWrite	(StageType&& inst);
-	void DirectIndirectLong			(StageType&& inst);
-	void DirectIndirectLongWrite	(StageType&& inst);
-	void DirectX					(StageType&& inst);
-	void DirectXWrite				(StageType&& inst);
-	void DirectXRMW					(StageType&& inst);
-	void DirectY					(StageType&& inst);
-	void DirectYWrite				(StageType&& inst);
-	void Immediate					(StageType&& inst);
+	void Absolute                   (StageType&& inst);
+	void AbsoluteWrite              (StageType&& inst);
+	void AbsoluteRMW                (StageType&& inst);
+	void AbsoluteJMP                (StageType&& inst);
+	void AbsoluteJSR                (StageType&& inst);
+	void AbsoluteLong               (StageType&& inst);
+	void AbsoluteLongWrite          (StageType&& inst);
+	void AbsoluteLongJMP            (StageType&& inst);
+	void AbsoluteLongJSL            (StageType&& inst);
+	void AbsoluteXLong              (StageType&& inst);
+	void AbsoluteXLongWrite         (StageType&& inst);
+	void AbsoluteX                  (StageType&& inst);
+	void AbsoluteXWrite             (StageType&& inst);
+	void AbsoluteXRMW               (StageType&& inst);
+	void AbsoluteY                  (StageType&& inst);
+	void AbsoluteYWrite             (StageType&& inst);
+	void AbsoluteXIndirectJMP       (StageType&& inst);
+	void AbsoluteXIndirectJSR       (StageType&& inst);
+	void AbsoluteIndirectJML        (StageType&& inst);
+	void AbsoluteIndirectJMP        (StageType&& inst);
+	void Accumulator                (StageType&& inst);
+	void Direct                     (StageType&& inst);
+	void DirectWrite                (StageType&& inst);
+	void DirectRMW                  (StageType&& inst);
+	void DirectXIndirect            (StageType&& inst);
+	void DirectXIndirectWrite       (StageType&& inst);
+	void DirectIndirect             (StageType&& inst);
+	void DirectIndirectWrite        (StageType&& inst);
+	void DirectIndirectY            (StageType&& inst);
+	void DirectIndirectYWrite       (StageType&& inst);
+	void DirectIndirectYLong        (StageType&& inst);
+	void DirectIndirectYLongWrite   (StageType&& inst);
+	void DirectIndirectLong	        (StageType&& inst);
+	void DirectIndirectLongWrite    (StageType&& inst);
+	void DirectX                    (StageType&& inst);
+	void DirectXWrite               (StageType&& inst);
+	void DirectXRMW                 (StageType&& inst);
+	void DirectY                    (StageType&& inst);
+	void DirectYWrite               (StageType&& inst);
+	void Immediate                  (StageType&& inst);
+	void ImmediateSpecial           (StageType&& inst);
+	void Implied                    (StageType&& inst);
 
-    void RelativeBranch				(StageType&& inst);
-    void RelativeBranchLong			(StageType&& inst);
-    void StackInterupt				(StageType&& inst);
-    
-    //Instructions
-    void ADC();
-    void AND();
-    void ASL();
-    void BCC();
-    void BCS();
-    void BEQ();
-    void BIT();
-    void BMI();
-    void BNE();
-    void BPL();
-    void BRA();
-    void BRK();
-    void BVC();
-    void BVS();
-    void CLC();
-    void CLD();
-    void CLI();
-    void CLV();
-    void CMP();
-    void COP();
-    void CPX();
-    void CPY();
-    void DEC();
-    void DEX();
-    void DEY();
-    void EOR();
-    void INC();
-    void INX();
-    void INY();
-    void LDA();
-    void LDX();
-    void LDY();
-    void LSR();
-    void ORA();
-    void PHA();
-    void PHB();
-    void PHP();
-    void PHD();
-    void PHK();
-    void PHX();
-    void PHY();
-    void PLA();
-    void PLB();
-    void PLD();
-    void PLP();
-    void PLX();
-    void PLY();
-    void REP();
-    void ROL();
-    void ROR();
-    void SBC();
-    void SEC();
-    void SED();
-    void SEI();
-    void SEP();
-    void STA();
-    void STP();
-    void STX();
-    void STY();
-    void STZ();
-    void TAX();
-    void TAY();
-    void TCD();
-    void TCS();
-    void TDC();
-    void TRB();
-    void TSB();
-    void TSC();
-    void TSX();
-    void TXA();
-    void TXS();
-    void TXY();
-    void TYA();
-    void TYX();
-    void WAI();
-    void XBA();
-    void XCE();
+	void RelativeBranch             (StageType&& inst);
+	void RelativeBranchLong         (StageType&& inst);
+	void StackInterupt              (StageType&& inst);
+	
+	//Instructions
+	void ADC();
+	void AND();
+	void ASL();
+	void BCC();
+	void BCS();
+	void BEQ();
+	void BIT();
+	void BMI();
+	void BNE();
+	void BPL();
+	void BRA();
+	void BRK();
+	void BVC();
+	void BVS();
+	void CLC();
+	void CLD();
+	void CLI();
+	void CLV();
+	void CMP();
+	void COP();
+	void CPX();
+	void CPY();
+	void DEC();
+	void DEX();
+	void DEY();
+	void EOR();
+	void INC();
+	void INX();
+	void INY();
+	void LDA();
+	void LDX();
+	void LDY();
+	void LSR();
+	void ORA();
+	void PHA();
+	void PHB();
+	void PHP();
+	void PHD();
+	void PHK();
+	void PHX();
+	void PHY();
+	void PLA();
+	void PLB();
+	void PLD();
+	void PLP();
+	void PLX();
+	void PLY();
+	void REP();
+	void ROL();
+	void ROR();
+	void SBC();
+	void SEC();
+	void SED();
+	void SEI();
+	void SEP();
+	void STA();
+	void STP();
+	void STX();
+	void STY();
+	void STZ();
+	void TAX();
+	void TAY();
+	void TCD();
+	void TCS();
+	void TDC();
+	void TRB();
+	void TSB();
+	void TSC();
+	void TSX();
+	void TXA();
+	void TXS();
+	void TXY();
+	void TYA();
+	void TYX();
+	void WAI();
+	void XBA();
+	void XCE();
 };
 
 #endif // W65816_H
