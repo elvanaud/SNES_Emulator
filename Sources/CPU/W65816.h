@@ -439,8 +439,9 @@ private:
 	void StackRelativeWrite         (StageType&& inst);
 	void StackRelativeIndirectY     (StageType&& inst);
 	void StackRelativeIndirectYWrite(StageType&& inst);
-	
 	void StackInterupt              (StageType&& inst);
+	void BlockMoveN                 (StageType&& inst);
+	void BlockMoveP                 (StageType&& inst);
 	
 	//Instructions
 	void ADC();

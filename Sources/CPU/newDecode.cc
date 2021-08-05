@@ -164,6 +164,7 @@ void W65816::decode(bool predecode)
 		case 0x41: DirectXIndirect              (StageType(EOR)); break;
 		case 0x42: Immediate                    (StageType(dummyStage)); break;//WDM
 		case 0x43: StackRelative                (StageType(EOR)); break;
+		case 0x44: BlockMoveP                   (StageType(dummyStage)); break;//MVP
 		case 0x45: Direct                       (StageType(EOR)); break;
 		case 0x46: DirectRMW                    (StageType(LSR)); break;
 		case 0x47: DirectIndirectLong           (StageType(EOR)); break;
@@ -179,6 +180,7 @@ void W65816::decode(bool predecode)
 		case 0x51: DirectIndirectY              (StageType(EOR)); break;
 		case 0x52: DirectIndirect               (StageType(EOR)); break;
 		case 0x53: StackRelativeIndirectY       (StageType(EOR)); break;
+		case 0x54: BlockMoveN                   (StageType(dummyStage)); break;//MVN
 		case 0x55: DirectX                      (StageType(EOR)); break;
 		case 0x56: DirectXRMW                   (StageType(LSR)); break;
 		case 0x57: DirectIndirectYLong          (StageType(EOR)); break;
@@ -2041,7 +2043,7 @@ void W65816::StackRelativeIndirectYWrite(StageType&& inst)
 		write(&adr,&idb.high);
 	}
 }	
-/////////////////////
+
 void W65816::StackInterupt(StageType&& inst)
 {
 	if(preDecodeStage)
@@ -2079,3 +2081,71 @@ void W65816::StackInterupt(StageType&& inst)
 		fetchLong(&ZERO,&adr,&pc.high);
 	}
 }
+
+void W65816::BlockMoveN(StageType&& inst)
+{
+	if(preDecodeStage)
+	{
+		lastPipelineStage = inst;
+	}
+	
+	if(isStageEnabled(0,SIG_ALWAYS))
+	{
+		fetchDec(&pc,&adr.high);
+		moveReg8(&adr.low,&dbr);
+	}
+	if(isStageEnabled(1,SIG_ALWAYS))
+	{
+		fetchIncLong(&adr.high,&x,&idb.low);
+	}
+	if(isStageEnabled(2,SIG_ALWAYS))
+	{
+		writeIncLong(&adr.low,&y,&idb.low);
+	}
+	if(isStageEnabled(3,SIG_ALWAYS))
+	{
+		dummyFetchLast();
+		decReg(&acc);
+		if(enablingSignals[SIG_ACC_ZERO])
+			incReg(&pc);
+	}
+	if(isStageEnabled(4,SIG_ALWAYS))
+	{
+		if(enablingSignals[SIG_ACC_ZERO]) incReg(&pc);
+		if(enablingSignals[SIG_ACC_NOT_ZERO]) decReg(&pc);
+	}
+}	
+
+void W65816::BlockMoveP(StageType&& inst)
+{
+	if(preDecodeStage)
+	{
+		lastPipelineStage = inst;
+	}
+	
+	if(isStageEnabled(0,SIG_ALWAYS))
+	{
+		fetchDec(&pc,&adr.high);
+		moveReg8(&adr.low,&dbr);
+	}
+	if(isStageEnabled(1,SIG_ALWAYS))
+	{
+		fetchDecLong(&adr.high,&x,&idb.low);
+	}
+	if(isStageEnabled(2,SIG_ALWAYS))
+	{
+		writeDecLong(&adr.low,&y,&idb.low);
+	}
+	if(isStageEnabled(3,SIG_ALWAYS))
+	{
+		dummyFetchLast();
+		decReg(&acc);
+		if(enablingSignals[SIG_ACC_ZERO])
+			incReg(&pc);
+	}
+	if(isStageEnabled(4,SIG_ALWAYS))
+	{
+		if(enablingSignals[SIG_ACC_ZERO]) incReg(&pc);
+		if(enablingSignals[SIG_ACC_NOT_ZERO]) decReg(&pc);
+	}
+}	
