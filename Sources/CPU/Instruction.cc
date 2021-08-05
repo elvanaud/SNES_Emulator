@@ -7,7 +7,7 @@
 	adrMode = adrMode;
 }*/
 
-Instruction::Instruction(){}
+/*Instruction::Instruction(){}
 
 vector<vector<Stage>> Instruction::Stages()
 {
@@ -43,3 +43,4 @@ string Instruction::getASM()
 {
 	return opcodeASM+adrMode.decodeASM();
 }
+*/

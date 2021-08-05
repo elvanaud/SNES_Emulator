@@ -1,6 +1,5 @@
 #include "W65816.h"
 #include "../Bus.h"
-#include "Stage.h"
 #include "Types.h"
 
 using std::bind;
@@ -13,16 +12,10 @@ using std::endl;
 
 W65816::W65816()
 {
-	initializeAddressingModes();
-	initializeAdrModeASMDecode();
-	initializeOpcodes();
-	reloadPipeline();
+	//initializeAdrModeASMDecode();
+
 	pc.set(0xFF); //Becomes useless
 	lastPipelineStage = StageType(dummyStage);
-
-	interuptIRQ     = Instruction("<interupt IRQ>", StackInterupt, IRQ);
-	interuptNMI     = Instruction("<interupt NMI>", StackInterupt, NMI);
-	interuptRESET   = Instruction("<interupt RST>", StackInterupt, RESET);
 
 	triggerRESET();
 
@@ -90,10 +83,10 @@ uint8_t W65816::getIR()
 	return ir;
 }
 
-unsigned int W65816::getTCycle()
+/*unsigned int W65816::getTCycle()
 {
 	return tcycle;
-}
+}*/
 
 uint32_t W65816::getAddressBus()
 {
@@ -110,10 +103,10 @@ uint16_t W65816::getY()
 	return y.val();
 }
 
-Instruction & W65816::getInst()
+/*Instruction & W65816::getInst()
 {
 	return decodingTable[ir];
-}
+}*/
 
 // ---------- PINS ------------------
 bool W65816::VDA()
@@ -253,39 +246,25 @@ void W65816::shrinkIndexRegisters(bool doIt)
 	}
 }
 
-/*void W65816::reloadPipeline()
-{
-	pipeline.clear();
-	tcycle = 0;
-
-	vector<StageType> T1 = lastPipelineStage; //Be careful to keep the previous inst stage before the new opcode fetch
-	T1.push_back(Stage(Stage::SIG_ALWAYS,fetchInc,&pc,&ir).get());
-	lastPipelineStage.clear();
-	pipeline.push_back(T1);
-
-	vector<StageType> T2 = {Stage(Stage::SIG_ALWAYS,decode).get(), Stage(Stage::SIG_ALWAYS,fetch,&pc,&adr.low).get()}; //Careful to keep the decode before the fetch
-	pipeline.push_back(T2);
-}*/
-
 bool W65816::isStageEnabled(EnablingCondition st)
 {
 	uint8_t op;
 	switch(st)//st.getEnablingCondition())
 	{
-		case Stage::SIG_ALWAYS: return true;
-		case Stage::SIG_INST: return true;
-		case Stage::SIG_MEM16_ONLY: return !p.mem8;
-		case Stage::SIG_MODE16_ONLY: if(isIndexRelated) return !p.index8; else return !p.mem8;
-		case Stage::SIG_MODE8_ONLY: if(isIndexRelated) return p.index8; else return p.mem8;
-		case Stage::SIG_DUMMY_STAGE: return true;
-		case Stage::SIG_X_CROSS_PAGE: op = bus->privateRead(pc.val()); return op > op+x.low;
-		case Stage::SIG_Y_CROSS_PAGE: op = bus->privateRead(pc.val()); return op > op+y.low;
-		case Stage::SIG_DL_NOT_ZERO: return d.low != 0;
-		case Stage::SIG_INDIRECT_Y_CROSS_PAGE_OR_X16: op = bus->privateRead(bus->privateRead(pc.val())+d.val()); return !p.index8 || op > op+y.low;
-		case Stage::SIG_PC_CROSS_PAGE_IN_EMUL: op = bus->privateRead(pc.val()); return p.emulationMode && op > op+adr.low;
-		case Stage::SIG_NATIVE_MODE: return !p.emulationMode;
-		case Stage::SIG_ACC_ZERO: return acc.val()==0;
-		case Stage::SIG_ACC_NOT_ZERO: return acc.val()!=0;
+		case SIG_ALWAYS: return true;
+		case SIG_INST: return true;
+		case SIG_MEM16_ONLY: return !p.mem8;
+		case SIG_MODE16_ONLY: if(isIndexRelated) return !p.index8; else return !p.mem8;
+		case SIG_MODE8_ONLY: if(isIndexRelated) return p.index8; else return p.mem8;
+		case SIG_DUMMY_STAGE: return true;
+		case SIG_X_CROSS_PAGE: op = bus->privateRead(pc.val()); return op > op+x.low;
+		case SIG_Y_CROSS_PAGE: op = bus->privateRead(pc.val()); return op > op+y.low;
+		case SIG_DL_NOT_ZERO: return d.low != 0;
+		case SIG_INDIRECT_Y_CROSS_PAGE_OR_X16: op = bus->privateRead(bus->privateRead(pc.val())+d.val()); return !p.index8 || op > op+y.low;
+		case SIG_PC_CROSS_PAGE_IN_EMUL: op = bus->privateRead(pc.val()); return p.emulationMode && op > op+adr.low;
+		case SIG_NATIVE_MODE: return !p.emulationMode;
+		case SIG_ACC_ZERO: return acc.val()==0;
+		case SIG_ACC_NOT_ZERO: return acc.val()!=0;
 	}
 
 	assert(false);

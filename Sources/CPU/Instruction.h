@@ -6,9 +6,8 @@ using std::vector;
 #include <string>
 using std::string;
 
-#include "Stage.h"
 #include "AddressingMode.h"
-
+/*
 class Instruction
 {
 public:
@@ -36,5 +35,5 @@ private:
 	string opcodeASM;
 	bool indexRelated = false;
 };
-
+*/
 #endif // INSTRUCTION_H

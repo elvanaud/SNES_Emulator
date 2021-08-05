@@ -8,9 +8,8 @@ using std::string;
 using std::vector;
 
 #include "Types.h"
-#include "Stage.h"
 
-
+/*
 class AddressingMode
 {
 public:
@@ -37,6 +36,6 @@ private:
 	unsigned int stageNum;
 	int name = -1;
 	std::function<void(std::stringstream&,string)> asmDecoder;
-};
+};*/
 
 #endif // ADDRESSINGMODE_H

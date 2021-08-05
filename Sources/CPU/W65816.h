@@ -6,12 +6,8 @@
 #include <vector>
 using std::vector;
 
-
-#include "Stage.h"
 class Bus;
-#include "Instruction.h"
 #include "Types.h"
-#include "AddressingMode.h"
 
 class W65816
 {
@@ -50,10 +46,10 @@ public:
 	string getPString();
 
 	//Getters - Internal
-	unsigned int getTCycle();
+	//unsigned int getTCycle();
 	uint16_t getAdr();
 	uint16_t getIDB();
-	Instruction & getInst();
+	//Instruction & getInst();
 
 	bool isBranchInstruction = false;   //used for debugging purposes (no effect in cpu emulation)
 	uint32_t branchAddress = 0;         // "
@@ -62,19 +58,12 @@ private:
 	//Private Internal State
 	Bus * bus;
 
-	vector<vector<StageType>> pipeline;
 	StageType lastPipelineStage;
 	unsigned int tcycle = 0;
 
 	bool vda = true;
 	bool vpa = true;
 	bool rdy = true;
-
-	Instruction decodingTable[0x100];
-
-	Instruction interuptIRQ;
-	Instruction interuptNMI;
-	Instruction interuptRESET;
 
 	void IRQ();
 	void NMI();
@@ -98,22 +87,11 @@ private:
 	bool branchTaken = false;
 	bool clockStopped = false;
 
-	enum EnablingCondition{
-		SIG_ALWAYS,SIG_INST,SIG_DUMMY_STAGE,SIG_MEM16_ONLY,SIG_MODE16_ONLY,SIG_MODE8_ONLY,
-		SIG_X_CROSS_PAGE,SIG_Y_CROSS_PAGE,SIG_DL_NOT_ZERO, SIG_INDIRECT_Y_CROSS_PAGE_OR_X16,
-		SIG_PC_CROSS_PAGE_IN_EMUL, SIG_NATIVE_MODE, SIG_ACC_ZERO, SIG_ACC_NOT_ZERO, last};
-
-	void reloadPipeline();
-	void processSignals();
-	bool isStageEnabled(EnablingCondition st);
-	void initializeOpcodes();
-	void initializeAddressingModes();
-	void initializeAdrModeASMDecode();
+	
 	uint32_t getParam(int index, int length = 1);
 
 	enum ValidAddressState {OpcodeFetch, InternalOperation, DataFetch, OperandFetch};
 	void handleValidAddressPINS(ValidAddressState state);
-	void preDecode();
 
 	void generateAddress(uint8_t bank, uint16_t adr);
 	void generateAddress(uint16_t adr);
@@ -228,8 +206,6 @@ private:
 	uint16_t getReg(Register16 & r);
 
 	//Internal Operations
-	//void decode();
-
 	void fetchInc(Register16 *src, uint8_t * dst);
 	void fetchDec(Register16 *src, uint8_t * dst);
 	void fetch(Register16 *src, uint8_t * dst);
@@ -279,105 +255,34 @@ private:
 	void invalidPrefetch();
 	void branchInstruction();
 
-	//Addressing Modes
-	enum AdrModeName {
-		ABSOLUTE, ABSOLUTE_WRITE, ABSOLUTE_RMW, ABSOLUTE_JMP, ABSOLUTE_JSR, ABSOLUTE_LONG,
-			ABSOLUTE_LONG_WRITE, ABSOLUTE_LONG_JMP, ABSOLUTE_LONG_JSL, ABSOLUTE_LONG_X, ABSOLUTE_X,
-			ABSOLUTE_X_WRITE, ABSOLUTE_X_LONG_WRITE, ABSOLUTE_X_RMW, ABSOLUTE_Y, ABSOLUTE_Y_WRITE,
-			ABSOLUTE_X_INDIRECT_JMP, ABSOLUTE_X_INDIRECT_JSR, ABSOLUTE_INDIRECT_JML, ABSOLUTE_INDIRECT_JMP,
-		ACCUMULATOR,
-		DIRECT, DIRECT_WRITE, DIRECT_RMW, DIRECT_X_INDIRECT, DIRECT_X_INDIRECT_WRITE, DIRECT_INDIRECT,
-			DIRECT_INDIRECT_WRITE, DIRECT_INDIRECT_Y, DIRECT_INDIRECT_Y_WRITE, DIRECT_INDIRECT_Y_LONG,
-			DIRECT_INDIRECT_Y_LONG_WRITE, DIRECT_INDIRECT_LONG, DIRECT_INDIRECT_LONG_WRITE,
-			DIRECT_X, DIRECT_X_WRITE, DIRECT_X_RMW, DIRECT_Y, DIRECT_Y_WRITE,
-		IMMEDIATE, IMMEDIATE_SPECIAL,
-		IMPLIED, IMPLIED_SPECIAL,
-		RELATIVE_BRANCH, RELATIVE_BRANCH_LONG,
-		STACK_POP, STACK_POP_8, STACK_POP_16, STACK_PUSH, STACK_PUSH_8, STACK_PUSH_16, STACK_PEA,
-			STACK_PEI, STACK_PER, STACK_RTI, STACK_RTS, STACK_RTL, STACK_RELATIVE, STACK_RELATIVE_WRITE,
-			STACK_RELATIVE_INDIRECT_Y, STACK_RELATIVE_INDIRECT_Y_WRITE, STACK_INTERUPT,
-		BLOCK_MOVE_N, BLOCK_MOVE_P
-		};
-
-	AddressingMode Absolute                     = AddressingMode(AdrModeName::ABSOLUTE);
-	AddressingMode AbsoluteWrite                = AddressingMode(AdrModeName::ABSOLUTE_WRITE);
-	AddressingMode AbsoluteRMW                  = AddressingMode(AdrModeName::ABSOLUTE_RMW);
-	AddressingMode AbsoluteJMP                  = AddressingMode(AdrModeName::ABSOLUTE_JMP);
-	AddressingMode AbsoluteJSR                  = AddressingMode(AdrModeName::ABSOLUTE_JSR);
-	AddressingMode AbsoluteLong                 = AddressingMode(AdrModeName::ABSOLUTE_LONG);
-	AddressingMode AbsoluteLongWrite            = AddressingMode(AdrModeName::ABSOLUTE_LONG_WRITE);
-	AddressingMode AbsoluteLongJMP              = AddressingMode(AdrModeName::ABSOLUTE_LONG_JMP);
-	AddressingMode AbsoluteLongJSL              = AddressingMode(AdrModeName::ABSOLUTE_LONG_JSL);
-	AddressingMode AbsoluteXLong                = AddressingMode(AdrModeName::ABSOLUTE_LONG_X);
-	AddressingMode AbsoluteX                    = AddressingMode(AdrModeName::ABSOLUTE_X);
-	AddressingMode AbsoluteXWrite               = AddressingMode(AdrModeName::ABSOLUTE_X_WRITE);
-	AddressingMode AbsoluteXLongWrite           = AddressingMode(AdrModeName::ABSOLUTE_X_LONG_WRITE);
-	AddressingMode AbsoluteXRMW                 = AddressingMode(AdrModeName::ABSOLUTE_X_RMW);
-	AddressingMode AbsoluteY                    = AddressingMode(AdrModeName::ABSOLUTE_Y);
-	AddressingMode AbsoluteYWrite               = AddressingMode(AdrModeName::ABSOLUTE_Y_WRITE);
-	AddressingMode AbsoluteXIndirectJMP         = AddressingMode(AdrModeName::ABSOLUTE_X_INDIRECT_JMP);
-	AddressingMode AbsoluteXIndirectJSR         = AddressingMode(AdrModeName::ABSOLUTE_X_INDIRECT_JSR);
-	AddressingMode AbsoluteIndirectJML          = AddressingMode(AdrModeName::ABSOLUTE_INDIRECT_JML);
-	AddressingMode AbsoluteIndirectJMP          = AddressingMode(AdrModeName::ABSOLUTE_INDIRECT_JMP);
-	AddressingMode Accumulator                  = AddressingMode(AdrModeName::ACCUMULATOR);
-	AddressingMode Direct                       = AddressingMode(AdrModeName::DIRECT);
-	AddressingMode DirectWrite                  = AddressingMode(AdrModeName::DIRECT_WRITE);
-	AddressingMode DirectRMW                    = AddressingMode(AdrModeName::DIRECT_RMW);
-	AddressingMode DirectXIndirectWrite         = AddressingMode(AdrModeName::DIRECT_X_INDIRECT_WRITE);
-	AddressingMode DirectIndirect               = AddressingMode(AdrModeName::DIRECT_INDIRECT);
-	AddressingMode DirectIndirectWrite          = AddressingMode(AdrModeName::DIRECT_INDIRECT_WRITE);
-	AddressingMode DirectIndirectY              = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y);
-	AddressingMode DirectIndirectYWrite         = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y_WRITE);
-	AddressingMode DirectIndirectYLong          = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y);
-	AddressingMode DirectIndirectYLongWrite     = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y_WRITE);
-	AddressingMode DirectIndirectLong           = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y);
-	AddressingMode DirectIndirectLongWrite      = AddressingMode(AdrModeName::DIRECT_INDIRECT_Y_WRITE);
-	AddressingMode DirectX                      = AddressingMode(AdrModeName::DIRECT_X);
-	AddressingMode DirectXWrite                 = AddressingMode(AdrModeName::DIRECT_X_WRITE);
-	AddressingMode DirectXRMW                   = AddressingMode(AdrModeName::DIRECT_X_RMW);
-	AddressingMode DirectY                      = AddressingMode(AdrModeName::DIRECT_Y);
-	AddressingMode DirectYWrite                 = AddressingMode(AdrModeName::DIRECT_Y_WRITE);
-	AddressingMode Immediate                    = AddressingMode(AdrModeName::IMMEDIATE);
-	AddressingMode ImmediateSpecial             = AddressingMode(AdrModeName::IMMEDIATE_SPECIAL);
-	AddressingMode Implied                      = AddressingMode(AdrModeName::IMPLIED);
-	AddressingMode ImpliedSpecial               = AddressingMode(AdrModeName::IMPLIED_SPECIAL);
-	AddressingMode StackPop                     = AddressingMode(AdrModeName::STACK_POP);
-	AddressingMode StackPop8                    = AddressingMode(AdrModeName::STACK_POP_8);
-	AddressingMode StackPop16                   = AddressingMode(AdrModeName::STACK_POP_16);
-	AddressingMode StackPush                    = AddressingMode(AdrModeName::STACK_PUSH);
-	AddressingMode StackPush8                   = AddressingMode(AdrModeName::STACK_PUSH_8);
-	AddressingMode StackPush16                  = AddressingMode(AdrModeName::STACK_PUSH_16);
-	AddressingMode StackPEA                     = AddressingMode(AdrModeName::STACK_PEA);
-	AddressingMode StackPEI                     = AddressingMode(AdrModeName::STACK_PEI);
-	AddressingMode StackPER                     = AddressingMode(AdrModeName::STACK_PER);
-	AddressingMode StackRTI                     = AddressingMode(AdrModeName::STACK_RTI);
-	AddressingMode StackRTS                     = AddressingMode(AdrModeName::STACK_RTS);
-	AddressingMode StackRTL                     = AddressingMode(AdrModeName::STACK_RTL);
-	AddressingMode StackRelative                = AddressingMode(AdrModeName::STACK_RELATIVE);
-	AddressingMode StackRelativeWrite           = AddressingMode(AdrModeName::STACK_RELATIVE_WRITE);
-	AddressingMode StackRelativeIndirectY       = AddressingMode(AdrModeName::STACK_RELATIVE_INDIRECT_Y);
-	AddressingMode StackRelativeIndirectYWrite  = AddressingMode(AdrModeName::STACK_RELATIVE_INDIRECT_Y_WRITE);
-	AddressingMode StackInterupt                = AddressingMode(AdrModeName::STACK_INTERUPT);
-	AddressingMode BlockMoveN                   = AddressingMode(AdrModeName::BLOCK_MOVE_N);
-	AddressingMode BlockMoveP                   = AddressingMode(AdrModeName::BLOCK_MOVE_P);
-
-	bool preDecodeStage = false;
-	bool isStageEnabled(unsigned int cycle, EnablingCondition signal);
-	
+	//New stuff
 	void noAutoIncPC();
 	bool prefetchIncPC = true;
 	bool doPrefetchInIDB = false;
+	bool isIndexRelated = false;
+	
+	void initializeAdrModeASMDecode();
+	
+	enum EnablingCondition{
+		SIG_ALWAYS,SIG_INST,SIG_DUMMY_STAGE,SIG_MEM16_ONLY,SIG_MODE16_ONLY,SIG_MODE8_ONLY,
+		SIG_X_CROSS_PAGE,SIG_Y_CROSS_PAGE,SIG_DL_NOT_ZERO, SIG_INDIRECT_Y_CROSS_PAGE_OR_X16,
+		SIG_PC_CROSS_PAGE_IN_EMUL, SIG_NATIVE_MODE, SIG_ACC_ZERO, SIG_ACC_NOT_ZERO, last};
 
+
+	bool preDecodeStage = false;
+	bool isStageEnabled(EnablingCondition st);
+	bool isStageEnabled(unsigned int cycle, EnablingCondition signal);
+	
 	enum PipelineContent {REGULAR_INST, IRQ_INTERUPT, NMI_INTERUPT, RESET_INTERUPT};
 	PipelineContent pipelineContent = REGULAR_INST;
 
-	bool isIndexRelated = false;
-
-	bool enablingSignals[EnablingCondition::last]; //back in fashion !
+	bool enablingSignals[EnablingCondition::last]; 
 	vector<bool> enabledStages;
 	int pipelineSize = 0;
+	
 	void decode(bool predecode = false);
-
+	
+	//Adressing Modes
 	void Absolute                   (StageType&& inst);
 	void AbsoluteWrite              (StageType&& inst);
 	void AbsoluteRMW                (StageType&& inst);

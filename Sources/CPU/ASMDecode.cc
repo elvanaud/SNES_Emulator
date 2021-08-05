@@ -3,7 +3,7 @@
 
 #include <sstream>
 #include <iomanip>
-using std::setfill;
+/*using std::setfill;
 using std::setw;
 using std::hex;
 using std::stringstream;
@@ -153,3 +153,4 @@ uint32_t W65816::getParam(int index, int length)
 		res |= uint32_t(bus->privateRead(adr))<<offset;
 	return res;
 }
+*/

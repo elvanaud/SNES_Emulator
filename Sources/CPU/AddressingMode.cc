@@ -1,5 +1,6 @@
 #include "AddressingMode.h"
 
+/*
 AddressingMode::AddressingMode(){}
 
 AddressingMode::AddressingMode(int id)
@@ -67,4 +68,4 @@ string AddressingMode::decodeASM()
 	//st<<" ";
 	asmDecoder(st,"$");
 	return st.str();
-}
+}*/
