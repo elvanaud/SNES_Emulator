@@ -137,7 +137,7 @@ bool ConsoleDebugger::tick()
 		
 		if(debugPrint || debugTrace)
 		{
-			//traceOrPrint();
+			traceOrPrint();
 		}
 		if(nbExecutedInstructions % 50'000 == 0)
 			cout << "Executed " << nbExecutedInstructions << " instructions"<<endl;
@@ -149,7 +149,7 @@ bool ConsoleDebugger::tick()
 	return false;
 }
 
-/*
+
 void ConsoleDebugger::traceOrPrint()
 {
 	using std::setfill;
@@ -163,7 +163,7 @@ void ConsoleDebugger::traceOrPrint()
 
 	stringstream ss;
 
-	ss <<hex << setfill('0')<<setw(6)<<cpu.getFullPC()-1 <<" " << instASM;*/
+	ss <<hex << setfill('0')<<setw(6)<<cpu.getFullPC()-1 <<" " << instASM;
 
 	//old comments
 	/*if(bus->isDataLoaded)
@@ -178,7 +178,7 @@ void ConsoleDebugger::traceOrPrint()
 	}
 	else */
 	//ss << "         ";
-	/*if(instASM.size()>14)
+	if(instASM.size()>14)
 	{
 		cout << "inst asm size loong: "<< instASM<<endl;
 		throw "asm long";
@@ -195,7 +195,7 @@ void ConsoleDebugger::traceOrPrint()
 	string traceLine = ss.str();
 	if(debugPrint) cout << traceLine;
 	if(debugTrace) trace+=traceLine;
-}*/
+}
 
 bool ConsoleDebugger::checkEvents()
 {

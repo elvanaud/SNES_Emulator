@@ -262,6 +262,7 @@ private:
 	bool isIndexRelated = false;
 	
 	void initializeAdrModeASMDecode();
+	string opcodeASM;
 	
 	enum EnablingCondition{
 		SIG_ALWAYS,SIG_INST,SIG_DUMMY_STAGE,SIG_MEM16_ONLY,SIG_MODE16_ONLY,SIG_MODE8_ONLY,
@@ -361,6 +362,7 @@ private:
 	void BPL();
 	void BRA();
 	void BRK();
+	void BRL();
 	void BVC();
 	void BVS();
 	void CLC();
@@ -378,11 +380,21 @@ private:
 	void INC();
 	void INX();
 	void INY();
+	void JMP();
+	void JML();
+	void JSR();
+	void JSL();
 	void LDA();
 	void LDX();
 	void LDY();
 	void LSR();
+	void MVP();
+	void MVN();
+	void NOP();
 	void ORA();
+	void PEA();
+	void PER();
+	void PEI();
 	void PHA();
 	void PHB();
 	void PHP();
@@ -399,6 +411,9 @@ private:
 	void REP();
 	void ROL();
 	void ROR();
+	void RTI();
+	void RTL();
+	void RTS();
 	void SBC();
 	void SEC();
 	void SED();
@@ -424,6 +439,7 @@ private:
 	void TYA();
 	void TYX();
 	void WAI();
+	void WDM();
 	void XBA();
 	void XCE();
 };

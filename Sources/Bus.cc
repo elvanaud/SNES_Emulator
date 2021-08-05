@@ -245,10 +245,10 @@ void Bus::run()
 			apu.tick();
 			dmaHandler.tick();
 		}
-		/*if(global_clock >= 21148004)
+		if(global_clock >= 21148004)
 		{
 			app.close();
-		}*/
+		}
 		if(debugger.checkEvents())//todo:replace with ClockManager
 		{
 			sf::Event event;

@@ -5,6 +5,7 @@ void W65816::Absolute(StageType&& inst)
 	if(preDecodeStage)
 	{
 		lastPipelineStage = inst;
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -25,7 +26,7 @@ void W65816::AbsoluteWrite(StageType&& inst)
 {
 	if(preDecodeStage)
 	{
-		;//empty
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -47,7 +48,7 @@ void W65816::AbsoluteRMW(StageType&& inst)
 {
 	if(preDecodeStage)
 	{
-		;//empty
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -82,6 +83,7 @@ void W65816::AbsoluteJMP(StageType&& inst)
 	if(preDecodeStage)
 	{
 		lastPipelineStage = inst;
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -96,6 +98,7 @@ void W65816::AbsoluteJSR(StageType&& inst)
 	if(preDecodeStage)
 	{
 		lastPipelineStage = inst;
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -123,6 +126,7 @@ void W65816::AbsoluteLong(StageType&& inst)
 	if(preDecodeStage)
 	{
 		lastPipelineStage = inst;
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -147,7 +151,7 @@ void W65816::AbsoluteLongWrite(StageType&& inst)
 {
 	if(preDecodeStage)
 	{
-		;//empty
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -174,6 +178,7 @@ void W65816::AbsoluteLongJMP(StageType&& inst)
 	if(preDecodeStage)
 	{
 		lastPipelineStage = inst;
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -192,6 +197,7 @@ void W65816::AbsoluteLongJSL(StageType&& inst)
 	if(preDecodeStage)
 	{
 		lastPipelineStage = inst;
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -226,6 +232,7 @@ void W65816::AbsoluteXLong(StageType&& inst)
 	if(preDecodeStage)
 	{
 		lastPipelineStage = inst;
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -253,7 +260,7 @@ void W65816::AbsoluteXLongWrite(StageType&& inst)
 {
 	if(preDecodeStage)
 	{
-		;//empty
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -283,6 +290,7 @@ void W65816::AbsoluteX(StageType&& inst)
 	if(preDecodeStage)
 	{
 		lastPipelineStage = inst;
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -309,7 +317,7 @@ void W65816::AbsoluteXWrite(StageType&& inst)
 {
 	if(preDecodeStage)
 	{
-		; //empty
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -337,7 +345,7 @@ void W65816::AbsoluteXRMW(StageType&& inst)
 {
 	if(preDecodeStage)
 	{
-		; //empty
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -380,6 +388,7 @@ void W65816::AbsoluteY(StageType&& inst)
 	if(preDecodeStage)
 	{
 		lastPipelineStage = inst;
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -406,7 +415,7 @@ void W65816::AbsoluteYWrite(StageType&& inst)
 {
 	if(preDecodeStage)
 	{
-		; //empty
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -435,6 +444,7 @@ void W65816::AbsoluteXIndirectJMP(StageType&& inst)
 	if(preDecodeStage)
 	{
 		lastPipelineStage = inst;
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -461,6 +471,7 @@ void W65816::AbsoluteXIndirectJSR(StageType&& inst)
 	if(preDecodeStage)
 	{
 		lastPipelineStage = inst;
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -495,6 +506,7 @@ void W65816::AbsoluteIndirectJML(StageType&& inst)
 	if(preDecodeStage)
 	{
 		lastPipelineStage = inst;
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -520,6 +532,7 @@ void W65816::AbsoluteIndirectJMP(StageType&& inst)
 	if(preDecodeStage)
 	{
 		lastPipelineStage = inst;
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -543,6 +556,7 @@ void W65816::Accumulator(StageType&& inst)
 		invalidPrefetch();
 		accPrefetchInIDB();
 		noAutoIncPC();
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -560,6 +574,7 @@ void W65816::Direct(StageType&& inst)
 	{
 		dhPrefetchInAdr();
 		lastPipelineStage = inst;
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_DL_NOT_ZERO))
@@ -583,6 +598,7 @@ void W65816::DirectWrite(StageType&& inst)
 	if(preDecodeStage)
 	{
 		dhPrefetchInAdr();
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_DL_NOT_ZERO))
@@ -607,6 +623,7 @@ void W65816::DirectRMW(StageType&& inst)
 	if(preDecodeStage)
 	{
 		dhPrefetchInAdr();
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_DL_NOT_ZERO))
@@ -646,6 +663,7 @@ void W65816::DirectXIndirect(StageType&& inst)
 	{
 		dhPrefetchInAdr();
 		lastPipelineStage = inst;
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_DL_NOT_ZERO))
@@ -683,6 +701,7 @@ void W65816::DirectXIndirectWrite(StageType&& inst)
 	if(preDecodeStage)
 	{
 		dhPrefetchInAdr();
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_DL_NOT_ZERO))
@@ -722,6 +741,7 @@ void W65816::DirectIndirect(StageType&& inst)
 	{
 		dhPrefetchInAdr();
 		lastPipelineStage = inst;
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_DL_NOT_ZERO))
@@ -754,6 +774,7 @@ void W65816::DirectIndirectWrite(StageType&& inst)
 	if(preDecodeStage)
 	{
 		dhPrefetchInAdr();
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_DL_NOT_ZERO))
@@ -788,6 +809,7 @@ void W65816::DirectIndirectY(StageType&& inst)
 	{
 		dhPrefetchInAdr();
 		lastPipelineStage = inst;
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_DL_NOT_ZERO))
@@ -826,6 +848,7 @@ void W65816::DirectIndirectYWrite(StageType&& inst)
 	if(preDecodeStage)
 	{
 		dhPrefetchInAdr();
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_DL_NOT_ZERO))
@@ -866,6 +889,7 @@ void W65816::DirectIndirectYLong(StageType&& inst)
 	{
 		dhPrefetchInAdr();
 		lastPipelineStage = inst;
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_DL_NOT_ZERO))
@@ -905,6 +929,7 @@ void W65816::DirectIndirectYLongWrite(StageType&& inst)
 	if(preDecodeStage)
 	{
 		dhPrefetchInAdr();
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_DL_NOT_ZERO))
@@ -946,6 +971,7 @@ void W65816::DirectIndirectLong(StageType&& inst)
 	{
 		dhPrefetchInAdr();
 		lastPipelineStage = inst;
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_DL_NOT_ZERO))
@@ -982,6 +1008,7 @@ void W65816::DirectIndirectLongWrite(StageType&& inst)
 	if(preDecodeStage)
 	{
 		dhPrefetchInAdr();
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_DL_NOT_ZERO))
@@ -1020,6 +1047,7 @@ void W65816::DirectX(StageType&& inst)
 	{
 		dhPrefetchInAdr();
 		lastPipelineStage = inst;
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_DL_NOT_ZERO))
@@ -1048,6 +1076,7 @@ void W65816::DirectXWrite(StageType&& inst)
 	if(preDecodeStage)
 	{
 		dhPrefetchInAdr();
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_DL_NOT_ZERO))
@@ -1077,6 +1106,7 @@ void W65816::DirectXRMW(StageType&& inst)
 	if(preDecodeStage)
 	{
 		dhPrefetchInAdr();
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_DL_NOT_ZERO))
@@ -1121,6 +1151,7 @@ void W65816::DirectY(StageType&& inst)
 	{
 		dhPrefetchInAdr();
 		lastPipelineStage = inst;
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_DL_NOT_ZERO))
@@ -1149,6 +1180,7 @@ void W65816::DirectYWrite(StageType&& inst)
 	if(preDecodeStage)
 	{
 		dhPrefetchInAdr();
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_DL_NOT_ZERO))
@@ -1179,6 +1211,7 @@ void W65816::Immediate(StageType&& inst)
 	{
 		opPrefetchInIDB();
 		lastPipelineStage = inst;
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_MODE16_ONLY))
@@ -1193,6 +1226,7 @@ void W65816::ImmediateSpecial(StageType&& inst)
 	{
 		opPrefetchInIDB();
 		noAutoIncPC();
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -1210,6 +1244,7 @@ void W65816::Implied(StageType&& inst)
 		noAutoIncPC();
 		lastPipelineStage = inst;
 		enabledStages.resize(0);//no stages in pipeline
+		inst(this);//predecode and ASM disassembly
 	}
 }
 	
@@ -1219,6 +1254,7 @@ void W65816::ImpliedSpecial(StageType&& inst)
 	{
 		invalidPrefetch();
 		noAutoIncPC();
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -1231,7 +1267,7 @@ void W65816::RelativeBranch(StageType&& inst)
 {
 	if(preDecodeStage)
 	{
-		inst(this);
+		inst(this);//predecode (special inst for branch) and ASM disassembly
 		lastPipelineStage = StageType(dummyStage);
 
 		if(!branchTaken)
@@ -1260,6 +1296,7 @@ void W65816::RelativeBranchLong(StageType&& inst)
 	if(preDecodeStage)
 	{
 		lastPipelineStage = inst;
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -1279,6 +1316,7 @@ void W65816::StackPop(StageType&& inst)
 		lastPipelineStage = inst;
 		noAutoIncPC();
 		invalidPrefetch();
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -1302,6 +1340,7 @@ void W65816::StackPop8(StageType&& inst)
 		lastPipelineStage = inst;
 		invalidPrefetch();
 		noAutoIncPC();
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -1321,6 +1360,7 @@ void W65816::StackPop16(StageType&& inst)
 		lastPipelineStage = inst;
 		noAutoIncPC();
 		invalidPrefetch();
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -1343,7 +1383,7 @@ void W65816::StackPush(StageType&& inst)
 	{
 		noAutoIncPC();
 		invalidPrefetch();
-		inst(this); //execute the instruction early
+		inst(this); //execute the instruction early and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_MODE16_ONLY))
@@ -1362,6 +1402,7 @@ void W65816::StackPush8(StageType&& inst)
 	{
 		noAutoIncPC();
 		invalidPrefetch();
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -1377,6 +1418,7 @@ void W65816::StackPush16(StageType&& inst)
 	{
 		noAutoIncPC();
 		invalidPrefetch();
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -1395,6 +1437,7 @@ void W65816::StackPEA(StageType&& inst)
 	if(preDecodeStage)
 	{
 		lastPipelineStage = inst;
+		inst(this);//predecode and ASM disassembly
 	}
 
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -1417,6 +1460,7 @@ void W65816::StackPEI(StageType&& inst)
 	{
 		lastPipelineStage = inst;
 		dhPrefetchInAdr();
+		inst(this);//predecode and ASM disassembly
 	}
 	
 	if(isStageEnabled(0,SIG_DL_NOT_ZERO))
@@ -1448,6 +1492,7 @@ void W65816::StackPER(StageType&& inst)
 	if(preDecodeStage)
 	{
 		lastPipelineStage = inst;
+		inst(this);//predecode and ASM disassembly
 	}
 	
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -1475,6 +1520,7 @@ void W65816::StackRTI(StageType&& inst)
 	{
 		lastPipelineStage = inst;
 		invalidPrefetch();
+		inst(this);//predecode and ASM disassembly
 	}
 	
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -1506,6 +1552,7 @@ void W65816::StackRTS(StageType&& inst)
 	{
 		lastPipelineStage = inst;
 		invalidPrefetch();
+		inst(this);//predecode and ASM disassembly
 	}
 	
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -1533,6 +1580,7 @@ void W65816::StackRTL(StageType&& inst)
 	{
 		lastPipelineStage = inst;
 		invalidPrefetch();
+		inst(this);//predecode and ASM disassembly
 	}
 	
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -1559,6 +1607,7 @@ void W65816::StackRelative(StageType&& inst)
 	if(preDecodeStage)
 	{
 		lastPipelineStage = inst;
+		inst(this);//predecode and ASM disassembly
 	}
 	
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -1581,7 +1630,7 @@ void W65816::StackRelativeWrite(StageType&& inst)
 {
 	if(preDecodeStage)
 	{
-		;//empty
+		inst(this);//predecode and ASM disassembly
 	}
 	
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -1606,6 +1655,7 @@ void W65816::StackRelativeIndirectY(StageType&& inst)
 	if(preDecodeStage)
 	{
 		lastPipelineStage = inst;
+		inst(this);//predecode and ASM disassembly
 	}
 	
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -1642,7 +1692,7 @@ void W65816::StackRelativeIndirectYWrite(StageType&& inst)
 {
 	if(preDecodeStage)
 	{
-		;//empty
+		inst(this);//predecode and ASM disassembly
 	}
 	
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -1682,6 +1732,8 @@ void W65816::StackInterupt(StageType&& inst)
 	{
 		lastPipelineStage = StageType(dummyStage);
 		noAutoIncPC();
+		//no predecode inst here
+		//todo: maybe erase asm here
 	}
 
 	if(isStageEnabled(0,SIG_NATIVE_MODE))
@@ -1719,6 +1771,7 @@ void W65816::BlockMoveN(StageType&& inst)
 	if(preDecodeStage)
 	{
 		lastPipelineStage = inst;
+		inst(this);//predecode and ASM disassembly
 	}
 	
 	if(isStageEnabled(0,SIG_ALWAYS))
@@ -1753,6 +1806,7 @@ void W65816::BlockMoveP(StageType&& inst)
 	if(preDecodeStage)
 	{
 		lastPipelineStage = inst;
+		inst(this);//predecode and ASM disassembly
 	}
 	
 	if(isStageEnabled(0,SIG_ALWAYS))
