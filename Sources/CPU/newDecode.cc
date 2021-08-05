@@ -269,6 +269,7 @@ void W65816::decode(bool predecode)
 		case 0xC8: Implied                  (StageType(INY)); break;
 		case 0xC9: Immediate                (StageType(CMP)); break;
 		case 0xCA: Implied                  (StageType(DEX)); break;
+		case 0xCB: ImpliedSpecial           (StageType(WAI)); break;
 		case 0xCC: isIndexRelated=true;Absolute(StageType(CPY)); break;
 		case 0xCD: Absolute                 (StageType(CMP)); break;
 		case 0xCE: AbsoluteRMW              (StageType(DEC)); break;
@@ -281,6 +282,7 @@ void W65816::decode(bool predecode)
 		case 0xD7: DirectIndirectYLong      (StageType(CMP)); break;
 		case 0xD8: Implied                  (StageType(CLD)); break;
 		case 0xD9: AbsoluteY                (StageType(CMP)); break;
+		case 0xDB: ImpliedSpecial           (StageType(STP)); break;
 		case 0xDC: AbsoluteIndirectJML      (StageType(dummyStage)); break;//JML
 		case 0xDD: AbsoluteX                (StageType(CMP)); break;
 		case 0xDE: AbsoluteXRMW             (StageType(DEC)); break;
@@ -295,6 +297,7 @@ void W65816::decode(bool predecode)
 		case 0xE8: Implied                  (StageType(INX)); break;
 		case 0xE9: Immediate                (StageType(SBC)); break;
 		case 0xEA: Implied                  (StageType(dummyStage)); break;//NOP
+		case 0xEB: ImpliedSpecial           (StageType(XBA)); break;
 		case 0xEC: isIndexRelated=true;Absolute(StageType(CPX)); break;
 		case 0xED: Absolute                 (StageType(SBC)); break;
 		case 0xEE: AbsoluteRMW              (StageType(INC)); break;
@@ -1530,7 +1533,7 @@ void W65816::ImmediateSpecial(StageType&& inst)
 	}
 }
 
-void W65816::ImmediateSpecial(StageType&& inst)
+void W65816::Implied(StageType&& inst)
 {
 	if(preDecodeStage)
 	{
@@ -1540,7 +1543,24 @@ void W65816::ImmediateSpecial(StageType&& inst)
 		enabledStages.resize(0);//no stages in pipeline
 	}
 }
+	
+void W65816::ImpliedSpecial(StageType&& inst)
+{
+	if(preDecodeStage)
+	{
+		invalidPrefetch();
+		noAutoIncPC();
+	}
 
+	if(isStageEnabled(0,SIG_ALWAYS))
+	{
+		inst(this);
+	}
+}	
+	
+	
+	
+	
 /////////////
 void W65816::RelativeBranch(StageType&& inst)
 {

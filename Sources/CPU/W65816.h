@@ -420,6 +420,7 @@ private:
 	void Immediate                  (StageType&& inst);
 	void ImmediateSpecial           (StageType&& inst);
 	void Implied                    (StageType&& inst);
+	void ImpliedSpecial             (StageType&& inst);
 
 	void RelativeBranch             (StageType&& inst);
 	void RelativeBranchLong         (StageType&& inst);

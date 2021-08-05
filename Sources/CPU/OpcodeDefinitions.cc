@@ -32,13 +32,10 @@ void W65816::initializeOpcodes()
 	decodingTable[0xAB] = Instruction("PLB", StackPop8, PLB);
 	decodingTable[0xB3] = Instruction("LDA", StackRelativeIndirectY, LDA);
 	decodingTable[0xC3] = Instruction("CMP", StackRelative, CMP);
-	decodingTable[0xCB] = Instruction("WAI", ImpliedSpecial, WAI);
 	decodingTable[0xD3] = Instruction("CMP", StackRelativeIndirectY, CMP);
 	decodingTable[0xD4] = Instruction("PEI", StackPEI, dummyStage);
 	decodingTable[0xDA] = Instruction("PHX", StackPush, PHX); decodingTable[0xDA].setIsIndexRelated(true);
-	decodingTable[0xDB] = Instruction("STP", ImpliedSpecial, STP);
 	decodingTable[0xE3] = Instruction("SBC", StackRelative, SBC);
-	decodingTable[0xEB] = Instruction("XBA", ImpliedSpecial, XBA);
 	decodingTable[0xF3] = Instruction("SBC", StackRelativeIndirectY, SBC);
 	decodingTable[0xF4] = Instruction("PEA", StackPEA, dummyStage);
 	decodingTable[0xFA] = Instruction("PLX", StackPop, PLX); decodingTable[0xFA].setIsIndexRelated(true);

@@ -5,10 +5,6 @@ using namespace std::placeholders;
 
 void W65816::initializeAddressingModes()
 {
-	ImpliedSpecial.setStages({  {Stage(Stage::SIG_INST,dummyStage)},
-								{Stage(Stage::SIG_DUMMY_STAGE, dummyStage)}});
-	ImpliedSpecial.setPredecodeSignals({bind(invalidPrefetch,this)});
-
 	StackPop.setStages({{Stage(Stage::SIG_DUMMY_STAGE,dummyStage)}, //The inc is supposed to happen here but I do it all in the "pop" operation
 						{Stage(Stage::SIG_ALWAYS,pop,&idb.low)},
 						{Stage(Stage::SIG_MODE16_ONLY,pop,&idb.high)},
