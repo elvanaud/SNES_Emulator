@@ -103,8 +103,10 @@ void W65816::decode(bool predecode)
 		case 0x05: Direct                   (StageType(ORA)); break;
 		case 0x06: DirectRMW                (StageType(ASL)); break;
 		case 0x07: DirectIndirectLong       (StageType(ORA)); break;
+		case 0x08: StackPush8               (StageType(PHP)); break;
 		case 0x09: Immediate                (StageType(ORA)); break;
 		case 0x0A: Accumulator              (StageType(ASL)); break;
+		case 0x0B: StackPush16              (StageType(PHD)); break;
 		case 0x0C: AbsoluteRMW              (StageType(TSB)); break;
 		case 0x0D: Absolute                 (StageType(ORA)); break;
 		case 0x0E: AbsoluteRMW              (StageType(ASL)); break;
@@ -131,8 +133,10 @@ void W65816::decode(bool predecode)
 		case 0x25: Direct                   (StageType(AND)); break;
 		case 0x26: DirectRMW                (StageType(ROL)); break;
 		case 0x27: DirectIndirectLong       (StageType(AND)); break;
+		case 0x28: StackPop8                (StageType(PLP)); break;
 		case 0x29: Immediate                (StageType(AND)); break;
 		case 0x2A: Accumulator              (StageType(ROL)); break;//ROL A
+		case 0x2B: StackPop16               (StageType(PLD)); break;
 		case 0x2C: Absolute                 (StageType(BIT)); break;
 		case 0x2D: Absolute                 (StageType(AND)); break;
 		case 0x2E: AbsoluteRMW              (StageType(ROL)); break;
@@ -157,8 +161,10 @@ void W65816::decode(bool predecode)
 		case 0x45: Direct                   (StageType(EOR)); break;
 		case 0x46: DirectRMW                (StageType(LSR)); break;
 		case 0x47: DirectIndirectLong       (StageType(EOR)); break;
+		case 0x48: StackPush                (StageType(PHA)); break;
 		case 0x49: Immediate                (StageType(EOR)); break;
 		case 0x4A: Accumulator              (StageType(LSR)); break;
+		case 0x4B: StackPush8               (StageType(PHK)); break;
 		case 0x4C: AbsoluteJMP              (StageType(dummyStage)); break;//JMP
 		case 0x4D: Absolute                 (StageType(EOR)); break;
 		case 0x4E: AbsoluteRMW              (StageType(LSR)); break;
@@ -171,6 +177,7 @@ void W65816::decode(bool predecode)
 		case 0x57: DirectIndirectYLong      (StageType(EOR)); break;
 		case 0x58: Implied                  (StageType(CLI)); break;
 		case 0x59: AbsoluteY                (StageType(EOR)); break;
+		case 0x5A: isIndexRelated=true;StackPush(StageType(PHY)); break;
 		case 0x5B: Implied                  (StageType(TCD)); break;
 		case 0x5C: AbsoluteLongJMP          (StageType(dummyStage)); break;//JMP
 		case 0x5D: AbsoluteX                (StageType(EOR)); break;
@@ -181,6 +188,7 @@ void W65816::decode(bool predecode)
 		case 0x65: Direct                   (StageType(ADC)); break;
 		case 0x66: DirectRMW                (StageType(ROR)); break;
 		case 0x67: DirectIndirectLong       (StageType(ADC)); break;
+		case 0x68: StackPop                 (StageType(PLA)); break;
 		case 0x69: Immediate                (StageType(ADC)); break;
 		case 0x6A: Accumulator              (StageType(ROR)); break;
 		case 0x6C: AbsoluteIndirectJMP      (StageType(dummyStage)); break;//JMP
@@ -196,6 +204,7 @@ void W65816::decode(bool predecode)
 		case 0x77: DirectIndirectYLong      (StageType(ADC)); break;
 		case 0x78: Implied                  (StageType(SEI)); break;
 		case 0x79: AbsoluteY                (StageType(ADC)); break;
+		case 0x7A: isIndexRelated=true;StackPop(StageType(PLY)); break;
 		case 0x7B: Implied                  (StageType(TDC)); break;
 		case 0x7C: AbsoluteXIndirectJMP     (StageType(dummyStage)); break;//JMP
 		case 0x7D: AbsoluteX                (StageType(ADC)); break;
@@ -211,6 +220,7 @@ void W65816::decode(bool predecode)
 		case 0x88: Implied                  (StageType(DEY)); break;
 		case 0x89: Immediate                (StageType(BIT)); break;
 		case 0x8A: Implied                  (StageType(TXA)); break;
+		case 0x8B: StackPush8               (StageType(PHB)); break;
 		case 0x8C: isIndexRelated=true;AbsoluteWrite(StageType(STY)); break;
 		case 0x8D: AbsoluteWrite            (StageType(STA)); break;
 		case 0x8E: isIndexRelated=true;AbsoluteWrite(StageType(STX)); break;
@@ -240,6 +250,7 @@ void W65816::decode(bool predecode)
 		case 0xA8: Implied                  (StageType(TAY)); break;
 		case 0xA9: Immediate                (StageType(LDA)); break;
 		case 0xAA: Implied                  (StageType(TAX)); break;
+		case 0xAB: StackPop8                (StageType(PLB)); break;
 		case 0xAC: isIndexRelated=true;Absolute(StageType(LDY)); break;//this is the worst line of code ever wrote in all history
 		case 0xAD: Absolute                 (StageType(LDA)); break;
 		case 0xAE: isIndexRelated=true;Absolute(StageType(LDX)); break;
@@ -282,6 +293,7 @@ void W65816::decode(bool predecode)
 		case 0xD7: DirectIndirectYLong      (StageType(CMP)); break;
 		case 0xD8: Implied                  (StageType(CLD)); break;
 		case 0xD9: AbsoluteY                (StageType(CMP)); break;
+		case 0xDA: isIndexRelated=true;StackPush(StageType(PHX)); break;
 		case 0xDB: ImpliedSpecial           (StageType(STP)); break;
 		case 0xDC: AbsoluteIndirectJML      (StageType(dummyStage)); break;//JML
 		case 0xDD: AbsoluteX                (StageType(CMP)); break;
@@ -310,6 +322,7 @@ void W65816::decode(bool predecode)
 		case 0xF7: DirectIndirectYLong      (StageType(SBC)); break;
 		case 0xF8: Implied                  (StageType(SED)); break;
 		case 0xF9: AbsoluteY                (StageType(SBC)); break;
+		case 0xFA: isIndexRelated=true;StackPop(StageType(PLX)); break;
 		case 0xFB: Implied                  (StageType(XCE)); break;
 		case 0xFC: AbsoluteXIndirectJSR     (StageType(dummyStage)); break;//JSR
 		case 0xFD: AbsoluteX                (StageType(SBC)); break;
@@ -1558,10 +1571,6 @@ void W65816::ImpliedSpecial(StageType&& inst)
 	}
 }	
 	
-	
-	
-	
-/////////////
 void W65816::RelativeBranch(StageType&& inst)
 {
 	if(preDecodeStage)
@@ -1607,6 +1616,125 @@ void W65816::RelativeBranchLong(StageType&& inst)
 	}
 }
 
+void W65816::StackPop(StageType&& inst)
+{
+	if(preDecodeStage)
+	{
+		lastPipelineStage = inst;
+		noAutoIncPC();
+		invalidPrefetch();
+	}
+
+	if(isStageEnabled(0,SIG_ALWAYS))
+	{
+		dummyStage();//The inc is supposed to happen in this stage but I do it all in the "pop" operation
+	}
+	if(isStageEnabled(1,SIG_ALWAYS))
+	{
+		pop(&idb.low);
+	}
+	if(isStageEnabled(2,SIG_MODE16_ONLY))
+	{
+		pop(&idb.high);
+	}
+}
+
+void W65816::StackPop8(StageType&& inst)
+{
+	if(preDecodeStage)
+	{
+		lastPipelineStage = inst;
+		invalidPrefetch();
+		noAutoIncPC();
+	}
+
+	if(isStageEnabled(0,SIG_ALWAYS))
+	{
+		dummyStage();//The inc is supposed to happen in this stage but I do it all in the "pop" operation
+	}
+	if(isStageEnabled(1,SIG_ALWAYS))
+	{
+		pop(&idb.low);
+	}
+}
+
+void W65816::StackPop16(StageType&& inst)
+{
+	if(preDecodeStage)
+	{
+		lastPipelineStage = inst;
+		noAutoIncPC();
+		invalidPrefetch();
+	}
+
+	if(isStageEnabled(0,SIG_ALWAYS))
+	{
+		dummyStage();//The inc is supposed to happen in this stage but I do it all in the "pop" operation
+	}
+	if(isStageEnabled(1,SIG_ALWAYS))
+	{
+		pop(&idb.low);
+	}
+	if(isStageEnabled(2,SIG_ALWAYS))
+	{
+		pop(&idb.high);
+	}
+}
+
+void W65816::StackPush(StageType&& inst)
+{
+	if(preDecodeStage)
+	{
+		noAutoIncPC();
+		invalidPrefetch();
+		inst(this); //execute the instruction early
+	}
+
+	if(isStageEnabled(0,SIG_MODE16_ONLY))
+	{
+		push(&idb.high);
+	}
+	if(isStageEnabled(1,SIG_ALWAYS))
+	{
+		push(&idb.low);
+	}
+}
+
+void W65816::StackPush8(StageType&& inst)
+{
+	if(preDecodeStage)
+	{
+		noAutoIncPC();
+		invalidPrefetch();
+	}
+
+	if(isStageEnabled(0,SIG_ALWAYS))
+	{
+		inst(this);
+		push(&idb.low);
+	}
+}
+
+void W65816::StackPush16(StageType&& inst)
+{
+	if(preDecodeStage)
+	{
+		noAutoIncPC();
+		invalidPrefetch();
+	}
+
+	if(isStageEnabled(0,SIG_ALWAYS))
+	{
+		inst(this); 
+		push(&idb.high);
+	}
+	if(isStageEnabled(1,SIG_ALWAYS))
+	{
+		push(&idb.low);
+	}
+}
+
+/////////////////////
 void W65816::StackInterupt(StageType&& inst)
 {
 	if(preDecodeStage)

@@ -421,9 +421,15 @@ private:
 	void ImmediateSpecial           (StageType&& inst);
 	void Implied                    (StageType&& inst);
 	void ImpliedSpecial             (StageType&& inst);
-
 	void RelativeBranch             (StageType&& inst);
 	void RelativeBranchLong         (StageType&& inst);
+	void StackPop                   (StageType&& inst);
+	void StackPop8                  (StageType&& inst);
+	void StackPop16                 (StageType&& inst);
+	void StackPush                  (StageType&& inst);
+	void StackPush8                 (StageType&& inst);
+	void StackPush16                (StageType&& inst);
+	
 	void StackInterupt              (StageType&& inst);
 	
 	//Instructions
