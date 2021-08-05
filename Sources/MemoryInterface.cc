@@ -2,13 +2,13 @@
 
 MemoryInterface::MemoryInterface()
 {
-    //ctor
+	//ctor
 }
 
 void MemoryInterface::doMemoryOperation(MemoryOperation op, uint8_t* dataAdr, uint8_t* data)
 {
-    if(op == Read)
-        *data = *dataAdr;
-    if(op == Write)
-        *dataAdr = *data;
+	if(op == Read)
+		*data = *dataAdr;
+	if(op == Write)
+		*dataAdr = *data;
 }

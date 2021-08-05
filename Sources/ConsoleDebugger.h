@@ -15,36 +15,36 @@ string csvGet(string src,string field);
 class ConsoleDebugger
 {
 public:
-    ConsoleDebugger(W65816 & cpu);
+	ConsoleDebugger(W65816 & cpu);
 
-    bool executeSystem();
-    bool tick();
-    void processEvent(sf::Event & event);
-    void attachBus(Bus* b);
+	bool executeSystem();
+	bool tick();
+	void processEvent(sf::Event & event);
+	void attachBus(Bus* b);
 
-    void saveTrace(string path);
+	void saveTrace(string path);
 
-    bool checkEvents();
-    void traceOrPrint();
+	bool checkEvents();
+	void traceOrPrint();
 
-    bool debugPrint = true;
-    bool debugTrace = true;
+	bool debugPrint = true;
+	bool debugTrace = true;
 
-    bool stepMode = true;
+	bool stepMode = true;
 
-    int nbExecutedInstructions = 0;
+	int nbExecutedInstructions = 0;
 private:
-    W65816& cpu;
-    Bus * bus;
+	W65816& cpu;
+	Bus * bus;
 
-    bool step = true;
+	bool step = true;
 
-    std::vector<uint32_t> watches;
-    std::vector<uint32_t> program_breakpoints;
+	std::vector<uint32_t> watches;
+	std::vector<uint32_t> program_breakpoints;
 
-    string trace;
+	string trace;
 
-    bool firstTrace = true;
+	bool firstTrace = true;
 };
 
 #endif // CONSOLE_DEBUGGER_H

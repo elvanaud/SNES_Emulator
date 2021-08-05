@@ -10,19 +10,19 @@
 class Cartridge : MemoryInterface
 {
 public:
-    Cartridge();
-    virtual ~Cartridge();
+	Cartridge();
+	virtual ~Cartridge();
 
-    void memoryMap(MemoryOperation op, uint32_t full_adr, uint8_t *data);
-    void load(std::ifstream & inputFile, CartridgeHeader header);
+	void memoryMap(MemoryOperation op, uint32_t full_adr, uint8_t *data);
+	void load(std::ifstream & inputFile, CartridgeHeader header);
 
-    CartridgeHeader header;
+	CartridgeHeader header;
 
 private:
-    unsigned int NumberOfROMBanks = MAX_BANKS;
-    unsigned int BankSize = 0;
+	unsigned int NumberOfROMBanks = MAX_BANKS;
+	unsigned int BankSize = 0;
 
-    uint8_t* romBanks[MAX_BANKS];
+	uint8_t* romBanks[MAX_BANKS];
 };
 
 #endif // CARTRIDGE_H
