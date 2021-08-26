@@ -262,7 +262,6 @@ private:
 	bool doPrefetchInIDB = false;
 	bool isIndexRelated = false;
 	
-	void initializeAdrModeASMDecode();
 	string opcodeASM;
 	string asmLine;
 	enum ASM_AdrModeType{   ASM_ABSOLUTE, ASM_ABSOLUTE_LONG, ASM_ABSOLUTE_X_LONG, ASM_ABSOLUTE_X, ASM_ABSOLUTE_Y, 

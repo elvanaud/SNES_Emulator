@@ -12,8 +12,6 @@ using std::endl;
 
 W65816::W65816()
 {
-	//initializeAdrModeASMDecode();
-
 	pc.set(0xFF); //Becomes useless
 	lastPipelineStage = StageType(dummyStage);
 
@@ -102,11 +100,6 @@ uint16_t W65816::getY()
 {
 	return y.val();
 }
-
-/*Instruction & W65816::getInst()
-{
-	return decodingTable[ir];
-}*/
 
 // ---------- PINS ------------------
 bool W65816::VDA()
@@ -304,31 +297,5 @@ void W65816::generateAddress(uint16_t adr)
 
 void W65816::checkInterupts()
 {
-	//if(tcycle != pipeline.size()) return;
 	if(internalIRQ || internalNMI || internalRST) executeInterupt = true;
 }
-
-/*void W65816::tick()
-{
-	handleValidAddressPINS(ValidAddressState::InternalOperation);
-	if(!rdy || clockStopped)
-	{
-		checkInterupts();
-		if(executeInterupt) rdy = true; //TODO: if rdy is manually low maybe shouldn't resume exec on interupt ? (need to differentiate between user rdy and internal rdy
-		if(clockStopped && internalRST) clockStopped = false;
-		return;
-	}
-
-	for(auto &stage : pipeline[tcycle])
-	{
-		stage(this);
-	}
-	processSignals();
-	++tcycle;
-	if(tcycle == pipeline.size()) checkInterupts();
-
-	if(tcycle >= pipeline.size())
-	{
-		reloadPipeline();
-	}
-}*/

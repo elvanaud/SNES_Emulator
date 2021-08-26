@@ -8,11 +8,6 @@ using std::setw;
 using std::hex;
 using std::stringstream;
 
-void W65816::initializeAdrModeASMDecode()
-{
-
-}
-
 uint32_t W65816::getParam(int index, int length)
 {
 	uint32_t res = 0;
