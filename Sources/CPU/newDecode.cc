@@ -21,6 +21,7 @@ void W65816::tick()
 		isIndexRelated = false; //this must be reset here after the last stage is executed
 		doPrefetchInIDB = false;
 
+		preDecodeStage = true;
 		fetchInc(&pc,&ir);
 		//asm disassembly should be accessible here
 		//move decode(true) here ??
@@ -33,8 +34,6 @@ void W65816::tick()
 	}
 	else if(tcycle == 1)
 	{
-		
-
 		fetch(&pc,&adr.low); //auto inc pc by default...? yes 52 out of 63 adr mode have a incPC signal
 		if(doPrefetchInIDB) idb.low = adr.low;
 		if(prefetchIncPC) ++pc;

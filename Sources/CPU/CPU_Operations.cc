@@ -37,7 +37,7 @@ void W65816::fetch(Register16 *src, uint8_t * dst)
 	if(src == &pc)
 	{
 		state = OperandFetch;
-		if(tcycle == 0) state = OpcodeFetch;
+		if(preDecodeStage && tcycle == 0) state = OpcodeFetch;
 	}
 	handleValidAddressPINS(state);
 	generateAddress(src->val());
