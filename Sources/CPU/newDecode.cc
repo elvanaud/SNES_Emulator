@@ -93,7 +93,8 @@ void W65816::decode(bool predecode)
 			{
 				--pc; 
 				invalidPrefetch(); 
-				vda = vpa = false; //force internal operation for this cycle too (not the expected behavior but I need it for tracing the asm)
+				if(pipelineContent != RESET_INTERUPT) 
+					vda = vpa = false; //force internal operation for this cycle too (not the expected behavior but I need it for tracing the asm)
 			} 
 			executeInterupt = false;
 		}
