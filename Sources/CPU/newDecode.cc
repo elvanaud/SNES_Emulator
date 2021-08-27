@@ -20,6 +20,7 @@ void W65816::tick()
 		prefetchIncPC = true;
 		isIndexRelated = false; //this must be reset here after the last stage is executed
 		doPrefetchInIDB = false;
+		asmLine = "if you see this there is a problem... a big problem";
 
 		preDecodeStage = true;
 		fetchInc(&pc,&ir);
@@ -88,7 +89,12 @@ void W65816::decode(bool predecode)
 			if(internalNMI) {pipelineContent = NMI_INTERUPT;}
 			if(internalRST) {pipelineContent = RESET_INTERUPT;}
 
-			if(effectiveInterupt) {--pc; invalidPrefetch();}
+			if(effectiveInterupt) 
+			{
+				--pc; 
+				invalidPrefetch(); 
+				vda = vpa = false; //force internal operation for this cycle too (not the expected behavior but I need it for tracing the asm)
+			} 
 			executeInterupt = false;
 		}
 	}
