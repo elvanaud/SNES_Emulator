@@ -12,7 +12,7 @@ myOffset = 0
 
 #Syncing the logs together
 #[myLogLine,sourceLogLine]
-syncLogs = [[1697,1671],[1744,1716],[1857,1827],[1877,1849]]
+#syncLogs = [[1697,1671],[1744,1716],[1857,1827],[1877,1849]]
 syncLogs = []
 for syncLine in syncLogs:
 	startLine = syncLine[1]
@@ -20,7 +20,7 @@ for syncLine in syncLogs:
 
 def checkLoopSync(line):
 	elements = line.split()
-	return elements[1] == "cmp" and elements[2] == "$2140"
+	return (elements[1] == "cmp" and elements[2] == "$2140") or (elements[1] == "beq" and elements[2] == "$8034")
 
 syncingBNEmyAdvance = False
 syncingBNEsourceAdvance = False
