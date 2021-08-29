@@ -11,9 +11,10 @@ using std::stringstream;
 uint32_t W65816::getParam(int index, int length)
 {
 	uint32_t res = 0;
+	uint32_t bank = uint32_t(pbr)<<16;
 
 	for(int adr = pc.val()+index-1, offset = 0;length > 0; --length,++adr,offset+=8)
-		res |= uint32_t(bus->privateRead(adr))<<offset;
+		res |= uint32_t(bus->privateRead(bank|adr))<<offset;
 	return res;
 }
 
@@ -53,7 +54,7 @@ void W65816::processASM(ASM_AdrModeType type)
 		 stream << " (" << std::hex << prefix << setfill('0')<<setw(4)<<getParam(1,2) << ")";
 		 break;
 	case ASM_ACCUMULATOR:
-		//stream << " A"; //yeah it's empty
+		if(asmAccAddFinalA) stream << " a"; 
 		break;
 	case ASM_DIRECT:
 		stream << " " << std::hex << prefix << setfill('0')<<setw(2)<<getParam(1,1) << "";
@@ -81,7 +82,7 @@ void W65816::processASM(ASM_AdrModeType type)
 		break;
 	case ASM_IMMEDIATE:
 		dataWidth = 1;
-		if(!p.mem8 || (isIndexRelated && !p.index8))
+		if((!isIndexRelated && !p.mem8) || (isIndexRelated && !p.index8))
 		{
 			dataWidth = 2;
 		}

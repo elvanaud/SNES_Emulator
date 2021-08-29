@@ -132,7 +132,7 @@ private:
 		}
 	};
 
-	Register16 pc; //Could be uint16_t directly ?
+	Register16 pc;
 	Register16 adr;
 	uint32_t addressBusBuffer;
 
@@ -271,6 +271,7 @@ private:
 							ASM_IMPLIED, ASM_RELATIVE_BRANCH, ASM_RELATIVE_BRANCH_LONG};
 	
 	void processASM(ASM_AdrModeType type);
+	bool asmAccAddFinalA = false;
 	
 	
 	enum EnablingCondition{

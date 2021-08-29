@@ -77,9 +77,9 @@ void ConsoleDebugger::processEvent(sf::Event & event)
 			cout<<"Breakpoint at address:"<<endl;
 			cin>>std::hex>>user_entry;
 
-			//program_breakpoints.push_back(user_entry);
+			program_breakpoints.push_back(user_entry);
 			//if(beforeLastElem<0)
-			for(int i = 0; i < beforeLastElem;++i)
+			/*for(int i = 0; i < beforeLastElem;++i)
 			{
 				if(program_breakpoints[i] == user_entry)
 					delete_bp = true;
@@ -91,7 +91,7 @@ void ConsoleDebugger::processEvent(sf::Event & event)
 			if(program_breakpoints[beforeLastElem]==user_entry || delete_bp)
 				program_breakpoints.pop_back();
 			else
-				program_breakpoints.push_back(user_entry);
+				program_breakpoints.push_back(user_entry);*/
 
 			break;
 		case sf::Keyboard::D:

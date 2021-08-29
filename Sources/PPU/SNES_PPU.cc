@@ -57,6 +57,10 @@ void SNES_PPU::memoryMap(MemoryOperation op, uint32_t full_adr, uint8_t* data)
 			++cgAddress;
 			cgAddress &= 0x1FF; //Clip to 9 bits
 			break;
+		//control:
+		case 0x4210:
+			*data = 0xc2;//todo: 
+			break;
 		}
 	}
 	else //Write

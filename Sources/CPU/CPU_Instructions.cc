@@ -71,6 +71,7 @@ void W65816::ASL()
 	if(preDecodeStage)
 	{
 		opcodeASM = "ASL";
+		asmAccAddFinalA = true;
 		return;
 	}
 	int offset = 7;
@@ -424,7 +425,7 @@ void W65816::JML()
 {
 	if(preDecodeStage)
 	{
-		opcodeASM = "JML";
+		opcodeASM = "JMP";//used to be jml but bsnes uses "jmp" (too bad)
 		return;
 	}
 }
@@ -490,6 +491,7 @@ void W65816::LSR()
 	if(preDecodeStage)
 	{
 		opcodeASM = "LSR";
+		asmAccAddFinalA = true;
 		return;
 	}
 	uint16_t val = getReg(idb);
@@ -731,7 +733,8 @@ void W65816::ROL()
 {
 	if(preDecodeStage)
 	{
-		opcodeASM = "ROL A";
+		opcodeASM = "ROL";
+		asmAccAddFinalA = true;
 		return;
 	}
 	int offset = 7;

@@ -93,6 +93,10 @@ void Bus::memoryMap(MemoryOperation op, uint32_t full_adr, uint8_t *data)
 			{
 				dmaHandler.memoryMap(op,full_adr,data);
 			}
+			else if(adr == 0x4210)
+			{
+				ppu.memoryMap(op,full_adr,data);
+			}
 		}
 	}
 }

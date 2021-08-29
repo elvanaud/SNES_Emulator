@@ -20,6 +20,7 @@ void W65816::tick()
 		prefetchIncPC = true;
 		isIndexRelated = false; //this must be reset here after the last stage is executed
 		doPrefetchInIDB = false;
+		asmAccAddFinalA = false;
 		asmLine = "if you see this there is a problem... a big problem";
 
 		preDecodeStage = true;
